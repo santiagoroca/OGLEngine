@@ -1,7 +1,7 @@
 #[derive(Debug, PartialEq, Clone)]
 pub struct Token {
-    _type: String,
-    _value: String
+    pub _type: String,
+    pub _value: String
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -35,20 +35,7 @@ impl Tokenizer {
         }
     }
 
-    // Reads the entire string and returns a vector of tokens
-    pub fn read (&mut self) -> Vec<Token> {
-
-        let mut blocks = Vec::<Token>::new();
-
-        while !self.eof() {
-            blocks.push(self.read_next());
-        }
-
-        blocks
-
-    }
-
-    fn read_next (&mut self) -> Token {
+    pub fn read_next (&mut self) -> Token {
 
         // Reads the file until it finds a non-white space char
         self.read_while_is_white_space();
@@ -100,7 +87,7 @@ impl Tokenizer {
 
     // Returns true if the current position is the end of the file
     // False otherwise
-    fn eof (&self) -> bool {
+    pub fn eof (&self) -> bool {
         self._pointer == self._tokens.len() - 1
     }
 

@@ -2,6 +2,7 @@ mod Tokenizer;
 mod Parser;
 
 use Tokenizer::Tokenizer as OtherTokenizer;
+use Parser::Parser as OtherParser;
 use std::fs::File;
 use std::io::prelude::*;
 
@@ -17,10 +18,12 @@ fn main () {
 
     let chars:Vec<char> = contents.chars().collect();
 
-    let mut tokens = OtherTokenizer {
-        _tokens: chars,
-        _pointer: 0
+    let mut parser = OtherParser {
+        tokenizer: OtherTokenizer {
+            _tokens: chars,
+            _pointer: 0
+        }
     };
 
-    println!("{:?}", tokens.read());
+    println!("{:?}", parser.parse());
 }
