@@ -23,7 +23,7 @@ impl Parser {
 
 
         while !self.tokenizer.eof() {
-            let mut token = self.tokenizer.read_next();
+            let token = self.tokenizer.read_next();
             let block = self.parse_next(token);
 
             if block._type != "EMPTY" {
@@ -37,11 +37,11 @@ impl Parser {
 
     fn parse_next (&mut self, token: Token) -> Block {
 
-        match token._value.as_ref() {
+        match token._type.as_ref() {
 
-            "scene"  => return self.read_scene(),
+            "STRING"  => return self.read_key_value(token),
 
-            _        => return Block {
+            _         => return Block {
                             _type: String::from("EMPTY"),
                             _args: Vec::<Token>::new(),
                             _childs: Vec::<Block>::new()
@@ -51,27 +51,30 @@ impl Parser {
 
     }
 
-    fn read_scene (&mut self) -> Block {
+    fn read_key_value (&mut self, token: Token) -> Block {
 
-        println!("{:?}", "NEW SCENE");
         let mut block = Block {
-            _type: String::from("SCENE"),
+            _type: token._value,
             _args: Vec::<Token>::new(),
             _childs: Vec::<Block>::new()
         };
 
-        // Add two arguments to Scene
-        block._args.push(self.tokenizer.read_next());
-        block._args.push(self.tokenizer.read_next());
+        let token = self.tokenizer.read_next();
 
-        // Skip OBRACE
-        self.tokenizer.read_next();
+        // Optional two arguments
+        if token._type != "OBRACE" {
+
+            // Add two arguments to Scene
+            block._args.push(token);
+            block._args.push(self.tokenizer.read_next());
+
+            // Skip OBRACE
+            self.tokenizer.read_next();
+
+        }
 
         let mut token = self.tokenizer.read_next();
-        println!("{:?}", token);
         while token._type != "CBRACE" {
-            println!("{:?}", token);
-
             let __block = self.parse_next(token);
 
             if __block._type != "EMPTY" {

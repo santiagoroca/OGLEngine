@@ -1,9 +1,6 @@
 scene 0 0 {
 
-  scene 0 0 {
-    scene 0 0 { }
-    scene 0 0 { }
-  }
-  scene 0 0 { }
+  cube {}
+  box 15 15 {}
 
 }
