@@ -1,0 +1,7 @@
+[package]
+name = "compiler"
+version = "0.1.0"
+authors = ["Santiago Roca <snroca@hotmail.com>"]
+
+[dependencies]
+regex = "0.2"

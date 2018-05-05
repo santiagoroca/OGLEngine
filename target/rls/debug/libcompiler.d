@@ -1,0 +1,1 @@
+/home/santi/Documentos/Projects/Rust/compiler/target/rls/debug/libcompiler.rmeta: /home/santi/Documentos/Projects/Rust/compiler/src/Tokenizer.rs /home/santi/Documentos/Projects/Rust/compiler/src/main.rs

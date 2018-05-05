@@ -1,0 +1,30 @@
+scene {
+
+  geometry 1 1 {
+    source fileobj
+  }
+
+  cube 0 0 {
+
+      animation {
+        rotate 180deg 0 1 0
+
+        action click {
+          color red
+        }
+
+        color blue
+      }
+
+  }
+
+  cube 2 2
+  cube 2 2
+  cube 2 2
+  cube 2 2
+  cube 2 2
+  cube 2 2
+  cube 2 2
+  cube 2 2
+
+}
