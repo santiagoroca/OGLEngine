@@ -1,19 +1,9 @@
 scene 0 0 {
 
-  cube 0 0 {
-
-    cube 0 0 { }
-
-    rotate 1deg 0 1 0
-
+  scene 0 0 {
+    scene 0 0 { }
+    scene 0 0 { }
   }
-
-  cube 0 0 {
-
-  }
-  
-  cube 0 0 {
-
-  }
+  scene 0 0 { }
 
 }
