@@ -1,12 +1,11 @@
 use Tokenizer::Tokenizer as OtherTokenizer;
 use Tokenizer::Token;
 
-
 #[derive(Debug, PartialEq, Clone)]
 pub struct Block {
-    _type: String,
-    _args: Vec<Token>,
-    _childs: Vec<Block>
+    pub _type: String,
+    pub _args: Vec<Token>,
+    pub _childs: Vec<Block>
 }
 
 #[derive(Debug, PartialEq, Clone)]

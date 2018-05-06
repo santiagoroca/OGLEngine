@@ -1,6 +1,3 @@
-scene 0 0 {
-
-  cube {}
-  box 15 15 {}
+scene 600 800 {
 
 }
