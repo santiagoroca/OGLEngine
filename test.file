@@ -3,4 +3,22 @@ scene
 
   cube;
 
+  cube
+  {
+    position -2 0 0;
+    scale 0.5;
+  }
+
+  cube
+  {
+    position 2 0 0;
+    scale 0.5;
+  }
+
+  cube
+  {
+    position -5 0 0;
+    scale 0.5 0.5 1.0;
+  }
+
 }

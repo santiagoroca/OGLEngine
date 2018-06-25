@@ -69,6 +69,18 @@
             Array.prototype.push.apply(scene_faces, [0,1,2,0,2,3,3,2,4,3,4,5,0,6,1,0,7,6,7,4,6,7,5,6,1,6,4,1,4,2,0,5,7,0,3,5].map(f => f + polygon_offset));
             polygon_offset += 8;
             
+            Array.prototype.push.apply(scene_vertices, [-1.5,-0.5,-0.5,-1.5,0.5,-0.5,-0.5,0.5,-0.5,-0.5,-0.5,-0.5,-0.5,0.5,0.5,-0.5,-0.5,0.5,-1.5,0.5,0.5,-1.5,-0.5,0.5]);
+            Array.prototype.push.apply(scene_faces, [0,1,2,0,2,3,3,2,4,3,4,5,0,6,1,0,7,6,7,4,6,7,5,6,1,6,4,1,4,2,0,5,7,0,3,5].map(f => f + polygon_offset));
+            polygon_offset += 8;
+            
+            Array.prototype.push.apply(scene_vertices, [0.5,-0.5,-0.5,0.5,0.5,-0.5,1.5,0.5,-0.5,1.5,-0.5,-0.5,1.5,0.5,0.5,1.5,-0.5,0.5,0.5,0.5,0.5,0.5,-0.5,0.5]);
+            Array.prototype.push.apply(scene_faces, [0,1,2,0,2,3,3,2,4,3,4,5,0,6,1,0,7,6,7,4,6,7,5,6,1,6,4,1,4,2,0,5,7,0,3,5].map(f => f + polygon_offset));
+            polygon_offset += 8;
+            
+            Array.prototype.push.apply(scene_vertices, [-3,-0.5,-1,-3,0.5,-1,-2,0.5,-1,-2,-0.5,-1,-2,0.5,1,-2,-0.5,1,-3,0.5,1,-3,-0.5,1]);
+            Array.prototype.push.apply(scene_faces, [0,1,2,0,2,3,3,2,4,3,4,5,0,6,1,0,7,6,7,4,6,7,5,6,1,6,4,1,4,2,0,5,7,0,3,5].map(f => f + polygon_offset));
+            polygon_offset += 8;
+            
         vbuffer = webgl.createBuffer ();
         webgl.bindBuffer(webgl.ARRAY_BUFFER, vbuffer);
         webgl.bufferData(webgl.ARRAY_BUFFER, new Float32Array(scene_vertices).buffer, webgl.STATIC_DRAW);
