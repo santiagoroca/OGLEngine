@@ -58,30 +58,35 @@ impl Parser {
             _childs: Vec::<Block>::new()
         };
 
-        let token = self.tokenizer.read_next();
-
-        // Optional two arguments
-        if token._type != "OBRACE" {
-
-            // Add two arguments to Scene
-            block._args.push(token);
-            block._args.push(self.tokenizer.read_next());
-
-            // Skip OBRACE
-            self.tokenizer.read_next();
-
-        }
-
         let mut token = self.tokenizer.read_next();
-        while token._type != "CBRACE" {
-            let __block = self.parse_next(token);
 
-            if __block._type != "EMPTY" {
-                block._childs.push(__block);
+        match token._type.as_ref() {
+
+            "OBRACE"     => {
+
+                let mut token = self.tokenizer.read_next();
+                while token._type != "CBRACE" {
+                    let __block = self.parse_next(token);
+
+                    if __block._type != "EMPTY" {
+                        block._childs.push(__block);
+                    }
+
+                    token = self.tokenizer.read_next();
+                }
+
             }
 
-            token = self.tokenizer.read_next();
-        }
+            _            => {
+
+                while token._type != "SEMICOLON" {
+                    block._args.push(token);
+                    token = self.tokenizer.read_next();
+                }
+
+            }
+
+        };
 
         block
 

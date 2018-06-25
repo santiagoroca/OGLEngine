@@ -1,5 +1,5 @@
 all:
 	mkdir -p build
 	cargo run
-	g++ build/out.cpp -o build/main -lGL -lGLU -lglut
+	cp build/out.js client/src/bundle.js
 	#rm build/out.cpp

@@ -14,7 +14,7 @@ impl Tokenizer {
 
     // Numbers and letters a-z 0-9
     fn is_digit (&self, _char: char) -> bool {
-        _char.is_alphanumeric()
+        _char.is_alphanumeric() || _char == '-' || _char == '.'
     }
 
     // Numbers and letters a-z 0-9
@@ -25,6 +25,11 @@ impl Tokenizer {
     // Numbers and letters a-z 0-9
     fn is_cbrace (&self, _char: char) -> bool {
         _char == '}'
+    }
+
+    // Numbers and letters a-z 0-9
+    fn is_semicolon (&self, _char: char) -> bool {
+        _char == ';'
     }
 
     // Reads from the chars stream, in the current _pointer
@@ -74,6 +79,15 @@ impl Tokenizer {
             }
         }
 
+        // If its a digit, keep reading the rest of the string
+        if self.is_semicolon(_char) {
+            self._pointer += 1;
+            return Token {
+                _type: String::from("SEMICOLON"),
+                _value: String::new()
+            }
+        }
+
         return Token {
             _type: String::from("EOF"),
             _value: String::new()
@@ -99,7 +113,7 @@ impl Tokenizer {
             _value: String::new()
         };
 
-        while self._tokens[self._pointer].is_alphanumeric() {
+        while self.is_digit(self._tokens[self._pointer]) {
             token._value.push(self._tokens[self._pointer]);
             self._pointer += 1;
         }

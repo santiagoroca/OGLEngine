@@ -1,3 +1,6 @@
-scene 600 800 {
+scene
+{
+
+  cube;
 
 }

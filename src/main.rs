@@ -1,3 +1,5 @@
+#![allow(non_snake_case)]
+
 mod Tokenizer;
 mod Parser;
 mod Compiler;
@@ -29,7 +31,7 @@ fn main () {
         }
     };
 
-    let mut output = File::create("./build/out.cpp")
+    let mut output = File::create("./build/out.js")
         .expect("Unable to create file");
 
     output.write_all(compiler.compile().as_bytes())
