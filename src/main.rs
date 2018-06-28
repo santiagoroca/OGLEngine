@@ -3,10 +3,13 @@
 mod Tokenizer;
 mod Parser;
 mod Compiler;
+mod GeometryWriter;
+mod Geometry;
+mod Shader;
+mod Transformable;
+mod Scene;
 
 use Compiler::Compiler as OtherCompiler;
-use Tokenizer::Tokenizer as OtherTokenizer;
-use Parser::Parser as OtherParser;
 use std::fs::File;
 use std::io::prelude::*;
 
@@ -22,14 +25,7 @@ fn main () {
 
     let chars:Vec<char> = contents.chars().collect();
 
-    let mut compiler = OtherCompiler {
-        parser: OtherParser {
-            tokenizer: OtherTokenizer {
-                _tokens: chars,
-                _pointer: 0
-            }
-        }
-    };
+    let mut compiler = OtherCompiler::new(chars);
 
     let mut output = File::create("./build/out.js")
         .expect("Unable to create file");

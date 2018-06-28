@@ -1,24 +1,19 @@
 scene
 {
 
-  cube;
+  light 0.5 0.0 0.0;
+  light -0.5 0.0 -0.5;
 
-  cube
-  {
-    position -2 0 0;
+  cube {
     scale 0.5;
+    translate 2 0 0;
   }
 
-  cube
-  {
-    position 2 0 0;
+  cube {
+    translate -2 0 0;
+    rotate 0.5 0 1 0;
+    rotate 0.5 1 0 0;
     scale 0.5;
-  }
-
-  cube
-  {
-    position -5 0 0;
-    scale 0.5 0.5 1.0;
   }
 
 }

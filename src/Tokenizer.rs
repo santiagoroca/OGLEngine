@@ -12,6 +12,13 @@ pub struct Tokenizer {
 
 impl Tokenizer {
 
+    pub fn new (chars: Vec<char>) -> Tokenizer {
+        Tokenizer {
+            _tokens: chars,
+            _pointer: 0
+        }
+    }
+
     // Numbers and letters a-z 0-9
     fn is_digit (&self, _char: char) -> bool {
         _char.is_alphanumeric() || _char == '-' || _char == '.'

@@ -15,6 +15,12 @@ pub struct Parser {
 
 impl Parser {
 
+    pub fn new (chars: Vec<char>) -> Parser {
+        Parser {
+            tokenizer: OtherTokenizer::new(chars)
+        }
+    }
+
     // Reads the entire string and returns a vector of tokens
     pub fn parse (&mut self) -> Vec<Block> {
 

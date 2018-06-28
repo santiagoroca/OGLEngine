@@ -1,12 +1,28 @@
 use Parser::Parser as OtherParser;
+use GeometryWriter::GeometryWriter as OtherGeometryWriter;
+use Geometry::Geometry;
+use Shader::Shader;
 use Parser::Block;
+use Transformable::Transformable;
+use Scene::Scene;
 
-#[derive(Debug, PartialEq, Clone)]
 pub struct Compiler {
-    pub parser: OtherParser
+    pub parser: OtherParser,
+    pub geometryWriter: OtherGeometryWriter,
+    geometry_offset: u16,
+    shader: Shader
 }
 
 impl Compiler {
+
+    pub fn new (chars: Vec<char>) -> Compiler {
+        Compiler {
+           geometryWriter: OtherGeometryWriter::new(),
+           parser: OtherParser::new(chars),
+           geometry_offset: 0,
+           shader: Shader::new()
+        }
+    }
 
     pub fn compile (&mut self) -> String {
 
@@ -19,200 +35,133 @@ impl Compiler {
 
         // Create the program tree for each Block
         for block in blocks {
-            out.push_str(&self.build_block(block));
+            out.push_str(&self.build_block(block, &mut Geometry::new(Vec::<f32>::new(), Vec::<u16>::new(), 0)));
         }
 
         out
 
     }
 
-    fn build_block (&self, block: Block) -> String {
+    fn build_block<T: Transformable> (&mut self, block: Block, parent: &mut T) -> String {
 
         // Create the program tree for each Block
         match block._type.as_ref() {
             "scene" => self.build_scene(block),
             "cube" => self.build_cube(block),
+            "light" => self.build_light(block),
+            "translate" => self.build_translate(block, parent),
+            "scale" => self.build_scale(block, parent),
+            "rotate" => self.build_rotate(block, parent),
             _       => String::new()
         }
 
     }
 
-    fn build_scene (&self, block: Block) -> String {
+    fn build_rotate<T: Transformable> (&mut self, block: Block, parent: &mut T) -> String {
+        parent.rotate(
+            block._args[0]._value.parse().unwrap(),
+            [
+                block._args[1]._value.parse().unwrap(),
+                block._args[2]._value.parse().unwrap(),
+                block._args[3]._value.parse().unwrap()
+            ].to_vec()
+        );
+        String::from("")
+    }
 
-        // Output Program
-        let mut out = String::new();
+    fn build_scale<T: Transformable> (&mut self, block: Block, parent: &mut T) -> String {
+        parent.scale(block._args[0]._value.parse().unwrap());
+        String::from("")
+    }
 
-        //
-        out.push_str("
-            const canvas = document.getElementById  ('target-canvas');
-            canvas.width = canvas.clientWidth;
-            canvas.height = canvas.clientHeight;
-            const webgl = canvas.getContext('webgl');
-            webgl.getExtension('OES_standard_derivatives');
-            webgl.enable(webgl.DEPTH_TEST);
-            webgl.depthFunc(webgl.LEQUAL);
-            webgl.clear(webgl.DEPTH_BUFFER_BIT);
-            webgl.clear(webgl.COLOR_BUFFER_BIT);
-            webgl.viewport(0, 0, canvas.clientWidth, canvas.clientHeight);
-            const shaderProgram = webgl.createProgram();
-            const fragment = webgl.createShader(webgl.FRAGMENT_SHADER)
-            webgl.shaderSource(fragment, `
-                #extension GL_OES_standard_derivatives : enable\\n
-                precision lowp float;
-                varying vec3 vPosition;
-                vec3 normals(vec3 pos) {
-                  vec3 fdx = dFdx(pos);
-                  vec3 fdy = dFdy(pos);
-                  return normalize(cross(fdx, fdy));
-                }
-                void main() {{
-                    /*vec3 normal = normalize(normals(vPosition));
-                    float radialLightAttenuation = max(0.0, dot(normal, normalize(vec3(0.5, 0.0, 0.5))));*/
-                    gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
-                }}
-            `);
-            webgl.compileShader(fragment);
-            const vertex = webgl.createShader(webgl.VERTEX_SHADER)
-            webgl.shaderSource(vertex, `
-                uniform mat4 uPMVMatrix;
-                uniform mat4 pMatrix;
-                attribute lowp vec3 aVertexPosition;
-                varying vec3 vPosition;
-                void main(void) {{
-                    gl_Position = pMatrix * uPMVMatrix * vec4(aVertexPosition, 1.0);
-                    vPosition = aVertexPosition;
-                }}
-            `);
-            webgl.compileShader(vertex);
-            webgl.attachShader(shaderProgram, vertex);
-            webgl.attachShader(shaderProgram, fragment);
-            webgl.linkProgram(shaderProgram);
-            webgl.useProgram(shaderProgram);
-            shaderProgram.vertexPositionAttribute = webgl.getAttribLocation(shaderProgram, 'aVertexPosition');
-            webgl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
-            const aspect = canvas.width / canvas.height;
-            const a = 1 * Math.tan(45 * Math.PI / 360);
-            const b = a * aspect;
-            const h = b + b, i = a + a, j = 10 - 1;
-            webgl.uniformMatrix4fv(webgl.getUniformLocation(shaderProgram, 'pMatrix'), false, [
-                1 * 2 / h, 0, 0, 0,
-                0, 1 * 2 / i, 0, 0,
-                0, 0, -11 / j, -1,
-                0, 0, -(10 * 1 * 2) / j, 0
-            ]);
-            webgl.uniformMatrix4fv(webgl.getUniformLocation(shaderProgram, 'uPMVMatrix'), false, [
-                1, 0, 0, 0,
-                0, 1, 0, 0,
-                0, 0, 1, 0,
-                0, 0, -5, 1
-            ]);
-            const scene_vertices = [];
-            const scene_faces = [];
-            let polygon_offset = 0;
-        ");
+    fn build_translate<T: Transformable> (&mut self, block: Block, parent: &mut T) -> String {
+        parent.translate(
+            [
+                block._args[0]._value.parse().unwrap(),
+                block._args[1]._value.parse().unwrap(),
+                block._args[2]._value.parse().unwrap()
+            ].to_vec()
+        );
+        String::from("")
+    }
 
-        // Create the program tree for each Block
-        for block in block._childs {
-            out.push_str(&self.build_block(block));
-        }
+    fn build_light (&mut self, block: Block) -> String {
 
-        out.push_str("
-        vbuffer = webgl.createBuffer ();
-        webgl.bindBuffer(webgl.ARRAY_BUFFER, vbuffer);
-        webgl.bufferData(webgl.ARRAY_BUFFER, new Float32Array(scene_vertices).buffer, webgl.STATIC_DRAW);
-        webgl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, 3, webgl.FLOAT, false, 0, 0);
-        fbuffer = webgl.createBuffer ();
-        webgl.bindBuffer(webgl.ELEMENT_ARRAY_BUFFER, fbuffer);
-        webgl.bufferData(webgl.ELEMENT_ARRAY_BUFFER, new Uint16Array(scene_faces).buffer, webgl.STATIC_DRAW);
-        webgl.drawElements(webgl.TRIANGLES, scene_faces.length, webgl.UNSIGNED_SHORT, 0);
-        ");
+        self.shader.addLight([
+            block._args[0]._value.parse().unwrap(),
+            block._args[1]._value.parse().unwrap(),
+            block._args[2]._value.parse().unwrap()
+        ]);
 
-        out
+        String::from("")
 
     }
 
-    fn build_cube (&self, block: Block) -> String {
+    fn build_scene (&mut self, block: Block) -> String {
 
         // Output Program
         let mut out = String::new();
 
-        //
-        let mut vertices = [
-            -1.0, -1.0, -1.0, -1.0, 1.0, -1.0, 1.0, 1.0,
-            -1.0, 1.0, -1.0, -1.0, 1.0, 1.0, 1.0, 1.0,
-            -1.0, 1.0, -1.0, 1.0, 1.0, -1.0, -1.0, 1.0
-        ];
+        let mut scene = Scene::new();
 
-        //
-        let faces = [
-            0, 1, 2, 0, 2, 3, 3, 2, 4, 3, 4, 5,
-            0, 6, 1, 0, 7, 6, 7, 4, 6, 7, 5, 6,
-            1, 6, 4, 1, 4, 2, 0, 5, 7, 0, 3, 5
-        ];
-
+        // Create the program tree for each Block
         for block in block._childs {
-
-            match block._type.as_ref() {
-
-                "position" => {
-
-                    let x: f32 = block._args[0]._value.parse().unwrap();
-                    let y: f32 = block._args[1]._value.parse().unwrap();
-                    let z: f32 = block._args[2]._value.parse().unwrap();
-
-                    let mut i = 0;
-                    while i < vertices.len() {
-                        vertices[i] += x;
-                        vertices[i + 1] += y;
-                        vertices[i + 2] += z;
-                        i += 3;
-                    }
-
-                }
-
-                "scale" => {
-
-                    let mut x = 1.0;
-                    let mut y = 1.0;
-                    let mut z = 1.0;
-
-                    if block._args.len() == 1 {
-                        x = block._args[0]._value.parse().unwrap();
-                        y = block._args[0]._value.parse().unwrap();
-                        z = block._args[0]._value.parse().unwrap();
-                    } else {
-                        x = block._args[0]._value.parse().unwrap();
-                        y = block._args[1]._value.parse().unwrap();
-                        z = block._args[2]._value.parse().unwrap();
-                    }
-
-                    let mut i = 0;
-                    while i < vertices.len() {
-                        vertices[i] *= x;
-                        vertices[i + 1] *= y;
-                        vertices[i + 2] *= z;
-                        i += 3;
-                    }
-
-                }
-
-                _ => {}
-
-            }
-
+            out.push_str(&self.build_block(block, &mut scene));
         }
 
-        out.push_str(&format!(
-            "
-            Array.prototype.push.apply(scene_vertices, [{}]);
-            Array.prototype.push.apply(scene_faces, [{}].map(f => f + polygon_offset));
-            polygon_offset += 8;
+        let head = String::from(format!("
+                {}
+                {}
+                {}
+                {}
+                {}
             ",
-            vertices.iter().map(|s| s.to_string()).collect::<Vec<String>>().join(","),
-            faces.iter().map(|s| s.to_string()).collect::<Vec<String>>().join(",")
-        ));
+            scene.canvasConfiguration(),
+            self.shader.getShader(),
+            scene.getTransformations(),
+            out,
+            self.geometryWriter.loaders)
+        );
 
-        out
+        head
+
+    }
+
+    fn build_cube (&mut self, block: Block) -> String {
+
+        //
+        let vertices : Vec<f32> = [
+            -1.0, -1.0,  1.0, 1.0, -1.0,  1.0, 1.0,  1.0,  1.0, -1.0,  1.0,  1.0,
+            -1.0, -1.0, -1.0, -1.0,  1.0, -1.0, 1.0,  1.0, -1.0, 1.0, -1.0, -1.0,
+            -1.0,  1.0, -1.0, -1.0,  1.0,  1.0, 1.0,  1.0,  1.0, 1.0,  1.0, -1.0,
+            -1.0, -1.0, -1.0, 1.0, -1.0, -1.0, 1.0, -1.0,  1.0, -1.0, -1.0,  1.0,
+            1.0, -1.0, -1.0, 1.0,  1.0, -1.0, 1.0,  1.0,  1.0, 1.0, -1.0,  1.0,
+            -1.0, -1.0, -1.0, -1.0, -1.0,  1.0, -1.0,  1.0,  1.0, -1.0,  1.0, -1.0
+        ].to_vec();
+
+        //
+        let faces : Vec<u16> = [
+            0,  1,  2, 0,  2,  3,
+            4,  5,  6, 4,  6,  7,
+            8,  9,  10, 8,  10, 11,
+            12, 13, 14, 12, 14, 15,
+            16, 17, 18, 16, 18, 19,
+            20, 21, 22, 20, 22, 23
+        ].to_vec();
+
+        let mut geometry = Geometry::new(vertices, faces, self.geometry_offset);
+
+        self.geometry_offset += geometry.getOffset();
+
+        for block in block._childs {
+            self.build_block(block, &mut geometry);
+        }
+
+        //
+        self.geometryWriter.write(geometry);
+
+        //
+        String::from("")
 
     }
 

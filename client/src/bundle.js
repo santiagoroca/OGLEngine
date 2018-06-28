@@ -1,5 +1,5 @@
 
-            const canvas = document.getElementById  ('target-canvas');
+            const canvas = document.getElementById('target-canvas');
             canvas.width = canvas.clientWidth;
             canvas.height = canvas.clientHeight;
             const webgl = canvas.getContext('webgl');
@@ -9,35 +9,45 @@
             webgl.clear(webgl.DEPTH_BUFFER_BIT);
             webgl.clear(webgl.COLOR_BUFFER_BIT);
             webgl.viewport(0, 0, canvas.clientWidth, canvas.clientHeight);
+            
             const shaderProgram = webgl.createProgram();
             const fragment = webgl.createShader(webgl.FRAGMENT_SHADER)
             webgl.shaderSource(fragment, `
-                #extension GL_OES_standard_derivatives : enable\n
-                precision lowp float;
-                varying vec3 vPosition;
-                vec3 normals(vec3 pos) {
-                  vec3 fdx = dFdx(pos);
-                  vec3 fdy = dFdy(pos);
-                  return normalize(cross(fdx, fdy));
-                }
-                void main() {{
-                    /*vec3 normal = normalize(normals(vPosition));
-                    float radialLightAttenuation = max(0.0, dot(normal, normalize(vec3(0.5, 0.0, 0.5))));*/
-                    gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
-                }}
-            `);
+
+            #extension GL_OES_standard_derivatives : enable\n
+            precision lowp float;
+
+            varying vec3 vPosition;
+
+            vec3 normals(vec3 pos) {
+              vec3 fdx = dFdx(pos);
+              vec3 fdy = dFdy(pos);
+              return normalize(cross(fdx, fdy));
+            }
+
+            void main() {
+                vec3 normal = normalize(normals(vPosition));
+                float attenuation = 0.0;
+                attenuation += max(0.0, dot(normal, normalize(vec3(0.5, 0, 0))));
+attenuation += max(0.0, dot(normal, normalize(vec3(-0.5, 0, -0.5))));
+                gl_FragColor = vec4(attenuation, attenuation, attenuation, 1.0);
+            }
+
+        `);
             webgl.compileShader(fragment);
             const vertex = webgl.createShader(webgl.VERTEX_SHADER)
             webgl.shaderSource(vertex, `
-                uniform mat4 uPMVMatrix;
-                uniform mat4 pMatrix;
-                attribute lowp vec3 aVertexPosition;
-                varying vec3 vPosition;
-                void main(void) {{
-                    gl_Position = pMatrix * uPMVMatrix * vec4(aVertexPosition, 1.0);
-                    vPosition = aVertexPosition;
-                }}
-            `);
+
+            uniform mat4 uPMVMatrix;
+            uniform mat4 pMatrix;
+            attribute lowp vec3 aVertexPosition;
+            varying vec3 vPosition;
+
+            void main(void) {{
+                gl_Position = pMatrix * uPMVMatrix * vec4(aVertexPosition, 1.0);
+                vPosition = aVertexPosition;
+            }}
+        `);
             webgl.compileShader(vertex);
             webgl.attachShader(shaderProgram, vertex);
             webgl.attachShader(shaderProgram, fragment);
@@ -45,6 +55,7 @@
             webgl.useProgram(shaderProgram);
             shaderProgram.vertexPositionAttribute = webgl.getAttribLocation(shaderProgram, 'aVertexPosition');
             webgl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
+        
             const aspect = canvas.width / canvas.height;
             const a = 1 * Math.tan(45 * Math.PI / 360);
             const b = a * aspect;
@@ -61,32 +72,25 @@
                 0, 0, 1, 0,
                 0, 0, -5, 1
             ]);
-            const scene_vertices = [];
-            const scene_faces = [];
-            let polygon_offset = 0;
-        
-            Array.prototype.push.apply(scene_vertices, [-1,-1,-1,-1,1,-1,1,1,-1,1,-1,-1,1,1,1,1,-1,1,-1,1,1,-1,-1,1]);
-            Array.prototype.push.apply(scene_faces, [0,1,2,0,2,3,3,2,4,3,4,5,0,6,1,0,7,6,7,4,6,7,5,6,1,6,4,1,4,2,0,5,7,0,3,5].map(f => f + polygon_offset));
-            polygon_offset += 8;
             
-            Array.prototype.push.apply(scene_vertices, [-1.5,-0.5,-0.5,-1.5,0.5,-0.5,-0.5,0.5,-0.5,-0.5,-0.5,-0.5,-0.5,0.5,0.5,-0.5,-0.5,0.5,-1.5,0.5,0.5,-1.5,-0.5,0.5]);
-            Array.prototype.push.apply(scene_faces, [0,1,2,0,2,3,3,2,4,3,4,5,0,6,1,0,7,6,7,4,6,7,5,6,1,6,4,1,4,2,0,5,7,0,3,5].map(f => f + polygon_offset));
-            polygon_offset += 8;
             
-            Array.prototype.push.apply(scene_vertices, [0.5,-0.5,-0.5,0.5,0.5,-0.5,1.5,0.5,-0.5,1.5,-0.5,-0.5,1.5,0.5,0.5,1.5,-0.5,0.5,0.5,0.5,0.5,0.5,-0.5,0.5]);
-            Array.prototype.push.apply(scene_faces, [0,1,2,0,2,3,3,2,4,3,4,5,0,6,1,0,7,6,7,4,6,7,5,6,1,6,4,1,4,2,0,5,7,0,3,5].map(f => f + polygon_offset));
-            polygon_offset += 8;
+                (async function () {
+
+                    let vertices = await fetch('vertices');
+                        vertices = await vertices.arrayBuffer();
+
+                    let faces = await fetch('faces');
+                        faces = await faces.arrayBuffer();
+
+                    vbuffer = webgl.createBuffer ();
+                    webgl.bindBuffer(webgl.ARRAY_BUFFER, vbuffer);
+                    webgl.bufferData(webgl.ARRAY_BUFFER, vertices, webgl.STATIC_DRAW);
+                    webgl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, 3, webgl.FLOAT, false, 0, 0);
+                    fbuffer = webgl.createBuffer ();
+                    webgl.bindBuffer(webgl.ELEMENT_ARRAY_BUFFER, fbuffer);
+                    webgl.bufferData(webgl.ELEMENT_ARRAY_BUFFER, faces, webgl.STATIC_DRAW);
+                    webgl.drawElements(webgl.TRIANGLES, new Uint16Array(faces).length, webgl.UNSIGNED_SHORT, 0);
+
+                })();
             
-            Array.prototype.push.apply(scene_vertices, [-3,-0.5,-1,-3,0.5,-1,-2,0.5,-1,-2,-0.5,-1,-2,0.5,1,-2,-0.5,1,-3,0.5,1,-3,-0.5,1]);
-            Array.prototype.push.apply(scene_faces, [0,1,2,0,2,3,3,2,4,3,4,5,0,6,1,0,7,6,7,4,6,7,5,6,1,6,4,1,4,2,0,5,7,0,3,5].map(f => f + polygon_offset));
-            polygon_offset += 8;
-            
-        vbuffer = webgl.createBuffer ();
-        webgl.bindBuffer(webgl.ARRAY_BUFFER, vbuffer);
-        webgl.bufferData(webgl.ARRAY_BUFFER, new Float32Array(scene_vertices).buffer, webgl.STATIC_DRAW);
-        webgl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, 3, webgl.FLOAT, false, 0, 0);
-        fbuffer = webgl.createBuffer ();
-        webgl.bindBuffer(webgl.ELEMENT_ARRAY_BUFFER, fbuffer);
-        webgl.bufferData(webgl.ELEMENT_ARRAY_BUFFER, new Uint16Array(scene_faces).buffer, webgl.STATIC_DRAW);
-        webgl.drawElements(webgl.TRIANGLES, scene_faces.length, webgl.UNSIGNED_SHORT, 0);
         
