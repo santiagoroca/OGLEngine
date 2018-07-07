@@ -8,6 +8,7 @@ mod Geometry;
 mod Shader;
 mod Transformable;
 mod Scene;
+mod Event;
 
 use Compiler::Compiler as OtherCompiler;
 use std::fs::File;

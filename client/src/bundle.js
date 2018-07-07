@@ -1,4 +1,5 @@
 
+                
             const canvas = document.getElementById('target-canvas');
             canvas.width = canvas.clientWidth;
             canvas.height = canvas.clientHeight;
@@ -9,7 +10,8 @@
             webgl.clear(webgl.DEPTH_BUFFER_BIT);
             webgl.clear(webgl.COLOR_BUFFER_BIT);
             webgl.viewport(0, 0, canvas.clientWidth, canvas.clientHeight);
-            
+        
+                
             const shaderProgram = webgl.createProgram();
             const fragment = webgl.createShader(webgl.FRAGMENT_SHADER)
             webgl.shaderSource(fragment, `
@@ -28,8 +30,7 @@
             void main() {
                 vec3 normal = normalize(normals(vPosition));
                 float attenuation = 0.0;
-                attenuation += max(0.0, dot(normal, normalize(vec3(0.5, 0, 0))));
-attenuation += max(0.0, dot(normal, normalize(vec3(-0.5, 0, -0.5))));
+                attenuation += max(0.0, dot(normal, normalize(vec3(0.5, 0, 0.5))));
                 gl_FragColor = vec4(attenuation, attenuation, attenuation, 1.0);
             }
 
@@ -56,6 +57,7 @@ attenuation += max(0.0, dot(normal, normalize(vec3(-0.5, 0, -0.5))));
             shaderProgram.vertexPositionAttribute = webgl.getAttribLocation(shaderProgram, 'aVertexPosition');
             webgl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
         
+                
             const aspect = canvas.width / canvas.height;
             const a = 1 * Math.tan(45 * Math.PI / 360);
             const b = a * aspect;
@@ -66,14 +68,10 @@ attenuation += max(0.0, dot(normal, normalize(vec3(-0.5, 0, -0.5))));
                 0, 0, -11 / j, -1,
                 0, 0, -(10 * 1 * 2) / j, 0
             ]);
-            webgl.uniformMatrix4fv(webgl.getUniformLocation(shaderProgram, 'uPMVMatrix'), false, [
-                1, 0, 0, 0,
-                0, 1, 0, 0,
-                0, 0, 1, 0,
-                0, 0, -5, 1
-            ]);
-            
-            
+            webgl.uniformMatrix4fv(webgl.getUniformLocation(shaderProgram, 'uPMVMatrix'), false, [0.5,0,0,0,0,0.43879128,0.23971277,0,0,-0.23971277,0.43879128,0,1,0,-3,1]);
+        
+                
+                
                 (async function () {
 
                     let vertices = await fetch('vertices');
@@ -93,4 +91,4 @@ attenuation += max(0.0, dot(normal, normalize(vec3(-0.5, 0, -0.5))));
 
                 })();
             
-        
+            

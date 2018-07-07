@@ -44,7 +44,7 @@ impl GeometryWriter {
 
                 })();
             ")
-            
+
         }
 
     }
