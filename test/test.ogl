@@ -1,0 +1,22 @@
+scene
+{
+
+    on drag 
+    {
+        translate vec3(delta_x, delta_y, none)
+    }
+
+    geometry
+    {
+ 
+        source './models/cube.json'
+
+        transform 
+        {
+            scale vec3(0.5, 0.5, 0.5)
+            translate vec3(2.0, 0.0, -5.0)
+        }
+
+    }
+
+}
