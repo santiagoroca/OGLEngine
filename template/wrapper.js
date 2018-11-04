@@ -1,3 +1,48 @@
+function EventScheduler (canvas, update) {
+
+    this.isLeftMousePressed = false;
+    this.prevXPosition = 0;
+    this.prevYPosition = 0;
+    this.drag_schedules = [];
+
+    canvas.addEventListener('mousedown', (event) => {
+        this.isLeftMousePressed = event.button == 0;
+        this.prevXPosition = event.x;
+        this.prevYPosition = event.y;
+    });
+ 
+    canvas.addEventListener('mousemove', (event) => this.ondrag(event));
+
+    canvas.addEventListener('mouseup', (event) => {
+        this.isLeftMousePressed = false;
+    });
+
+    this.update = update;
+}
+
+EventScheduler.prototype.ondrag = function (event) {
+    if (!this.isLeftMousePressed) {
+        return;
+    }
+
+    const variables = {
+        delta_x: (event.x - this.prevXPosition) * 0.001,
+        delta_y: -(event.y - this.prevYPosition) * 0.001
+    }
+
+    for (const schedule of this.drag_schedules) {
+        schedule(variables);
+    }
+
+    this.prevXPosition = event.x;
+    this.prevYPosition = event.y;
+    this.update();
+}
+
+EventScheduler.prototype.scheduleDrag = function (schedule) {
+    this.drag_schedules.push(schedule);
+}
+
 function viewer (container) {
 
     /*
@@ -27,19 +72,7 @@ function viewer (container) {
     /*
     * Events Configuration
     */
-   let isLeftMousePressed = false;
-   let prevXPosition = 0;
-   let prevYPosition = 0;
-
-   canvas.addEventListener('mousedown', (event) => {
-       isLeftMousePressed = event.button == 0;
-       prevXPosition = event.x;
-       prevYPosition = event.y;
-   });
-
-   canvas.addEventListener('mouseup', (event) => {
-       isLeftMousePressed = false;
-   });
+    const eventScheduler = new EventScheduler(canvas, updateMatrix);
 
     /*
     * Basic Shader Configuration
@@ -65,12 +98,13 @@ function viewer (container) {
 
     const vertex = ` 
         attribute lowp vec3 aVertexPosition; 
+        uniform mat4 localTransform; 
         uniform mat4 uPMVMatrix; 
         uniform mat4 pMatrix; 
         varying vec3 vPosition; 
         
         void main(void) {
-            gl_Position = pMatrix * uPMVMatrix * vec4(aVertexPosition, 1.0); 
+            gl_Position = pMatrix * uPMVMatrix * localTransform * vec4(aVertexPosition, 1.0); 
             vPosition = vec4(pMatrix * uPMVMatrix * vec4(aVertexPosition, 1.0)).xyz; 
         }
     `;
@@ -96,6 +130,7 @@ function viewer (container) {
     shaderProgram.vertexPositionAttribute = webgl.getAttribLocation(shaderProgram, "aVertexPosition");
     shaderProgram.uPMVMatrix = webgl.getUniformLocation(shaderProgram, "uPMVMatrix");
     shaderProgram.pMatrix = webgl.getUniformLocation(shaderProgram, 'pMatrix');
+    shaderProgram.localTransform = webgl.getUniformLocation(shaderProgram, 'localTransform');
     webgl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
 
     /*
@@ -122,7 +157,7 @@ function viewer (container) {
 
     '%scene%'
 
-    const updateMatrix = () => {
+    function updateMatrix () {
         webgl.uniformMatrix4fv(shaderProgram.uPMVMatrix, false, worldMatrix);
         requestAnimationFrame(() => render());
     }
@@ -130,12 +165,13 @@ function viewer (container) {
     /*
     * Render Geometry Objectsl
     */
-    const render = () => {
+    function render () {
         
         webgl.clear(webgl.DEPTH_BUFFER_BIT);
         webgl.clear(webgl.COLOR_BUFFER_BIT);
 
         for (const geometry of geometries) {
+            webgl.uniformMatrix4fv(shaderProgram.localTransform, false, geometry.localTransform);
             webgl.bindBuffer(webgl.ARRAY_BUFFER, geometry.vertexs);
             webgl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, 3, webgl.FLOAT, false, 0, 0);
             webgl.bindBuffer(webgl.ELEMENT_ARRAY_BUFFER, geometry.indexes);

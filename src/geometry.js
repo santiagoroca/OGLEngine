@@ -1,5 +1,7 @@
 const read = require('fs').readFileSync;
 const Transform = require('./transform.js');
+const Events = require('./events.js');
+const hash = require('./helper.js').hash;
 
 module.exports = class Geometry {
 
@@ -7,6 +9,7 @@ module.exports = class Geometry {
         this.vertexs = [];
         this.indexes = [];
         this.transform = new Transform();
+        this.events = new Events();
     }
 
     setVertexs (vertexs) {
@@ -38,6 +41,45 @@ module.exports = class Geometry {
         const file = JSON.parse(read(url));
         this.vertexs = file.vertexs;
         this.indexes = file.indexes;
+    }
+
+    addEvents (event) {
+        this.events.addEvent(event);
+    }
+
+    isDynamic () {
+        return this.events.events.length;
+    }
+
+    toString () {
+        const r_hash = hash();
+        const g_hash = hash();
+
+        return `
+
+            const v_buff_${r_hash} = webgl.createBuffer();
+            webgl.bindBuffer(webgl.ARRAY_BUFFER, v_buff_${r_hash});
+            webgl.bufferData(webgl.ARRAY_BUFFER, new Float32Array([
+                ${this.vertexs}
+            ]).buffer, webgl.STATIC_DRAW);
+
+            const f_buff_${r_hash} = webgl.createBuffer();
+            webgl.bindBuffer(webgl.ELEMENT_ARRAY_BUFFER, f_buff_${r_hash});
+            webgl.bufferData(webgl.ELEMENT_ARRAY_BUFFER, new Uint16Array([
+                ${this.indexes}
+            ]).buffer, webgl.STATIC_DRAW);
+
+            const geometry_${g_hash} = {
+                vertexs: v_buff_${r_hash},
+                indexes: f_buff_${r_hash},
+                count: ${this.indexes.length},
+                localTransform: [${this.transform.transform}]
+            };
+            geometries.push(geometry_${g_hash});
+
+            ${this.events.toString(`geometry_${g_hash}`)}
+
+        `;
     }
 
 }

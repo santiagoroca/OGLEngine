@@ -118,6 +118,9 @@ module.exports = {
             [ " transform ", `$$ = $1;`],
             [ " STATIC transform ", `
                 $$ = ['applyTransformation', [$4]]
+            `],
+            [ " ON event ", `
+                $$ = [ 'addEvents', $2['events'] ]
             `]
         ],
 

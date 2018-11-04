@@ -5,17 +5,31 @@ module.exports = class Events {
     }
 
     addTranslateEvent (transform) {
-        this.events.push(`
+        this.events.push({
+            type: 'drag',
+            stringified: `
+                this.localTransform[12] += event['${transform[0]}'] || 0.0;
+                this.localTransform[13] += event['${transform[1]}'] || 0.0;
+                this.localTransform[14] += event['${transform[2]}'] || 0.0;
+            `
+        });
+    }
 
-            const x = variables['${transform[0]}'] || 0.0;
-            const y = variables['${transform[1]}'] || 0.0;
-            const z = variables['${transform[2]}'] || 0.0;
+    addEvent (event) {
+        this.events.push(event);
+    }
 
-            worldMatrix[12] += x;
-            worldMatrix[13] += y;
-            worldMatrix[14] += z;
+    toString (geometry_id) {
+        return this.events.map(event => {
+            let out = `eventScheduler.scheduleDrag((function (event) {`
 
-        `);
+            switch (event.type) {
+                case 'drag': out += event.stringified;
+                    break;
+            }
+
+            return `${out} }).bind(${geometry_id}));`;
+        })
     }
 
 }
