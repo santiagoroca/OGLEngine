@@ -1,7 +1,11 @@
 scene {
 
     geometry {
+
+        # Picks the loader automatically, based on the extension
         source -> src='./models/cube.json'
+
+        # Color can be defined in so many pretty ways
         color -> hex=#ff0000, r=0.5
 
         transform {
@@ -9,11 +13,15 @@ scene {
             translate -> x=2.0, z=-5.0
         }
 
+        /*
+        * But  im just trying some nice comments
+        */
         on -> type=@KEYPRESS, key='a', hndl=(translate -> x=-0.1)
         on -> type=@KEYPRESS, key='d', hndl=(translate -> x=0.1)
         on -> type=@KEYPRESS, key='w', hndl=(translate -> y=0.1)
         on -> type=@KEYPRESS, key='s', hndl=(translate -> y=-0.1)
         on -> type=@DRAG, hndl=(rotate -> axis=@UP, amnt=.delta_x)
+
     }
 
 }

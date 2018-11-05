@@ -51,8 +51,8 @@ module.exports = {
             ["\\)", "return 'CPAR';"],
             ["\\[", "return 'OARR';"],
             ["\\]", "return 'CARR';"],
-            ["/\\*]", "return 'C_START';"],
-            ["\\*/]", "return 'C_END';"],
+            ["#.*", "/* IGNORE */"],
+            ["[/][*][^*]*[*]+([^/*][^*]*[*]+)*[/]", "/* IGNORE */"],
             [",", "return 'COLON';"],
             ["\\*", "return 'PRODUCT';"],
             ["->", "return 'ARROW';"],
@@ -122,7 +122,7 @@ module.exports = {
             [ " transform ", `$$ = $1;`],
             [ " STATIC transform ", " $$ = ['applyTransformation', $4] "],
             [ " ON ARROW args ", " $$ = [ 'addEvent', $3 ] "],
-            [ " COLOR ARROW args ", " $$ = [ 'setColor', $3 ] "]
+            [ " COLOR ARROW args ", " $$ = [ 'setColor', $3 ] "],
         ],
 
         transform:
