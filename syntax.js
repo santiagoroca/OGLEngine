@@ -31,6 +31,13 @@ module.exports = {
             ["drag", "return 'DRAG';"],
             ["source", "return 'SOURCE';"],
 
+            /* Constant Values */
+            ["@UP", "return 'UP_VECTOR';"],
+            ["@RIGHT", "return 'RIGHT_VECTOR';"],
+            ["@BACK", "return 'BACK_VECTOR';"],
+            ["@DRAG", "return 'DRAG';"],
+            ["@KEYPRESS", "return 'KEYPRESS';"],
+
             /* natives */
             ["\\-?[0-9]+(?:\\.[0-9]+)?", "return 'NUMBER';"],
             ["'[a-zA-Z0-9\\._/]+'", "return 'STRING';"],
@@ -114,8 +121,8 @@ module.exports = {
             [ " STATIC transform ", `
                 $$ = ['applyTransformation', $4]
             `],
-            [ " ON event ", `
-                $$ = [ 'addEvents', $2['events'] ]
+            [ " ON ARROW args ", `
+                $$ = [ 'addEvent', $3 ]
             `]
         ],
 
@@ -126,27 +133,11 @@ module.exports = {
             `],
         ],
 
-        event:
-        [
-            [ " DRAG OBRACE transformations_events CBRACE ", `
-                $$ = $3;
-            `]
-        ],
-
-        transformations_events:
-        [
-            [ " transformations_events transformation_event ", " $$[$2[0]]($2[1]); " ],
-            [ " transformation_event ", `
-                $$ = new yy.DragEvents();
-                $$[$1[0]]($1[1]);
-            `],
-        ],
-
         transformation_event:
         [
-            [ " ROTATE ARROW args ", ` $$ = ['addRotateEvent', $3]; `],
-            [ " TRANSLATE ARROW args ", " $$ = ['addTranslateEvent', $3]; "],
-            [ " SCALE ARROW args ", " $$ = ['addScaleEvent', $3]"]
+            [ " ROTATE ARROW args ", " $$ = yy.TransformEvents.RotateEvent($3); "],
+            [ " TRANSLATE ARROW args ", " $$ = yy.TransformEvents.TranslateEvent($3); "],
+            [ " SCALE ARROW args ", " $$ = yy.TransformEvents.ScaleEvent($3); "]
         ],
 
         transformations:
@@ -227,7 +218,13 @@ module.exports = {
             [ " string ", " $$ = $1 " ],
             [ " SCOPE_VARIABLE ", " $$ = $1; "],
             [ " vec3 ", " $$ = $1; "],
-            [ " expression ", " $$ = $1; " ]
+            [ " expression ", " $$ = $1; " ],
+            [ " UP_VECTOR ", " $$ = [0, 1, 0]; " ],
+            [ " RIGHT_VECTOR ", " $$ = [1, 0, 0]; " ],
+            [ " BACK_VECTOR ", " $$ = [0, 0, 1]; " ],
+            [ " DRAG ", " $$ = 'drag'; " ],
+            [ " KEYPRESS ", " $$ = 'keypres'; " ],
+            [ " OPAR transformation_event CPAR ", " $$ = $2; " ],
         ],
 
         expression:

@@ -10,7 +10,7 @@ parser.generate();
 // Load all context classes
 parser.yy = {
     Events: require('./src/events/Events.js'),
-    DragEvents: require('./src/events/DragEvents.js'),
+    TransformEvents: require('./src/events/TransformEvents.js'),
     Scene: require('./src/scene.js'),
     Geometry: require('./src/geometry.js'),
     Transform: require('./src/transform/Transform.js'),
@@ -23,3 +23,7 @@ console.log(
         read('./test/test.ogl').toString()
     ))
 );
+
+/*WRAPPER_TEMPLATE.replace(/'%scene%'/g, parser.parse(
+    read('./test/test.ogl').toString()
+))*/

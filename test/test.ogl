@@ -8,10 +8,11 @@ scene {
             translate -> x=2.0, z=-5.0
         }
 
-        on drag {
-            scale -> x=1.001, y=1.001, z=1.001
-            
-        }
+        on -> type=@KEYPRESS, key='a', hndl=(translate -> x=-0.1)
+        on -> type=@KEYPRESS, key='d', hndl=(translate -> x=0.1)
+        on -> type=@KEYPRESS, key='w', hndl=(translate -> y=0.1)
+        on -> type=@KEYPRESS, key='s', hndl=(translate -> y=-0.1)
+        on -> type=@DRAG, hndl=(rotate -> axis=@UP, amnt=.delta_x)
     }
 
 }

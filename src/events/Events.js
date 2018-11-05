@@ -14,15 +14,31 @@ module.exports = class Events {
 
     toString (geometry_id) {
         return this.events.map(event => {
-            let out = `eventScheduler.scheduleDrag((function (event) {`
 
             switch (event.type) {
-                case 'drag': out += event.stringified;
-                    break;
+                case 'drag': return this.scheduleDragWrapper(geometry_id, event)
+                case 'keypres': return this.scheduleKeyPressWrapper(geometry_id, event)
             }
 
-            return `${out} }).bind(${geometry_id}));`;
         }).join('\n');
+    }
+
+    scheduleDragWrapper (geometry_id, handler) {
+        return `
+            eventScheduler.scheduleDrag((function (event) {
+                ${handler.hndl}
+            }).bind(${geometry_id}));
+        `;
+    }
+
+    scheduleKeyPressWrapper (geometry_id, event) {
+        return `
+            eventScheduler.scheduleKeyPress((function (event) {
+                if (event.key == '${event.key}') {
+                    ${event.hndl}
+                }
+            }).bind(${geometry_id}));
+        `;
     }
 
 }

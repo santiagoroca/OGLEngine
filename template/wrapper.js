@@ -3,7 +3,9 @@ function EventScheduler (canvas, update) {
     this.isLeftMousePressed = false;
     this.prevXPosition = 0;
     this.prevYPosition = 0;
+
     this.drag_schedules = [];
+    this.key_press_schedules = [];
 
     canvas.addEventListener('mousedown', (event) => {
         this.isLeftMousePressed = event.button == 0;
@@ -11,11 +13,12 @@ function EventScheduler (canvas, update) {
         this.prevYPosition = event.y;
     });
  
-    canvas.addEventListener('mousemove', (event) => this.ondrag(event));
-
-    canvas.addEventListener('mouseup', (event) => {
+    document.addEventListener('mouseup', (event) => {
         this.isLeftMousePressed = false;
     });
+
+    canvas.addEventListener('mousemove', (event) => this.ondrag(event));
+    document.addEventListener('keydown', (event) => this.keypress(event));
 
     this.update = update;
 }
@@ -27,7 +30,8 @@ EventScheduler.prototype.ondrag = function (event) {
 
     const variables = {
         delta_x: (event.x - this.prevXPosition) * 0.001,
-        delta_y: -(event.y - this.prevYPosition) * 0.001
+        delta_y: -(event.y - this.prevYPosition) * 0.001,
+        up: [0, 1, 0], right: [1, 0 , 0], back: [0, 0, 1]
     }
 
     for (const schedule of this.drag_schedules) {
@@ -41,6 +45,22 @@ EventScheduler.prototype.ondrag = function (event) {
 
 EventScheduler.prototype.scheduleDrag = function (schedule) {
     this.drag_schedules.push(schedule);
+}
+
+EventScheduler.prototype.keypress = function (event) {
+    const variables = {
+        key: event.key
+    }
+
+    for (const schedule of this.key_press_schedules) {
+        schedule(variables);
+    }
+
+    this.update();
+}
+
+EventScheduler.prototype.scheduleKeyPress = function (schedule) {
+    this.key_press_schedules.push(schedule);
 }
 
 function viewer (container) {
