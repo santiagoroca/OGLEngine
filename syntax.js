@@ -33,10 +33,7 @@ module.exports = {
 
             /* natives */
             ["\\-?[0-9]+(?:\\.[0-9]+)?", "return 'NUMBER';"],
-            ["[a-zA-Z0-9\\._/]+\\b", "return 'STRING';"],
-
-            /* Scoped Variables */
-            ["\\.[a-zA-Z0-9\\._/]+", "return 'SCOPE_VARIABLE';"],
+            ["'[a-zA-Z0-9\\._/]+'", "return 'STRING';"],
 
             /* Tokens */
             ["\\{", "return 'OBRACE';"],
@@ -49,6 +46,9 @@ module.exports = {
             ["\\*/]", "return 'C_END';"],
             [",", "return 'COLON';"],
             ["\\*", "return 'PRODUCT';"],
+            ["->", "return 'ARROW';"],
+            ["[a-zA-Z]*?=", "return 'VARNAME';"],
+            ["\\.[a-zA-Z0-9\\._/]+", "return 'SCOPE_VARIABLE';"],
             ["'", "return 'QUOTE';"],
             [
                 "[#|\\.]-?[_a-zA-Z]+[_a-zA-Z0-9-]*",
@@ -92,13 +92,7 @@ module.exports = {
             [ " statement ", " $$ = new yy.Scene(); $$[$1.k]($1.v); " ]
         ],
 
-        string:
-        [
-            [ " QUOTE STRING QUOTE " , " $$ = $2 "]
-        ],
-
         statement: [
-            [ " PRINT OPAR string CPAR ", " console.log($3); " ],
             [ " GEOMETRY OBRACE CBRACE ", ` $$ = { k: 'appendGeometry', v: null }; `],
             [ " GEOMETRY OBRACE g_statements CBRACE ", `
                 $$ = { k: 'appendGeometry', v: $3 };
@@ -118,7 +112,7 @@ module.exports = {
         [
             [ " VERTEXS array ", " $$ = ['setVertexs', $2] " ],
             [ " INDEXES array ", " $$ = ['setIndexes', $2]; " ],
-            [ " SOURCE string ", `$$ = ['loadFromFile', $2];`],
+            [ " SOURCE ARROW arg ", `$$ = ['loadFromFile', $3];`],
             [ " transform ", `$$ = $1;`],
             [ " STATIC transform ", `
                 $$ = ['applyTransformation', $4]
@@ -153,30 +147,25 @@ module.exports = {
 
         transformation_event:
         [
-            [ " ROTATE vec3 numeric_expression ", `
-                $$ = ['addRotateEvent', [$2[0], $2[1], $2[2], $3]];
-            `],
-            [ " ROTATE vec3 SCOPED_VARIABLE ", `
-                $$ = ['addRotateEvent', [$2[0], $2[1], $2[2], $3]];
-            `],
-            [ " TRANSLATE vec3 ", " $$ = ['addTranslateEvent', [$2[0], $2[1], $2[2]]]; "],
-            [ " SCALE vec3 ", " $$ = ['ScaleEvent', [$2[0], $2[1], $2[2]]]; "]
+            [ " ROTATE ARROW args ", ` $$ = ['addRotateEvent', $3]; `],
+            [ " TRANSLATE ARROW arg ", " $$ = ['addTranslateEvent', $3]; "],
+            [ " SCALE ARROW arg ", " $$ = ['ScaleEvent', $3]"]
         ],
 
         transformations:
         [
-            [ " transformations transformation ", " $$[$2[0]].apply($$, $2[1]); " ],
+            [ " transformations transformation ", " $$[$2[0]]($2[1]); " ],
             [ " transformation ", `
                 $$ = new yy.Transform();
-                $$[$1[0]].apply($$, $1[1]);
+                $$[$1[0]]($1[1]);
             `],
         ],
 
         transformation:
         [
-            [ " ROTATE vec3 number ", " $$ = ['rotate', [$2, $3, $4]]; "],
-            [ " TRANSLATE vec3 ", " $$ = ['translate', [$2[0], $2[1], $2[2]]]; "],
-            [ " SCALE vec3 ", " $$ = ['scale', [$2[0], $2[1], $2[2]]]; "]
+            [ " ROTATE ARROW args ", " $$ = ['rotate', $3]; "],
+            [ " TRANSLATE ARROW args ", " $$ = ['translate', $3]; "],
+            [ " SCALE ARROW args ", " $$ = ['scale', $3]; "]
         ],
 
         vec3:
@@ -218,13 +207,33 @@ module.exports = {
         strings:
         [
             [ " numbers COLON STRING ", " $$.push('$3'); " ],
-            [ " STRING ", " $$ = ['$1']; " ]
+            [ " string ", " $$ = [$1]; " ]
+        ],
+
+        string:
+        [
+            [ " STRING ", " $$ = $1.replace(/'/g, ''); " ]
         ],
 
         numeric_expression:
         [
             [ " number PRODUCT number ", " $$ = $1 * $3; " ],
             [ " number ", " $$ = $1; " ],
+        ],
+
+        args: [
+            [ " args arg ", " Object.assign($$, $2); " ],
+            [ " arg ", " $$ = {}; Object.assign($$, $1); " ],
+        ],
+
+        arg: [
+            [ " VARNAME value ", " $$ = { [`${$1.replace(/=/g, '')}`]: $2 }; " ],
+        ],
+
+        value: 
+        [
+            [ " number ", " $$ = $1 " ],
+            [ " string ", " $$ = $1 " ],
         ]
 
     }

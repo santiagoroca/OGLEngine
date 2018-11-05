@@ -37,8 +37,8 @@ module.exports = class Geometry {
         return this.vertexs;
     }
 
-    loadFromFile (url) {
-        const file = JSON.parse(read(url));
+    loadFromFile (args) {
+        const file = JSON.parse(read(args.src));
         this.vertexs = file.vertexs;
         this.indexes = file.indexes;
     }

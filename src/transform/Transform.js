@@ -6,32 +6,46 @@ module.exports = class Transform {
         this.transform = Math.mat4.identity();
     }
 
-    translate (x, y, z) {
-        this.transform[12] += x;
-        this.transform[13] += y;
-        this.transform[14] += z;
+    translate (args) {
+        if (args.x) this.transform[12] += args.x;
+        if (args.y) this.transform[13] += args.y;
+        if (args.z) this.transform[14] += args.z;
     }
 
-    scale (x, y, z) {
-        this.transform[0] *= x;
-        this.transform[1] *= y;
-        this.transform[2] *= z;
-        this.transform[3] *= x;
-        this.transform[4] *= y;
-        this.transform[5] *= z;
-        this.transform[6] *= x;
-        this.transform[7] *= y;
-        this.transform[8] *= z;
-        this.transform[9] *= x;
-        this.transform[10] *= y;
-        this.transform[11] *= z;
+    scale (args) {
+
+        if (args.x) {
+            this.transform[0] *= args.x;
+            this.transform[3] *= args.x;
+            this.transform[6] *= args.x;
+            this.transform[9] *= args.x;
+        }
+
+        if (args.y) {
+            this.transform[1] *= args.y;
+            this.transform[4] *= args.y;
+            this.transform[7] *= args.y;
+            this.transform[10] *= args.y;
+        }
+        
+        if (args.z) {
+            this.transform[2] *= args.z;
+            this.transform[5] *= args.z;
+            this.transform[8] *= args.z;
+            this.transform[11] *= args.z;
+        }
+        
     }
 
-    rotate (deg, axis) {
+    rotate (args) {
 
-        let x = axis[0];
-        let y = axis[1];
-        let z = axis[2];
+        if (!args.amnt || !args.axis) {
+            throw(new Error('You must define an axis and an ammount of rotation.'));
+        }
+
+        let x = args.axis[0];
+        let y = args.axis[1];
+        let z = args.axis[2];
 
         // Compute the length of the rotation vector
         let len = Math.sqrt(x*x + y*y + z*z);
@@ -48,8 +62,8 @@ module.exports = class Transform {
         z *= len;
 
         // TODO
-        let s = Math.sin(deg);
-        let c = Math.cos(deg);
+        let s = Math.sin(args.deg);
+        let c = Math.cos(args.deg);
         let t = 1.0 - c;
 
         // TODO

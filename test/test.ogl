@@ -1,34 +1,11 @@
 scene {
 
     geometry {
-        source './models/cube.json'
+        source -> src='./models/cube.json'
 
         transform {
-            scale vec3(0.5, 0.5, 0.5)
-            translate vec3(2.0, 0.0, -5.0)
-        }
-
-        on drag {
-            translate vec3(delta_x, delta_y, none)
-            rotate vec3(0.0, 1.0, 0.0) 10deg
-        }
-    }
-
-    geometry {
-        source './models/cube.json'
-
-        transform {
-            scale vec3(0.5, 0.5, 0.5)
-            translate vec3(-2.0, 0.0, -5.0)
-        }
-    }
-
-    geometry {
-        source './models/cube.json'
-
-        transform {
-            scale vec3(0.5, 0.5, 0.5)
-            translate vec3(0.0, 1.0, -5.0)
+            scale -> x=0.5 y=0.5 z=0.5
+            translate -> x=2.0 z=-5.0
         }
     }
 
