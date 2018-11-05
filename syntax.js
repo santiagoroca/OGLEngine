@@ -48,7 +48,7 @@ module.exports = {
             ["\\*", "return 'PRODUCT';"],
             ["->", "return 'ARROW';"],
             ["[a-zA-Z]*?=", "return 'VARNAME';"],
-            ["\\.[a-zA-Z0-9\\._/]+", "return 'SCOPE_VARIABLE';"],
+            ["\.[a-zA-Z0-9_/]*", "return 'SCOPE_VARIABLE';"],
             ["'", "return 'QUOTE';"],
             [
                 "[#|\\.]-?[_a-zA-Z]+[_a-zA-Z0-9-]*",
@@ -96,9 +96,6 @@ module.exports = {
             [ " GEOMETRY OBRACE CBRACE ", ` $$ = { k: 'appendGeometry', v: null }; `],
             [ " GEOMETRY OBRACE g_statements CBRACE ", `
                 $$ = { k: 'appendGeometry', v: $3 };
-            `],
-            [ " ON event ", `
-                $$ = { k: 'addEvents', v: $2 }
             `]
         ],
 
@@ -138,18 +135,18 @@ module.exports = {
 
         transformations_events:
         [
-            [ " transformations_events transformation_event ", " $$[$2[0]].apply($$, $2[1]); " ],
+            [ " transformations_events transformation_event ", " $$[$2[0]]($2[1]); " ],
             [ " transformation_event ", `
                 $$ = new yy.DragEvents();
-                $$[$1[0]].apply($$, $1[1]);
+                $$[$1[0]]($1[1]);
             `],
         ],
 
         transformation_event:
         [
             [ " ROTATE ARROW args ", ` $$ = ['addRotateEvent', $3]; `],
-            [ " TRANSLATE ARROW arg ", " $$ = ['addTranslateEvent', $3]; "],
-            [ " SCALE ARROW arg ", " $$ = ['ScaleEvent', $3]"]
+            [ " TRANSLATE ARROW args ", " $$ = ['addTranslateEvent', $3]; "],
+            [ " SCALE ARROW args ", " $$ = ['ScaleEvent', $3]"]
         ],
 
         transformations:
@@ -222,7 +219,7 @@ module.exports = {
         ],
 
         args: [
-            [ " args arg ", " Object.assign($$, $2); " ],
+            [ " args COLON arg ", " Object.assign($$, $3); " ],
             [ " arg ", " $$ = {}; Object.assign($$, $1); " ],
         ],
 
@@ -234,6 +231,7 @@ module.exports = {
         [
             [ " number ", " $$ = $1 " ],
             [ " string ", " $$ = $1 " ],
+            [ " SCOPE_VARIABLE ", " $$ = $1; "]
         ]
 
     }

@@ -4,13 +4,21 @@ module.exports = class DragEvents {
         this.events = [];
     }
 
-    addTranslateEvent (x, y, z) {
+    parseArg (arg) {
+        if (isNaN(arg)) {
+            return 'event' + arg;
+        }
+
+        return arg;
+    }
+
+    addTranslateEvent (args) {
         this.events.push({
             type: 'drag',
             stringified: `
-                this.localTransform[12] += event['${x}'] || 0.0;
-                this.localTransform[13] += event['${y}'] || 0.0;
-                this.localTransform[14] += event['${z}'] || 0.0;
+                ${ args.x ? `this.localTransform[12] += ${this.parseArg(args.x)}` : '' }
+                ${ args.y ? `this.localTransform[13] += ${this.parseArg(args.y)}` : '' }
+                ${ args.z ? `this.localTransform[14] += ${this.parseArg(args.z)}` : '' }
             `
         });
     }
