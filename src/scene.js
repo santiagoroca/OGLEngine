@@ -1,4 +1,4 @@
-const Transform = require('./transform.js');
+const Transform = require('./transform/Transform.js');
 const GeometryBatch = require('./geometry_batch.js');
 
 /*

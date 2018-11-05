@@ -1,6 +1,6 @@
 const read = require('fs').readFileSync;
-const Transform = require('./transform.js');
-const Events = require('./events.js');
+const Transform = require('./transform/Transform.js');
+const Events = require('./events/Events.js');
 const hash = require('./helper.js').hash;
 
 module.exports = class Geometry {

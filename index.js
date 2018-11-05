@@ -9,10 +9,11 @@ parser.generate();
 
 // Load all context classes
 parser.yy = {
-    Events: require('./src/events.js'),
+    Events: require('./src/events/Events.js'),
+    DragEvents: require('./src/events/DragEvents.js'),
     Scene: require('./src/scene.js'),
     Geometry: require('./src/geometry.js'),
-    Transform: require('./src/transform.js'),
+    Transform: require('./src/transform/Transform.js'),
     Math: require('./src/math.js'),
 }
 

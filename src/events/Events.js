@@ -4,17 +4,6 @@ module.exports = class Events {
         this.events = [];
     }
 
-    addTranslateEvent (transform) {
-        this.events.push({
-            type: 'drag',
-            stringified: `
-                this.localTransform[12] += event['${transform[0]}'] || 0.0;
-                this.localTransform[13] += event['${transform[1]}'] || 0.0;
-                this.localTransform[14] += event['${transform[2]}'] || 0.0;
-            `
-        });
-    }
-
     addEvent (event) {
         this.events.push(event);
     }

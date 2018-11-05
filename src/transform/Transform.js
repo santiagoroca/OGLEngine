@@ -1,4 +1,4 @@
-const Math = require('./math.js');
+const Math = require('../math.js');
 
 module.exports = class Transform {
 

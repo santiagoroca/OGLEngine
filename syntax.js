@@ -35,6 +35,9 @@ module.exports = {
             ["\\-?[0-9]+(?:\\.[0-9]+)?", "return 'NUMBER';"],
             ["[a-zA-Z0-9\\._/]+\\b", "return 'STRING';"],
 
+            /* Scoped Variables */
+            ["\\.[a-zA-Z0-9\\._/]+", "return 'SCOPE_VARIABLE';"],
+
             /* Tokens */
             ["\\{", "return 'OBRACE';"],
             ["\\}", "return 'CBRACE';"],
@@ -45,6 +48,7 @@ module.exports = {
             ["/\\*]", "return 'C_START';"],
             ["\\*/]", "return 'C_END';"],
             [",", "return 'COLON';"],
+            ["\\*", "return 'PRODUCT';"],
             ["'", "return 'QUOTE';"],
             [
                 "[#|\\.]-?[_a-zA-Z]+[_a-zA-Z0-9-]*",
@@ -140,25 +144,20 @@ module.exports = {
 
         transformations_events:
         [
-            [ " transformations_events transformations_event ", " $$[$2[0]]($2[1]); " ],
+            [ " transformations_events transformations_event ", "$$[$2[0]].apply($$, $2[1]); " ],
             [ " transformations_event ", `
-                $$ = new yy.Events();
-                $$[$1[0]]($1[1]);
+                $$ = new yy.DragEvents();
+                $$[$1[0]].apply($$, $1[1]);
             `],
         ],
 
         transformations_event:
         [
-
-            /* rotate vec3(0.0, 1.0, 1.0) 20deg */
-            [ " ROTATE vec3 NUMBER unit ", " $$ = ['RotateEvent', [$2, $3, $4]]; "],
-
-            /* translate vec3(2.0, 2.0, 2.0) */
+            [ " ROTATE vec3 numeric_expression ", `
+                $$ = ['addRotateEvent', [$2[0], $2[1], $2[2], $3]];
+            `],
             [ " TRANSLATE vec3 ", " $$ = ['addTranslateEvent', [$2[0], $2[1], $2[2]]]; "],
-
-            /* scale vec3(2.0, 2.0, 2.0) */
             [ " SCALE vec3 ", " $$ = ['ScaleEvent', [$2[0], $2[1], $2[2]]]; "]
-
         ],
 
         transformations:
@@ -172,16 +171,9 @@ module.exports = {
 
         transformation:
         [
-
-            /* rotate vec3(0.0, 1.0, 1.0) 20deg */
-            [ " ROTATE vec3 NUMBER unit ", " $$ = ['rotate', [$2, $3, $4]]; "],
-
-            /* translate vec3(2.0, 2.0, 2.0) */
+            [ " ROTATE vec3 number ", " $$ = ['rotate', [$2, $3, $4]]; "],
             [ " TRANSLATE vec3 ", " $$ = ['translate', [$2[0], $2[1], $2[2]]]; "],
-
-            /* scale vec3(2.0, 2.0, 2.0) */
             [ " SCALE vec3 ", " $$ = ['scale', [$2[0], $2[1], $2[2]]]; "]
-
         ],
 
         vec3:
@@ -198,8 +190,8 @@ module.exports = {
 
         unit:
         [
-            [ " DEG ", " $$ = 'deg'; " ],
-            [ " RAD ", " $$ = 'rad'; " ]
+            [ " DEG ", " $$ = parseFloat(0.0174533); " ],
+            [ " RAD ", " $$ = parseFloat(1); " ]
         ],
 
         array:
@@ -211,13 +203,25 @@ module.exports = {
         numbers:
         [
             [ " numbers COLON NUMBER ", " $$.push( parseFloat($3) ); " ],
-            [ " NUMBER ", " $$ = [parseFloat($1)]; " ]
+            [ " number ", " $$ = [$1]; " ]
+        ],
+
+        number:
+        [
+            [ " number unit ", " $$ = $1 * $2; " ],
+            [ " NUMBER ", " $$ = parseFloat($1); " ]
         ],
 
         strings:
         [
             [ " numbers COLON STRING ", " $$.push('$3'); " ],
             [ " STRING ", " $$ = ['$1']; " ]
+        ],
+
+        numeric_expression:
+        [
+            [ " number PRODUCT number ", " $$ = $1 * $3; " ],
+            [ " number ", " $$ = $1; " ],
         ]
 
     }
