@@ -30,6 +30,7 @@ module.exports = {
             ["on", "return 'ON';"],
             ["drag", "return 'DRAG';"],
             ["source", "return 'SOURCE';"],
+            ["color", "return 'COLOR';"],
 
             /* Constant Values */
             ["@UP", "return 'UP_VECTOR';"],
@@ -40,6 +41,7 @@ module.exports = {
 
             /* natives */
             ["\\-?[0-9]+(?:\\.[0-9]+)?", "return 'NUMBER';"],
+            ["#[0-9A-Fa-f]{6}", "return 'HEXA';"],
             ["'[a-zA-Z0-9\\._/]+'", "return 'STRING';"],
 
             /* Tokens */
@@ -118,12 +120,9 @@ module.exports = {
             [ " INDEXES array ", " $$ = ['setIndexes', $2]; " ],
             [ " SOURCE ARROW arg ", `$$ = ['loadFromFile', $3];`],
             [ " transform ", `$$ = $1;`],
-            [ " STATIC transform ", `
-                $$ = ['applyTransformation', $4]
-            `],
-            [ " ON ARROW args ", `
-                $$ = [ 'addEvent', $3 ]
-            `]
+            [ " STATIC transform ", " $$ = ['applyTransformation', $4] "],
+            [ " ON ARROW args ", " $$ = [ 'addEvent', $3 ] "],
+            [ " COLOR ARROW args ", " $$ = [ 'setColor', $3 ] "]
         ],
 
         transform:
@@ -186,10 +185,14 @@ module.exports = {
             [ " number ", " $$ = [$1]; " ]
         ],
 
+        hexadecimal: [
+            [ " HEXA ", " $$ = parseInt($1.replace(/#/, ''), 16); " ],
+        ],
+
         number:
         [
             [ " number unit ", " $$ = $1 * $2; " ],
-            [ " NUMBER ", " $$ = parseFloat($1); " ]
+            [ " NUMBER ", " $$ = parseFloat($1); " ],
         ],
 
         strings:
@@ -225,6 +228,12 @@ module.exports = {
             [ " DRAG ", " $$ = 'drag'; " ],
             [ " KEYPRESS ", " $$ = 'keypres'; " ],
             [ " OPAR transformation_event CPAR ", " $$ = $2; " ],
+            [ " hexadecimal ", ` $$ = {
+                    r: ($1 >> 16) & 255,
+                    g: ($1 >> 8) & 255,
+                    b: ($1 >> 0) & 255
+                };
+            `],
         ],
 
         expression:

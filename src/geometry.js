@@ -8,6 +8,7 @@ module.exports = class Geometry {
     constructor () {
         this.vertexs = [];
         this.indexes = [];
+        this.color = { r: 0.5, g: 0.5, b: 0.5, a: 1.0 };
         this.transform = new Transform();
         this.events = new Events();
     }
@@ -43,6 +44,14 @@ module.exports = class Geometry {
         this.indexes = file.indexes;
     }
 
+    setColor (args) {
+        if (args.hex) {
+            Object.assign(this.color, args.hex);
+        }
+        
+        Object.assign(this.color, args);
+    }
+
     addEvent (event) {
         this.events.addEvent(event);
     }
@@ -73,7 +82,8 @@ module.exports = class Geometry {
                 vertexs: v_buff_${r_hash},
                 indexes: f_buff_${r_hash},
                 count: ${this.indexes.length},
-                localTransform: [${this.transform.transform}]
+                localTransform: [${this.transform.transform}],
+                color: [${this.color.r}, ${this.color.g}, ${this.color.b}, ${this.color.a}]
             };
             geometries.push(geometry_${g_hash});
 

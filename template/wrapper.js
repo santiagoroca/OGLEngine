@@ -101,6 +101,7 @@ function viewer (container) {
         #extension GL_OES_standard_derivatives : enable
         precision highp float; 
 
+        uniform vec4 geometryColor; 
         varying vec3 vPosition;
         
         vec3 normals(vec3 pos) { 
@@ -112,8 +113,8 @@ function viewer (container) {
         void main() {
             vec3 normal = normalize(normals(vPosition)); 
             float attenuation = max(0.0, dot(normal, normalize(vec3(1.0, 0.5, 0.5))));
-            gl_FragColor = vec4(attenuation, attenuation, attenuation, 1.0); 
-        } 
+            gl_FragColor = geometryColor * vec4(attenuation, attenuation, attenuation, 1.0); 
+        }
     `;
 
     const vertex = ` 
@@ -151,6 +152,7 @@ function viewer (container) {
     shaderProgram.uPMVMatrix = webgl.getUniformLocation(shaderProgram, "uPMVMatrix");
     shaderProgram.pMatrix = webgl.getUniformLocation(shaderProgram, 'pMatrix');
     shaderProgram.localTransform = webgl.getUniformLocation(shaderProgram, 'localTransform');
+    shaderProgram.geometryColor = webgl.getUniformLocation(shaderProgram, 'geometryColor');
     webgl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
 
     /*
@@ -192,6 +194,7 @@ function viewer (container) {
 
         for (const geometry of geometries) {
             webgl.uniformMatrix4fv(shaderProgram.localTransform, false, geometry.localTransform);
+            webgl.uniform4fv(shaderProgram.geometryColor, geometry.color);
             webgl.bindBuffer(webgl.ARRAY_BUFFER, geometry.vertexs);
             webgl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, 3, webgl.FLOAT, false, 0, 0);
             webgl.bindBuffer(webgl.ELEMENT_ARRAY_BUFFER, geometry.indexes);
