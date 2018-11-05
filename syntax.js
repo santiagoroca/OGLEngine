@@ -212,12 +212,6 @@ module.exports = {
             [ " STRING ", " $$ = $1.replace(/'/g, ''); " ]
         ],
 
-        numeric_expression:
-        [
-            [ " number PRODUCT number ", " $$ = $1 * $3; " ],
-            [ " number ", " $$ = $1; " ],
-        ],
-
         args: [
             [ " args COLON arg ", " Object.assign($$, $3); " ],
             [ " arg ", " $$ = {}; Object.assign($$, $1); " ],
@@ -231,8 +225,17 @@ module.exports = {
         [
             [ " number ", " $$ = $1 " ],
             [ " string ", " $$ = $1 " ],
-            [ " SCOPE_VARIABLE ", " $$ = $1; "]
-        ]
+            [ " SCOPE_VARIABLE ", " $$ = $1; "],
+            [ " vec3 ", " $$ = $1; "],
+            [ " expression ", " $$ = $1; " ]
+        ],
+
+        expression:
+        [
+            [ " OPAR expression CPAR ", " $$ = $2; " ],
+            [ " SCOPE_VARIABLE PRODUCT number ", " $$ = $1 + '*' + $3; " ],
+            [ " number PRODUCT number ", " $$ = $1 * $3; " ]
+        ],
 
     }
 

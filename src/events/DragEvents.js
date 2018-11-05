@@ -6,7 +6,7 @@ module.exports = class DragEvents {
 
     parseArg (arg) {
         if (isNaN(arg)) {
-            return 'event' + arg;
+            return arg.replace(/\./, 'event.');
         }
 
         return arg;
@@ -23,14 +23,14 @@ module.exports = class DragEvents {
         });
     }
 
-    addRotateEvent (x, y, z, deg) {
+    addRotateEvent (args) {
         this.events.push({
             type: 'drag',
             stringified: `
 
-                let x = ${x};
-                let y = ${y};
-                let z = ${z};
+                let x = ${this.parseArg(args.axis[0])};
+                let y = ${this.parseArg(args.axis[1])};
+                let z = ${this.parseArg(args.axis[2])};
         
                 // Compute the length of the rotation vector
                 let len = Math.sqrt(x*x + y*y + z*z);
@@ -46,10 +46,20 @@ module.exports = class DragEvents {
                 y *= len;
                 z *= len;
         
-                let s = ${Math.sin(deg)};
-                let c = ${Math.cos(deg)};
-                let t = ${1.0 - Math.cos(deg)};
-        
+                ${
+                    isNaN(args.amnt) ?
+                    `
+                        let s = Math.sin(${this.parseArg(args.amnt)});
+                        let c = Math.cos(${this.parseArg(args.amnt)});
+                        let t = 1.0 - Math.cos(${this.parseArg(args.amnt)});
+                    ` :
+                    `
+                        let s = ${Math.sin(this.parseArg(args.amnt))};
+                        let c = ${Math.cos(this.parseArg(args.amnt))};
+                        let t = ${1.0 - Math.cos(this.parseArg(args.amnt))};
+                    `
+                }
+                
                 // TODO
                 let a00 = this.localTransform[0];
                 let a01 = this.localTransform[1];

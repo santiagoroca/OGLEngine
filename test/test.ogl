@@ -9,7 +9,8 @@ scene {
         }
 
         on drag {
-            translate -> x=.delta_x, z=.delta_x
+            rotate -> axis=vec3(0.0, 1.0, 0.0), amnt=.delta_x
+            rotate -> axis=vec3(1.0, 0.0, 0.0), amnt=(.delta_y * -2.0)
         }
     }
 
