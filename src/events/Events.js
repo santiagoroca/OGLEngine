@@ -8,6 +8,10 @@ module.exports = class Events {
         this.events.push(event);
     }
 
+    addEvents (events) {
+        Array.prototype.push.apply(this.events, events);
+    }
+
     toString (geometry_id) {
         return this.events.map(event => {
             let out = `eventScheduler.scheduleDrag((function (event) {`
@@ -18,7 +22,7 @@ module.exports = class Events {
             }
 
             return `${out} }).bind(${geometry_id}));`;
-        })
+        }).join('\n');
     }
 
 }

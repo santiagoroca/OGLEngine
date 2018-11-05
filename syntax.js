@@ -110,18 +110,18 @@ module.exports = {
 
         g_statements:
         [
-            [ " g_statements g_statement ", " $$[$2[0]].apply($$, $2[1]); " ],
-            [ " g_statement ", " $$ = new yy.Geometry(); $$[$1[0]].apply($$, $1[1]); "]
+            [ " g_statements g_statement ", " $$[$2[0]]($2[1]); " ],
+            [ " g_statement ", " $$ = new yy.Geometry(); $$[$1[0]]($1[1]); "]
         ],
 
         g_statement:
         [
-            [ " VERTEXS array ", " $$ = ['setVertexs', [$2]] " ],
-            [ " INDEXES array ", " $$ = ['setIndexes', [$2]]; " ],
-            [ " SOURCE string ", `$$ = ['loadFromFile', [$2]];`],
+            [ " VERTEXS array ", " $$ = ['setVertexs', $2] " ],
+            [ " INDEXES array ", " $$ = ['setIndexes', $2]; " ],
+            [ " SOURCE string ", `$$ = ['loadFromFile', $2];`],
             [ " transform ", `$$ = $1;`],
             [ " STATIC transform ", `
-                $$ = ['applyTransformation', [$4]]
+                $$ = ['applyTransformation', $4]
             `],
             [ " ON event ", `
                 $$ = [ 'addEvents', $2['events'] ]
@@ -131,7 +131,7 @@ module.exports = {
         transform:
         [
             [ " TRANSFORM OBRACE transformations CBRACE ", `
-                $$ = ['applyTransformation', [$3]];
+                $$ = ['applyTransformation', $3];
             `],
         ],
 
@@ -144,16 +144,19 @@ module.exports = {
 
         transformations_events:
         [
-            [ " transformations_events transformations_event ", "$$[$2[0]].apply($$, $2[1]); " ],
-            [ " transformations_event ", `
+            [ " transformations_events transformation_event ", " $$[$2[0]].apply($$, $2[1]); " ],
+            [ " transformation_event ", `
                 $$ = new yy.DragEvents();
                 $$[$1[0]].apply($$, $1[1]);
             `],
         ],
 
-        transformations_event:
+        transformation_event:
         [
             [ " ROTATE vec3 numeric_expression ", `
+                $$ = ['addRotateEvent', [$2[0], $2[1], $2[2], $3]];
+            `],
+            [ " ROTATE vec3 SCOPED_VARIABLE ", `
                 $$ = ['addRotateEvent', [$2[0], $2[1], $2[2], $3]];
             `],
             [ " TRANSLATE vec3 ", " $$ = ['addTranslateEvent', [$2[0], $2[1], $2[2]]]; "],

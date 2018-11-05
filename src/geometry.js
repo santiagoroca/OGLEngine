@@ -43,8 +43,8 @@ module.exports = class Geometry {
         this.indexes = file.indexes;
     }
 
-    addEvents (event) {
-        this.events.addEvent(event);
+    addEvents (events) {
+        this.events.addEvents(events);
     }
 
     isDynamic () {
