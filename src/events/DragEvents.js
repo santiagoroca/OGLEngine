@@ -23,6 +23,35 @@ module.exports = class DragEvents {
         });
     }
 
+    addScaleEvent (args) {
+        this.events.push({
+            type: 'drag',
+            stringified: `
+
+                ${ args.x ? `
+                    this.localTransform[0] *= ${this.parseArg(args.x)};
+                    this.localTransform[3] *= ${this.parseArg(args.x)};
+                    this.localTransform[6] *= ${this.parseArg(args.x)};
+                    this.localTransform[9] *= ${this.parseArg(args.x)};
+                ` : '' }
+
+                ${ args.y ?  `
+                    this.localTransform[1] *= ${this.parseArg(args.y)};
+                    this.localTransform[4] *= ${this.parseArg(args.y)};
+                    this.localTransform[7] *= ${this.parseArg(args.y)};
+                    this.localTransform[10] *= ${this.parseArg(args.y)};
+                ` : '' }
+
+                ${ args.z ? `
+                    this.localTransform[2] *= ${this.parseArg(args.z)};
+                    this.localTransform[5] *= ${this.parseArg(args.z)};
+                    this.localTransform[8] *= ${this.parseArg(args.z)};
+                    this.localTransform[11] *= ${this.parseArg(args.z)};
+                ` : '' }
+            `
+        });
+    }
+
     addRotateEvent (args) {
         this.events.push({
             type: 'drag',

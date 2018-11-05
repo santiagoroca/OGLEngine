@@ -146,7 +146,7 @@ module.exports = {
         [
             [ " ROTATE ARROW args ", ` $$ = ['addRotateEvent', $3]; `],
             [ " TRANSLATE ARROW args ", " $$ = ['addTranslateEvent', $3]; "],
-            [ " SCALE ARROW args ", " $$ = ['ScaleEvent', $3]"]
+            [ " SCALE ARROW args ", " $$ = ['addScaleEvent', $3]"]
         ],
 
         transformations:
