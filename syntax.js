@@ -40,8 +40,8 @@ module.exports = {
             ["@KEYPRESS", "return 'KEYPRESS';"],
 
             /* natives */
+            ["0x[0-9A-Fa-f]{6}", "return 'HEXA';"],
             ["\\-?[0-9]+(?:\\.[0-9]+)?", "return 'NUMBER';"],
-            ["#[0-9A-Fa-f]{6}", "return 'HEXA';"],
             ["'[a-zA-Z0-9\\._/]+'", "return 'STRING';"],
 
             /* Tokens */
@@ -186,7 +186,7 @@ module.exports = {
         ],
 
         hexadecimal: [
-            [ " HEXA ", " $$ = parseInt($1.replace(/#/, ''), 16); " ],
+            [ " HEXA ", " $$ = parseInt($1.replace(/0x/, ''), 16); " ],
         ],
 
         number:

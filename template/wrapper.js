@@ -113,7 +113,10 @@ function viewer (container) {
         void main() {
             vec3 normal = normalize(normals(vPosition)); 
             float attenuation = max(0.0, dot(normal, normalize(vec3(1.0, 0.5, 0.5))));
-            gl_FragColor = geometryColor * vec4(attenuation, attenuation, attenuation, 1.0); 
+            gl_FragColor = max(
+                geometryColor * vec4(attenuation, attenuation, attenuation, 1.0),
+                geometryColor * vec4(0.4)
+            );
         }
     `;
 
