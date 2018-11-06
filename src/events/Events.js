@@ -25,10 +25,12 @@ module.exports = class Events {
         }).join('\n');
     }
 
-    scheduleDragWrapper (geometry_id, handler) {
+    scheduleDragWrapper (geometry_id, event) {
         return `
             eventScheduler.scheduleDrag((function (event) {
-                ${handler.hndl}
+                if (event.button == ${event.btn}) {
+                    ${event.hndl}
+                }
             }).bind(${geometry_id}));
         `;
     }

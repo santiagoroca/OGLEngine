@@ -42,6 +42,11 @@ module.exports = {
             ["@KEYPRESS", "return 'KEYPRESS';"],
             ["@KEYDOWN", "return 'KEYDOWN';"],
             ["@INTERVAL", "return 'INTERVAL';"],
+            ["@BUTTON0", "return 'BUTTON0';"],
+            ["@BUTTON1", "return 'BUTTON1';"],
+            ["@BUTTON2", "return 'BUTTON2';"],
+            ["@BUTTON3", "return 'BUTTON3';"],
+            ["@BUTTON4", "return 'BUTTON4';"],
 
             /* natives */
             ["0x[0-9A-Fa-f]{6}", "return 'HEXA';"],
@@ -249,6 +254,11 @@ module.exports = {
             [ " KEYPRESS ", " $$ = 'keypres'; " ],
             [ " KEYDOWN ", " $$ = 'keydown'; " ],
             [ " INTERVAL ", " $$ = 'interval'; " ],
+            [ " BUTTON0 " , " $$ = 0; " ],
+            [ " BUTTON1 " , " $$ = 1; " ],
+            [ " BUTTON2 " , " $$ = 2; " ],
+            [ " BUTTON3 " , " $$ = 3; " ],
+            [ " BUTTON4 " , " $$ = 4; " ],
             [ " OPAR transformation_event CPAR ", " $$ = $2; " ],
             [ " hexadecimal ", ` $$ = {
                     r: ($1 >> 16) & 255,

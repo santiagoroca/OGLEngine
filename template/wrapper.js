@@ -14,20 +14,20 @@ function EventScheduler (canvas, update) {
     this.active_events = [];
 
     canvas.addEventListener('mousedown', (event) => {
-        this.isLeftMousePressed = event.button == 0;
+        this.isLeftMouseButtonPressed = event.button;
         this.prevXPosition = event.x;
         this.prevYPosition = event.y;
     });
  
     document.addEventListener('mouseup', (event) => {
-        this.isLeftMousePressed = false;
+        this.isLeftMouseButtonPressed = false;
     });
 
     document.addEventListener('keydown', (event) => {
         if (event.repeat) {
             return;
         }
-        
+
         this.active_events.push(event.key);
     });
 
@@ -65,14 +65,15 @@ function EventScheduler (canvas, update) {
 }
 
 EventScheduler.prototype.ondrag = function (event) {
-    if (!this.isLeftMousePressed) {
+    if (isNaN(this.isLeftMouseButtonPressed)) {
         return;
     }
 
     const variables = {
         delta_x: (event.x - this.prevXPosition) * 0.001,
         delta_y: -(event.y - this.prevYPosition) * 0.001,
-        up: [0, 1, 0], right: [1, 0 , 0], back: [0, 0, 1]
+        up: [0, 1, 0], right: [1, 0 , 0], back: [0, 0, 1],
+        button: this.isLeftMouseButtonPressed
     }
 
     for (const schedule of this.drag_schedules) {
