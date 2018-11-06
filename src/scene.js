@@ -1,4 +1,5 @@
 const Transform = require('./transform/Transform.js');
+const Camera = require('./Camera.js');
 const GeometryBatch = require('./geometry_batch.js');
 
 /*
@@ -13,9 +14,18 @@ const GeometryBatch = require('./geometry_batch.js');
 module.exports = class Scene {
 
     constructor () {
-        this.geometries = [];
         this.transform = new Transform();
+        this.cameras = [];
+        this.geometries = [];
         this.events = [];
+    }
+
+    appendCamera (camera) {
+        if (!camera) {
+            return;
+        }
+
+        this.cameras.push(camera);
     }
 
     appendGeometry (geometry) {
@@ -45,6 +55,7 @@ module.exports = class Scene {
         }
 
         out += geometryBatch.toString();
+        out += this.cameras.map(camera => camera.toString()).join('\n');
         
         return out;
     }

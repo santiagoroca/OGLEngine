@@ -1,9 +1,9 @@
-const Math = require('../math.js');
+const MathHelper = require('../math.js');
 
 module.exports = class Transform {
 
     constructor () {
-        this.transform = Math.mat4.identity();
+        this.transform = MathHelper.mat4.identity();
     }
 
     translate (args) {
@@ -62,8 +62,8 @@ module.exports = class Transform {
         z *= len;
 
         // TODO
-        let s = Math.sin(args.deg);
-        let c = Math.cos(args.deg);
+        let s = Math.sin(args.amnt);
+        let c = Math.cos(args.amnt);
         let t = 1.0 - c;
 
         // TODO

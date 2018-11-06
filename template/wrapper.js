@@ -95,6 +95,12 @@ function viewer (container) {
     const eventScheduler = new EventScheduler(canvas, updateMatrix);
 
     /*
+    * There are multiple cameras but only one active
+    */
+    const cameras = [];
+    let activeCamera = null;
+
+    /*
     * Basic Shader Configuration
     */
     const fragment = `
@@ -158,32 +164,23 @@ function viewer (container) {
     shaderProgram.geometryColor = webgl.getUniformLocation(shaderProgram, 'geometryColor');
     webgl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
 
-    /*
-    * Transformation Matrix Configuration
-    */
-    const aspect = canvas.width / canvas.height;
-    const a = 1 * Math.tan(45 * Math.PI / 360);
-    const b = a * aspect;
-    const h = b + b, i = a + a, j = 10 - 1;
-    let worldMatrix = [
-        1, 0, 0, 0,
-        0, 1, 0, 0,
-        0, 0, 1, 0,
-        0, 0, 0, 1
-    ];
-
-    webgl.uniformMatrix4fv(shaderProgram.pMatrix, false, [
-        1 * 2 / h, 0, 0, 0,
-        0, 1 * 2 / i, 0, 0,
-        0, 0, -11 / j, -1,
-        0, 0, -(10 * 1 * 2) / j, 0
-    ]);
-    webgl.uniformMatrix4fv(shaderProgram.uPMVMatrix, false, worldMatrix);
-
     '%scene%'
 
+    /*
+    *
+    */
     function updateMatrix () {
-        webgl.uniformMatrix4fv(shaderProgram.uPMVMatrix, false, worldMatrix);
+        webgl.uniformMatrix4fv(shaderProgram.uPMVMatrix, false, activeCamera.worldMatrix);
+        requestAnimationFrame(() => render());
+    }
+
+    /*
+    *
+    */
+    function enableCamera (camera) {
+        activeCamera = camera;
+        webgl.uniformMatrix4fv(shaderProgram.pMatrix, false, camera.projectionMatrix);
+        webgl.uniformMatrix4fv(shaderProgram.uPMVMatrix, false, camera.worldMatrix);
         requestAnimationFrame(() => render());
     }
 

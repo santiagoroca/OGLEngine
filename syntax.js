@@ -31,6 +31,8 @@ module.exports = {
             ["drag", "return 'DRAG';"],
             ["source", "return 'SOURCE';"],
             ["color", "return 'COLOR';"],
+            ["camera", "return 'CAMERA';"],
+            ["projection", "return 'PROJECTION';"],
 
             /* Constant Values */
             ["@UP", "return 'UP_VECTOR';"],
@@ -102,10 +104,26 @@ module.exports = {
         ],
 
         statement: [
+            [ " CAMERA OBRACE CBRACE ", ` $$ = { k: 'appendCamera', v: null }; `],
             [ " GEOMETRY OBRACE CBRACE ", ` $$ = { k: 'appendGeometry', v: null }; `],
+            [ " CAMERA OBRACE c_statements CBRACE ", `
+                $$ = { k: 'appendCamera', v: $3 };
+            `],
             [ " GEOMETRY OBRACE g_statements CBRACE ", `
                 $$ = { k: 'appendGeometry', v: $3 };
             `]
+        ],
+
+        c_statements:
+        [
+            [ " c_statements c_statement ", " $$[$2[0]]($2[1]); " ],
+            [ " c_statement ", " $$ = new yy.Camera(); $$[$1[0]]($1[1]); "]
+        ],
+
+        c_statement:
+        [
+            [ " transform ", `$$ = $1;`],
+            [ " PROJECTION ARROW args", `$$ = [ 'setProjection', $3 ];`],
         ],
 
         g_statements:

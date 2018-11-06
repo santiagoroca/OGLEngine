@@ -13,6 +13,7 @@ parser.yy = {
     TransformEvents: require('./src/events/TransformEvents.js'),
     Scene: require('./src/scene.js'),
     Geometry: require('./src/geometry.js'),
+    Camera: require('./src/camera.js'),
     Transform: require('./src/transform/Transform.js'),
     Math: require('./src/math.js'),
 }
