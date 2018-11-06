@@ -18,6 +18,8 @@ module.exports = class Events {
             switch (event.type) {
                 case 'drag': return this.scheduleDragWrapper(geometry_id, event)
                 case 'keypres': return this.scheduleKeyPressWrapper(geometry_id, event)
+                case 'keydown': return this.scheduleKeyPressWrapper(geometry_id, event)
+                case 'interval': return this.scheduleIntervalWrapper(geometry_id, event)
             }
 
         }).join('\n');
@@ -34,11 +36,27 @@ module.exports = class Events {
     scheduleKeyPressWrapper (geometry_id, event) {
         return `
             eventScheduler.scheduleKeyPress((function (event) {
+                ${event.hndl}
+            }).bind(${geometry_id}), '${event.key}');
+        `;
+    }
+
+    scheduleIntervalWrapper (geometry_id, event) {
+        return `
+            eventScheduler.scheduleInterval((function (event) {
+                ${event.hndl}
+            }).bind(${geometry_id}), ${event.every});
+        `;
+    }
+
+    scheduleKeyDownWrapper (geometry_id, event) {
+        return `
+            eventScheduler.scheduleKeyDown((function (event) {
                 if (event.key == '${event.key}') {
                     ${event.hndl}
                 }
             }).bind(${geometry_id}));
         `;
     }
-
+    
 }

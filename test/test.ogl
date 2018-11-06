@@ -1,11 +1,17 @@
 scene {
 
     camera {
+
+        # TODO - Far plane might not be working properly
         projection -> fov=60.0, near=1.0, far=10.0
 
+        # TODO - Transform is not working properly
+        # Check what happen with transformations
         transform {
             translate -> z=-5.0
+            rotate -> axis=@UP, amnt=160deg
         }
+
     }
 
     geometry {
@@ -25,8 +31,25 @@ scene {
         on -> type=@KEYPRESS, key='d', hndl=(translate -> x=0.1)
         on -> type=@KEYPRESS, key='w', hndl=(translate -> y=0.1)
         on -> type=@KEYPRESS, key='s', hndl=(translate -> y=-0.1)
-        on -> type=@DRAG, hndl=(rotate -> axis=@UP, amnt=.delta_x)
-        
+        on -> type=@INTERVAL, every=16.0, hndl=(rotate -> axis=@UP, amnt=1deg)
+        on -> type=@INTERVAL, every=16.0, hndl=(rotate -> axis=@RIGHT, amnt=2deg)
+        on -> type=@INTERVAL, every=16.0, hndl=(rotate -> axis=@BACK, amnt=3deg)
     }
+
+    # Create the rest of the events
+        # Keydown
+
+    # Improve Keypress event
+    # Add key configuration to drag
+    # Add events to the scene
+    # Check what happen with transformations
+    # Try to unify all entities and all methods, make diferentiation in JAvascript, not parser
+    # Add parameter to transformation to allow to transform based on world transformations
+    # Create abstract geometries
+    # Create Geometries batches that share transform
+    # Check how to load geometries from different programs
+    # Check how to split your code in different files
+    # Check what about routes and external assets
+    
 
 }

@@ -1,11 +1,17 @@
 function EventScheduler (canvas, update) {
 
+    // Event attribute calculations
     this.isLeftMousePressed = false;
     this.prevXPosition = 0;
     this.prevYPosition = 0;
 
+    // Schedules Lists
     this.drag_schedules = [];
-    this.key_press_schedules = [];
+    this.key_down_schedules = [];
+    this.key_press_schedules = {};
+
+    // Active Events List
+    this.active_events = [];
 
     canvas.addEventListener('mousedown', (event) => {
         this.isLeftMousePressed = event.button == 0;
@@ -17,8 +23,43 @@ function EventScheduler (canvas, update) {
         this.isLeftMousePressed = false;
     });
 
+    document.addEventListener('keydown', (event) => {
+        if (event.repeat) {
+            return;
+        }
+        
+        this.active_events.push(event.key);
+    });
+
+    document.addEventListener('keyup', (event) => {
+        this.active_events.splice(this.active_events.indexOf(event.key), 1);
+    });
+
     canvas.addEventListener('mousemove', (event) => this.ondrag(event));
-    document.addEventListener('keydown', (event) => this.keypress(event));
+    document.addEventListener('keydown', (event) => this.keydown(event));
+
+    /*
+    * Start event loop - WOrk on the delay to make it once every 16ms
+    */
+    const EventLoop = () => {
+        if (!this.active_events.length) {
+            requestAnimationFrame(() => EventLoop());
+            return;
+        }
+
+        for (const key of this.active_events) {
+            if (this.key_press_schedules[key]) {
+                for (const schedule of this.key_press_schedules[key]) {
+                    schedule();
+                }
+            }
+        }
+        
+        requestAnimationFrame(() => this.update());
+        requestAnimationFrame(() => EventLoop());
+    };
+
+    requestAnimationFrame(() => EventLoop());
 
     this.update = update;
 }
@@ -47,20 +88,32 @@ EventScheduler.prototype.scheduleDrag = function (schedule) {
     this.drag_schedules.push(schedule);
 }
 
-EventScheduler.prototype.keypress = function (event) {
+EventScheduler.prototype.scheduleKeyPress = function (schedule, key) {
+    if (!this.key_press_schedules[key]) {
+        this.key_press_schedules[key] = [];
+    }
+
+    this.key_press_schedules[key].push(schedule);
+}
+
+EventScheduler.prototype.keydown = function (event) {
     const variables = {
         key: event.key
     }
 
-    for (const schedule of this.key_press_schedules) {
+    for (const schedule of this.key_down_schedules) {
         schedule(variables);
     }
 
     this.update();
 }
 
-EventScheduler.prototype.scheduleKeyPress = function (schedule) {
-    this.key_press_schedules.push(schedule);
+EventScheduler.prototype.scheduleKeyDown = function (schedule) {
+    this.key_down_schedules.push(schedule);
+}
+
+EventScheduler.prototype.scheduleInterval = function (schedule, timer) {
+    setInterval(() => { schedule(); requestAnimationFrame(() => this.update()); }, timer);
 }
 
 function viewer (container) {
@@ -186,6 +239,7 @@ function viewer (container) {
 
     /*
     * Render Geometry Objectsl
+    * TODO Remember to implement isDirty pattern
     */
     function render () {
         
