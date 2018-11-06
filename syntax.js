@@ -40,6 +40,7 @@ module.exports = {
             ["@BACK", "return 'BACK_VECTOR';"],
             ["@DRAG", "return 'DRAG';"],
             ["@KEYPRESS", "return 'KEYPRESS';"],
+            ["@KEYDOWN", "return 'KEYDOWN';"],
             ["@INTERVAL", "return 'INTERVAL';"],
 
             /* natives */
@@ -246,6 +247,7 @@ module.exports = {
             [ " BACK_VECTOR ", " $$ = [0, 0, 1]; " ],
             [ " DRAG ", " $$ = 'drag'; " ],
             [ " KEYPRESS ", " $$ = 'keypres'; " ],
+            [ " KEYDOWN ", " $$ = 'keydown'; " ],
             [ " INTERVAL ", " $$ = 'interval'; " ],
             [ " OPAR transformation_event CPAR ", " $$ = $2; " ],
             [ " hexadecimal ", ` $$ = {

@@ -18,7 +18,7 @@ module.exports = class Events {
             switch (event.type) {
                 case 'drag': return this.scheduleDragWrapper(geometry_id, event)
                 case 'keypres': return this.scheduleKeyPressWrapper(geometry_id, event)
-                case 'keydown': return this.scheduleKeyPressWrapper(geometry_id, event)
+                case 'keydown': return this.scheduleKeyDownWrapper(geometry_id, event)
                 case 'interval': return this.scheduleIntervalWrapper(geometry_id, event)
             }
 

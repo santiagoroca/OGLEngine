@@ -27,10 +27,10 @@ scene {
         }
 
         # Event Handlers
-        on -> type=@KEYPRESS, key='a', hndl=(translate -> x=-0.1)
-        on -> type=@KEYPRESS, key='d', hndl=(translate -> x=0.1)
-        on -> type=@KEYPRESS, key='w', hndl=(translate -> y=0.1)
-        on -> type=@KEYPRESS, key='s', hndl=(translate -> y=-0.1)
+        on -> type=@KEYDOWN, key='a', hndl=(translate -> x=-0.1)
+        on -> type=@KEYDOWN, key='d', hndl=(translate -> x=0.1)
+        on -> type=@KEYDOWN, key='w', hndl=(translate -> y=0.1)
+        on -> type=@KEYDOWN, key='s', hndl=(translate -> y=-0.1)
         on -> type=@INTERVAL, every=16.0, hndl=(rotate -> axis=@UP, amnt=1deg)
         on -> type=@INTERVAL, every=16.0, hndl=(rotate -> axis=@RIGHT, amnt=2deg)
         on -> type=@INTERVAL, every=16.0, hndl=(rotate -> axis=@BACK, amnt=3deg)
@@ -50,6 +50,8 @@ scene {
     # Check how to load geometries from different programs
     # Check how to split your code in different files
     # Check what about routes and external assets
+    # Implement dirty pattern in render function and update function
+    # CHeck on keypress method to filter only alphanumeric keys
     
 
 }
