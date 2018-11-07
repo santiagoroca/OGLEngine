@@ -1,7 +1,11 @@
+function Transformable (transform) {
+    this.transform = transform;
+}
+
 function EventScheduler (canvas, update) {
 
     // Event attribute calculations
-    this.isLeftMousePressed = false;
+    this.isMousePressed = false;
     this.prevXPosition = 0;
     this.prevYPosition = 0;
 
@@ -11,16 +15,16 @@ function EventScheduler (canvas, update) {
     this.key_press_schedules = {};
 
     // Active Events List
-    this.active_events = [];
+    this.active_events = {};
 
     canvas.addEventListener('mousedown', (event) => {
-        this.isLeftMouseButtonPressed = event.button;
+        this.isMousePressed = event.button;
         this.prevXPosition = event.x;
         this.prevYPosition = event.y;
     });
  
     document.addEventListener('mouseup', (event) => {
-        this.isLeftMouseButtonPressed = false;
+        this.isMousePressed = false;
     });
 
     document.addEventListener('keydown', (event) => {
@@ -28,11 +32,11 @@ function EventScheduler (canvas, update) {
             return;
         }
 
-        this.active_events.push(event.key);
+        this.active_events[event.key] = true;
     });
 
     document.addEventListener('keyup', (event) => {
-        this.active_events.splice(this.active_events.indexOf(event.key), 1);
+        this.active_events[event.key] = false;
     });
 
     canvas.addEventListener('mousemove', (event) => this.ondrag(event));
@@ -42,12 +46,15 @@ function EventScheduler (canvas, update) {
     * Start event loop - WOrk on the delay to make it once every 16ms
     */
     const EventLoop = () => {
-        if (!this.active_events.length) {
+        const active_events = Object.keys(this.active_events)
+            .filter(key => this.active_events[key]);
+
+        if (!active_events.length) {
             requestAnimationFrame(() => EventLoop());
             return;
         }
 
-        for (const key of this.active_events) {
+        for (const key of active_events) {
             if (this.key_press_schedules[key]) {
                 for (const schedule of this.key_press_schedules[key]) {
                     schedule();
@@ -65,7 +72,7 @@ function EventScheduler (canvas, update) {
 }
 
 EventScheduler.prototype.ondrag = function (event) {
-    if (isNaN(this.isLeftMouseButtonPressed)) {
+    if (this.isMousePressed === false) {
         return;
     }
 
@@ -224,7 +231,7 @@ function viewer (container) {
     *
     */
     function updateMatrix () {
-        webgl.uniformMatrix4fv(shaderProgram.uPMVMatrix, false, activeCamera.worldMatrix);
+        webgl.uniformMatrix4fv(shaderProgram.uPMVMatrix, false, activeCamera.transform);
         requestAnimationFrame(() => render());
     }
 
@@ -234,7 +241,7 @@ function viewer (container) {
     function enableCamera (camera) {
         activeCamera = camera;
         webgl.uniformMatrix4fv(shaderProgram.pMatrix, false, camera.projectionMatrix);
-        webgl.uniformMatrix4fv(shaderProgram.uPMVMatrix, false, camera.worldMatrix);
+        webgl.uniformMatrix4fv(shaderProgram.uPMVMatrix, false, camera.transform);
         requestAnimationFrame(() => render());
     }
 
@@ -248,7 +255,7 @@ function viewer (container) {
         webgl.clear(webgl.COLOR_BUFFER_BIT);
 
         for (const geometry of geometries) {
-            webgl.uniformMatrix4fv(shaderProgram.localTransform, false, geometry.localTransform);
+            webgl.uniformMatrix4fv(shaderProgram.localTransform, false, geometry.transform);
             webgl.uniform4fv(shaderProgram.geometryColor, geometry.color);
             webgl.bindBuffer(webgl.ARRAY_BUFFER, geometry.vertexs);
             webgl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, 3, webgl.FLOAT, false, 0, 0);

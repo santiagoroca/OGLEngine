@@ -78,13 +78,13 @@ module.exports = class Geometry {
                 ${this.indexes}
             ]).buffer, webgl.STATIC_DRAW);
 
-            const geometry_${g_hash} = {
+            const geometry_${g_hash} = Object.assign({
                 vertexs: v_buff_${r_hash},
                 indexes: f_buff_${r_hash},
                 count: ${this.indexes.length},
-                localTransform: [${this.transform.transform}],
-                color: [${this.color.r}, ${this.color.g}, ${this.color.b}, ${this.color.a}]
-            };
+                color: [${this.color.r}, ${this.color.g}, ${this.color.b}, ${this.color.a}],
+                transform: [${this.transform.transform}]
+            });
             geometries.push(geometry_${g_hash});
 
             ${this.events.toString(`geometry_${g_hash}`)}

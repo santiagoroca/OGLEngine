@@ -114,13 +114,14 @@ module.exports = {
         c_statements:
         [
             [ " c_statements c_statement ", " $$[$2[0]]($2[1]); " ],
-            [ " c_statement ", " $$ = new yy.Camera(); $$[$1[0]]($1[1]); "]
+            [ " c_statement ", " $$ = new yy.Camera(); $$[$1[0]]($1[1]); "],
         ],
 
         c_statement:
         [
             [ " transform ", `$$ = $1;`],
             [ " PROJECTION ARROW args", `$$ = [ 'setProjection', $3 ];`],
+            [ " ON ARROW args ", " $$ = [ 'addEvent', $3 ] "],
         ],
 
         g_statements:

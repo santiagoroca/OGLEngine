@@ -12,52 +12,52 @@ module.exports = class Events {
         Array.prototype.push.apply(this.events, events);
     }
 
-    toString (geometry_id) {
+    toString (object_id) {
         return this.events.map(event => {
 
             switch (event.type) {
-                case 'drag': return this.scheduleDragWrapper(geometry_id, event)
-                case 'keypres': return this.scheduleKeyPressWrapper(geometry_id, event)
-                case 'keydown': return this.scheduleKeyDownWrapper(geometry_id, event)
-                case 'interval': return this.scheduleIntervalWrapper(geometry_id, event)
+                case 'drag': return this.scheduleDragWrapper(object_id, event)
+                case 'keypress': return this.scheduleKeyPressWrapper(object_id, event)
+                case 'keydown': return this.scheduleKeyDownWrapper(object_id, event)
+                case 'interval': return this.scheduleIntervalWrapper(object_id, event)
             }
 
         }).join('\n');
     }
 
-    scheduleDragWrapper (geometry_id, event) {
+    scheduleDragWrapper (object_id, event) {
         return `
             eventScheduler.scheduleDrag((function (event) {
-                if (event.button == ${event.btn}) {
+                ${ event.btn ? `if (event.button == ${event.btn}) {` : ''}
                     ${event.hndl}
-                }
-            }).bind(${geometry_id}));
+                ${ event.btn ? `}` : ''}
+            }).bind(${object_id}));
         `;
     }
 
-    scheduleKeyPressWrapper (geometry_id, event) {
+    scheduleKeyPressWrapper (object_id, event) {
         return `
             eventScheduler.scheduleKeyPress((function (event) {
                 ${event.hndl}
-            }).bind(${geometry_id}), '${event.key}');
+            }).bind(${object_id}), '${event.key}');
         `;
     }
 
-    scheduleIntervalWrapper (geometry_id, event) {
+    scheduleIntervalWrapper (object_id, event) {
         return `
             eventScheduler.scheduleInterval((function (event) {
                 ${event.hndl}
-            }).bind(${geometry_id}), ${event.every});
+            }).bind(${object_id}), ${event.every});
         `;
     }
 
-    scheduleKeyDownWrapper (geometry_id, event) {
+    scheduleKeyDownWrapper (object_id, event) {
         return `
             eventScheduler.scheduleKeyDown((function (event) {
                 if (event.key == '${event.key}') {
                     ${event.hndl}
                 }
-            }).bind(${geometry_id}));
+            }).bind(${object_id}));
         `;
     }
     
