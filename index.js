@@ -16,6 +16,7 @@ parser.yy = {
     Camera: require('./src/camera.js'),
     Transform: require('./src/transform/Transform.js'),
     Math: require('./src/math.js'),
+    Constants: require('./src/constants.js'),
 }
 
 // Output program

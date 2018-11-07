@@ -2,10 +2,9 @@ scene {
 
     camera {
 
-        # TODO - Far plane might not be working properly
+        # Projection Configuration
         projection -> fov=60.0, near=1.0, far=10.0
-
-        # TODO - Transform is not working properly
+        
         # Check what happen with transformations
         transform {
             translate -> z=-5.0
@@ -26,17 +25,14 @@ scene {
             scale -> x=0.5, y=0.5, z=0.5
         }
 
-        # Event Handlers
-        on -> type=@DRAG, btn=@BUTTON0, hndl=(translate -> x=.delta_x)
-        on -> type=@DRAG, btn=@BUTTON2, hndl=(translate -> y=.delta_x)
-        on -> type=@INTERVAL, every=16.0, hndl=(rotate -> axis=@UP, amnt=1deg)
-        on -> type=@INTERVAL, every=16.0, hndl=(rotate -> axis=@RIGHT, amnt=2deg)
-        on -> type=@INTERVAL, every=16.0, hndl=(rotate -> axis=@BACK, amnt=3deg)
+        # Event Handler
+        on -> type=@INTERVAL, every=@FRAME, hndl=(rotate -> axis=@UP, amnt=1deg)
+
     }
 
     # Add events to the scene
     # Check what happen with transformations
-    # Try to unify all entities and all methods, make diferentiation in JAvascript, not parser
+    # Try to unify all entities and all methods, make diferentiation in Javascript, not parser
     # Add parameter to transformation to allow to transform based on world transformations
     # Create abstract geometries
     # Create Geometries batches that share transform
@@ -46,6 +42,8 @@ scene {
     # Implement dirty pattern in render function and update function
     # Check on keypress method to filter only alphanumeric keys
     # Use dictionary for all key events, all mouse events maybe
+    # TODO - Transform is not working properly
+    # TODO - Far plane might not be working properly
     
 
 }

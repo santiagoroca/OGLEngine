@@ -35,18 +35,7 @@ module.exports = {
             ["projection", "return 'PROJECTION';"],
 
             /* Constant Values */
-            ["@UP", "return 'UP_VECTOR';"],
-            ["@RIGHT", "return 'RIGHT_VECTOR';"],
-            ["@BACK", "return 'BACK_VECTOR';"],
-            ["@DRAG", "return 'DRAG';"],
-            ["@KEYPRESS", "return 'KEYPRESS';"],
-            ["@KEYDOWN", "return 'KEYDOWN';"],
-            ["@INTERVAL", "return 'INTERVAL';"],
-            ["@BUTTON0", "return 'BUTTON0';"],
-            ["@BUTTON1", "return 'BUTTON1';"],
-            ["@BUTTON2", "return 'BUTTON2';"],
-            ["@BUTTON3", "return 'BUTTON3';"],
-            ["@BUTTON4", "return 'BUTTON4';"],
+            ["@", "return 'AT';"],
 
             /* natives */
             ["0x[0-9A-Fa-f]{6}", "return 'HEXA';"],
@@ -66,7 +55,8 @@ module.exports = {
             ["\\*", "return 'PRODUCT';"],
             ["->", "return 'ARROW';"],
             ["[a-zA-Z]*?=", "return 'VARNAME';"],
-            ["\.[a-zA-Z0-9_/]*", "return 'SCOPE_VARIABLE';"],
+            ["\\.[a-zA-Z0-9_/]*", "return 'SCOPE_VARIABLE';"],
+            ["[a-zA-Z0-9_/]+", "return 'CONSTANT';"],
             ["'", "return 'QUOTE';"],
             [
                 "[#|\\.]-?[_a-zA-Z]+[_a-zA-Z0-9-]*",
@@ -247,18 +237,6 @@ module.exports = {
             [ " SCOPE_VARIABLE ", " $$ = $1; "],
             [ " vec3 ", " $$ = $1; "],
             [ " expression ", " $$ = $1; " ],
-            [ " UP_VECTOR ", " $$ = [0, 1, 0]; " ],
-            [ " RIGHT_VECTOR ", " $$ = [1, 0, 0]; " ],
-            [ " BACK_VECTOR ", " $$ = [0, 0, 1]; " ],
-            [ " DRAG ", " $$ = 'drag'; " ],
-            [ " KEYPRESS ", " $$ = 'keypres'; " ],
-            [ " KEYDOWN ", " $$ = 'keydown'; " ],
-            [ " INTERVAL ", " $$ = 'interval'; " ],
-            [ " BUTTON0 " , " $$ = 0; " ],
-            [ " BUTTON1 " , " $$ = 1; " ],
-            [ " BUTTON2 " , " $$ = 2; " ],
-            [ " BUTTON3 " , " $$ = 3; " ],
-            [ " BUTTON4 " , " $$ = 4; " ],
             [ " OPAR transformation_event CPAR ", " $$ = $2; " ],
             [ " hexadecimal ", ` $$ = {
                     r: ($1 >> 16) & 255,
@@ -266,6 +244,7 @@ module.exports = {
                     b: ($1 >> 0) & 255
                 };
             `],
+            [ " constant ", " $$ = $1; "]
         ],
 
         expression:
@@ -274,6 +253,11 @@ module.exports = {
             [ " SCOPE_VARIABLE PRODUCT number ", " $$ = $1 + '*' + $3; " ],
             [ " number PRODUCT number ", " $$ = $1 * $3; " ]
         ],
+
+        constant:
+        [
+            [ " AT CONSTANT ", " $$ = yy.Constants[$2]; " ]
+        ]
 
     }
 
