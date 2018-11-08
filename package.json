@@ -9,7 +9,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "g": "^2.0.1",
     "jison": "^0.4.18"
   }
 }
