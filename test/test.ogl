@@ -3,7 +3,7 @@ scene {
     camera {
 
         # Projection Configuration
-        projection -> fov=60.0, near=0.1, far=10.0
+        projection -> fov=45.0, near=0.1, far=10.0
         
         # Check what happen with transformations
         transform {
@@ -16,12 +16,14 @@ scene {
         on -> type=@KEYPRESS, key='d', hndl=(translate -> x=-0.1)
         on -> type=@KEYPRESS, key='w', hndl=(translate -> z=0.1)
         on -> type=@KEYPRESS, key='s', hndl=(translate -> z=-0.1)
+        on -> type=@DRAG, btn=@BUTTON0, hndl=(rotate -> axis=@UP, amnt=.delta_x)
+        on -> type=@DRAG, btn=@BUTTON0, hndl=(rotate -> axis=@RIGHT, amnt=.delta_y)
     }
 
     geometry {
 
         # Picks the loader automatically, based on the extension
-        source -> src='./models/cube.json'
+        source -> src='./models/test.json'
 
         # Color can be defined in so many pretty ways
         color -> r=1.0, g=0.0, b=0.9

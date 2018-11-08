@@ -1,7 +1,7 @@
-const read = require('fs').readFileSync;
 const Transform = require('./transform/Transform.js');
 const Events = require('./events/Events.js');
 const hash = require('./helper.js').hash;
+const load = require('./parser/loader.js');
 
 module.exports = class Geometry {
 
@@ -39,9 +39,9 @@ module.exports = class Geometry {
     }
 
     loadFromFile (args) {
-        const file = JSON.parse(read(args.src));
-        this.vertexs = file.vertexs;
-        this.indexes = file.indexes;
+        const geometry = load(args.src);
+        this.vertexs = geometry.vertexs;
+        this.indexes = geometry.indexes;
     }
 
     setColor (args) {
