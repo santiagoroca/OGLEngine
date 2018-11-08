@@ -1,8 +1,63 @@
-function Transformable (transform) {
-    this.transform = transform;
+function Transform (transform = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]) {
+    this.matrix = transform;
+    this.translation = [0, 0, 0];
+    this.x_angle = 0;
+    this.y_angle = 0;
+    this.z_angle = 0;
+    this.scale = 1.0;
 }
 
+Transform.prototype.translate = function (x, y, z) {
+
+    const right = vec3.multiplyScalar(vec3.normalize([
+        this.matrix[0], this.matrix[4], this.matrix[8]
+    ]), x);
+
+    const up = vec3.multiplyScalar(vec3.normalize([
+        this.matrix[1], this.matrix[5], this.matrix[9]
+    ]), y);
+
+    const back = vec3.multiplyScalar(vec3.normalize([
+        this.matrix[2], this.matrix[6], this.matrix[10]
+    ]), z);
+
+    this.translation = vec3.add(
+        this.translation, vec3.add(vec3.add(right, up), back)
+    );
+
+    this.calculateTransform();
+}
+
+Transform.prototype.rotate = function (x, y, z) {
+    this.x_angle += x;
+    this.y_angle += y;
+    this.z_angle += z;
+    this.calculateTransform();
+}
+
+Transform.prototype.calculateTransform = function () {
+    this.matrix = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
+
+    this.matrix = mat4.rotate(this.matrix, this.y_angle, [
+        this.matrix[1], this.matrix[5], this.matrix[9]
+    ]);
+
+    this.matrix = mat4.rotate(this.matrix, this.x_angle, [
+        this.matrix[0], this.matrix[4], this.matrix[8]
+    ]);
+
+    this.matrix = mat4.rotate(this.matrix, this.z_angle, [
+        this.matrix[2], this.matrix[6], this.matrix[10]
+    ]);
+
+    this.matrix = mat4.translate(this.matrix, this.translation);
+}
+
+
 function EventScheduler (canvas, update) {
+
+    // DIsable context menu
+    canvas.oncontextmenu  = () => false;
 
     // Event attribute calculations
     this.isMousePressed = false;
@@ -80,7 +135,7 @@ EventScheduler.prototype.ondrag = function (event) {
         delta_x: (event.x - this.prevXPosition) * 0.001,
         delta_y: -(event.y - this.prevYPosition) * 0.001,
         up: [0, 1, 0], right: [1, 0 , 0], back: [0, 0, 1],
-        button: this.isLeftMouseButtonPressed
+        button: this.isMousePressed
     }
 
     for (const schedule of this.drag_schedules) {
@@ -231,7 +286,7 @@ function viewer (container) {
     *
     */
     function updateMatrix () {
-        webgl.uniformMatrix4fv(shaderProgram.uPMVMatrix, false, activeCamera.transform);
+        webgl.uniformMatrix4fv(shaderProgram.uPMVMatrix, false, activeCamera.transform.matrix);
         requestAnimationFrame(() => render());
     }
 
@@ -241,7 +296,7 @@ function viewer (container) {
     function enableCamera (camera) {
         activeCamera = camera;
         webgl.uniformMatrix4fv(shaderProgram.pMatrix, false, camera.projectionMatrix);
-        webgl.uniformMatrix4fv(shaderProgram.uPMVMatrix, false, camera.transform);
+        webgl.uniformMatrix4fv(shaderProgram.uPMVMatrix, false, camera.transform.matrix);
         requestAnimationFrame(() => render());
     }
 
@@ -255,7 +310,7 @@ function viewer (container) {
         webgl.clear(webgl.COLOR_BUFFER_BIT);
 
         for (const geometry of geometries) {
-            webgl.uniformMatrix4fv(shaderProgram.localTransform, false, geometry.transform);
+            webgl.uniformMatrix4fv(shaderProgram.localTransform, false, geometry.transform.matrix);
             webgl.uniform4fv(shaderProgram.geometryColor, geometry.color);
             webgl.bindBuffer(webgl.ARRAY_BUFFER, geometry.vertexs);
             webgl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, 3, webgl.FLOAT, false, 0, 0);

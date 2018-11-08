@@ -28,9 +28,9 @@ module.exports = class Events {
     scheduleDragWrapper (object_id, event) {
         return `
             eventScheduler.scheduleDrag((function (event) {
-                ${ event.btn ? `if (event.button == ${event.btn}) {` : ''}
+                ${ typeof event.btn !== 'undefined' ? `if (event.button == ${event.btn}) {` : ''}
                     ${event.hndl}
-                ${ event.btn ? `}` : ''}
+                ${ typeof event.btn !== 'undefined' ? `}` : ''}
             }).bind(${object_id}));
         `;
     }

@@ -20,11 +20,12 @@ parser.yy = {
 }
 
 // Output program
-console.log(
-    WRAPPER_TEMPLATE.replace(/'%scene%'/g, parser.parse(
+console.log(`
+    ${read('./template/mat.js')}    
+    ${WRAPPER_TEMPLATE.replace(/'%scene%'/g, parser.parse(
         read('./test/test.ogl').toString()
-    ))
-);
+    ))}
+`);
 
 /*WRAPPER_TEMPLATE.replace(/'%scene%'/g, parser.parse(
     read('./test/test.ogl').toString()

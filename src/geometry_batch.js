@@ -40,7 +40,7 @@ module.exports = class GeometryBatch {
                 vertexs: v_buff_${r_hash},
                 indexes: f_buff_${r_hash},
                 count: ${this.indexes.length},
-                transform: [${Math.mat4.identity()}], 
+                transform: new Transform(), 
                 color: [0.5, 0.5, 0.5, 1.0]
             })
         `

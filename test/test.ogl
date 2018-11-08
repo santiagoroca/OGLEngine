@@ -11,13 +11,10 @@ scene {
             rotate -> axis=@UP, amnt=160deg
         }
 
-        # Event Handler
-        on -> type=@KEYPRESS, key='a', hndl=(translate -> x=0.1)
-        on -> type=@KEYPRESS, key='d', hndl=(translate -> x=-0.1)
-        on -> type=@KEYPRESS, key='w', hndl=(translate -> z=0.1)
-        on -> type=@KEYPRESS, key='s', hndl=(translate -> z=-0.1)
-        on -> type=@DRAG, btn=@BUTTON0, hndl=(rotate -> axis=@UP, amnt=.delta_x)
-        on -> type=@DRAG, btn=@BUTTON0, hndl=(rotate -> axis=@RIGHT, amnt=.delta_y)
+        # Event Handlers
+        on -> type=@DRAG, btn=@BUTTON0, hndl=(rotate -> x=(.delta_y * -1), y=.delta_x)
+        on -> type=@DRAG, btn=@BUTTON2, hndl=(translate -> x=(.delta_x * 2), y=(.delta_y * 2))
+        
     }
 
     geometry {
@@ -31,8 +28,6 @@ scene {
         transform {
             scale -> x=0.5, y=0.5, z=0.5
         }
-
-        on -> type=@INTERVAL, every=@FRAME, hndl=(rotate -> axis=@UP, amnt=-1deg)
     }
 
     geometry {
@@ -48,7 +43,10 @@ scene {
             translate -> x=-2.0
         }
 
-        on -> type=@INTERVAL, every=@FRAME, hndl=(rotate -> axis=@UP, amnt=1deg)
+        on -> type=@KEYPRESS, key='a', hndl=(translate -> x=0.1)
+        on -> type=@KEYPRESS, key='d', hndl=(translate -> x=-0.1)
+        on -> type=@KEYPRESS, key='w', hndl=(translate -> z=0.1)
+        on -> type=@KEYPRESS, key='s', hndl=(translate -> z=-0.1)
     }
 
     # Check what happen with transformations

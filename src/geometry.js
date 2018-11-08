@@ -83,7 +83,7 @@ module.exports = class Geometry {
                 indexes: f_buff_${r_hash},
                 count: ${this.indexes.length},
                 color: [${this.color.r}, ${this.color.g}, ${this.color.b}, ${this.color.a}],
-                transform: [${this.transform.transform}]
+                transform: new Transform([${this.transform.transform}])
             });
             geometries.push(geometry_${g_hash});
 
