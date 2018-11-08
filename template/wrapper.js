@@ -26,6 +26,7 @@ Transform.prototype.translate = function (x, y, z) {
     );
 
     this.calculateTransform();
+    
 }
 
 Transform.prototype.rotate = function (x, y, z) {

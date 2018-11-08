@@ -49,16 +49,16 @@ scene {
         on -> type=@KEYPRESS, key='s', hndl=(translate -> z=-0.1)
     }
 
-    # Check what happen with transformations
-    # Add parameter to transformation to allow to transform based on world transformations
-    # Create abstract geometries
+    # Add lights configurations/shader configuration
+    # Check on keypress method to filter only alphanumeric keys
+    # Use dictionary for all key events, all mouse events maybe
     # Create Geometries batches that share transform
-    # Check how to load geometries from different programs
+    # Add parameter to indicate transformations relative to what
+    # Create abstract geometries
+    # Check how to load geometries from different libraries / async
     # Check how to split your code in different files
     # Check what about routes and external assets
     # Implement dirty pattern in render function and update function
-    # Check on keypress method to filter only alphanumeric keys
-    # Use dictionary for all key events, all mouse events maybe
     # Try to unify all entities and all methods, make diferentiation in Javascript, not parser
     # TODO - Transform is not working properly
     # TODO - Far plane might not be working properly
