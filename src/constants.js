@@ -12,4 +12,7 @@ module.exports = {
     "BUTTON3": 3,
     "BUTTON4": 4,
     "FRAME": 16,
+    "DIRECTIONAL": 'directional',
+    "AMBIENT": 'ambient',
+    "POINT": 'point'
 }

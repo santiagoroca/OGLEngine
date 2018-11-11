@@ -1,4 +1,5 @@
 module.exports = (directional_l, ambient_l, point_l) => {
+
     return `
 
         const PhongFragment = \`
@@ -8,14 +9,28 @@ module.exports = (directional_l, ambient_l, point_l) => {
             uniform mat4 uPMVMatrix;
             uniform vec4 geometryColor; 
 
+            const vec4 ambient_light = vec4(${ambient_l});
+
+            ${
+                directional_l.map(
+                    ({ direction }, index) => `const vec3 dir_${index} = vec3(${direction});`
+                ).join('\n')
+            }
+
             varying vec3 vNormal;
 
             void main() {
-                float attenuation = max(0.3, dot(vNormal, vec3(1.0, 0.5, -0.5)));
-                gl_FragColor = max(
-                    geometryColor * vec4(attenuation, attenuation, attenuation, 1.0),
-                    geometryColor * vec4(0.4)
-                );
+                float attenuation = 0.0;
+                
+                ${
+                    directional_l.map(
+                        ({}, index) => ` attenuation += max(0.0, dot(vNormal, dir_${index}));`
+                    ).join('\n')
+                }
+                
+                gl_FragColor = 
+                    geometryColor * vec4(attenuation, attenuation, attenuation, 1.0) +
+                    geometryColor * ambient_light;
             }
         \`;
 
