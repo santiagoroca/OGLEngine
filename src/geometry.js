@@ -1,7 +1,7 @@
 const Transform = require('./transform/Transform.js');
 const Events = require('./events/Events.js');
 const hash = require('./helper.js').hash;
-const load = require('./parser/loader.js');
+const load = require('./parser/Loader.js');
 
 module.exports = class Geometry {
 
@@ -50,6 +50,10 @@ module.exports = class Geometry {
         }
         
         Object.assign(this.color, args);
+    }
+
+    generateNormals () {
+        
     }
 
     addEvent (event) {

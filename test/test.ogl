@@ -1,5 +1,7 @@
 scene {
 
+    light -> type=@DIRECTIONAL, axis=vec3(1.0, 0.0, 0.0), color=0xFF0000
+
     camera {
 
         # Projection Configuration
@@ -20,19 +22,6 @@ scene {
     geometry {
 
         # Picks the loader automatically, based on the extension
-        source -> src='./models/test.json'
-
-        # Color can be defined in so many pretty ways
-        color -> r=1.0, g=0.0, b=0.9
-
-        transform {
-            scale -> x=0.5, y=0.5, z=0.5
-        }
-    }
-
-    geometry {
-
-        # Picks the loader automatically, based on the extension
         source -> src='./models/cube.json'
 
         # Color can be defined in so many pretty ways
@@ -43,10 +32,7 @@ scene {
             translate -> x=-2.0
         }
 
-        on -> type=@KEYPRESS, key='a', hndl=(translate -> x=0.1)
-        on -> type=@KEYPRESS, key='d', hndl=(translate -> x=-0.1)
-        on -> type=@KEYPRESS, key='w', hndl=(translate -> z=0.1)
-        on -> type=@KEYPRESS, key='s', hndl=(translate -> z=-0.1)
+        on -> type=@INTERVAL, every=@FRAME, hndl=(rotate -> y=0.1)
     }
 
     # Add lights configurations/shader configuration

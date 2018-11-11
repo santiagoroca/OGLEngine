@@ -1,5 +1,5 @@
 const Transform = require('./transform/Transform.js');
-const Camera = require('./Camera.js');
+const Shaders = require('./shader/Shaders.js');
 const GeometryBatch = require('./geometry_batch.js');
 
 /*
@@ -15,9 +15,14 @@ module.exports = class Scene {
 
     constructor () {
         this.transform = new Transform();
+        this.shaders = new Shaders();
         this.cameras = [];
         this.geometries = [];
         this.events = [];
+    }
+
+    appendLight (light) {
+        this.shaders.appendLight(light);
     }
 
     appendCamera (camera) {
@@ -45,16 +50,15 @@ module.exports = class Scene {
         let out = '';
 
         for (const geometry of this.geometries) {
-
             if (geometry.isDynamic()) {
                 out += geometry.toString();
             } else {
                 geometryBatch.addGeometry(geometry);
             }
-
         }
 
         out += geometryBatch.toString();
+        out += this.shaders.toString();
         out += this.cameras.map(camera => camera.toString()).join('\n');
         
         return out;

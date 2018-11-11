@@ -9,6 +9,9 @@ module.exports = {
 
         "rules": [
 
+            /* Variables */
+            ["[a-zA-Z]*?=", "return 'VARNAME';"],
+
             /* KEYWORDS */
             ["\\s+", "/* skip whitespace */"],
             ["scene", "return 'SCENE';"],
@@ -33,6 +36,7 @@ module.exports = {
             ["color", "return 'COLOR';"],
             ["camera", "return 'CAMERA';"],
             ["projection", "return 'PROJECTION';"],
+            ["light", "return 'LIGHT';"],
 
             /* Constant Values */
             ["@", "return 'AT';"],
@@ -54,7 +58,6 @@ module.exports = {
             [",", "return 'COLON';"],
             ["\\*", "return 'PRODUCT';"],
             ["->", "return 'ARROW';"],
-            ["[a-zA-Z]*?=", "return 'VARNAME';"],
             ["\\.[a-zA-Z0-9_/]*", "return 'SCOPE_VARIABLE';"],
             ["[a-zA-Z0-9_/]+", "return 'CONSTANT';"],
             ["'", "return 'QUOTE';"],
@@ -103,6 +106,7 @@ module.exports = {
         statement: [
             [ " CAMERA OBRACE CBRACE ", ` $$ = { k: 'appendCamera', v: null }; `],
             [ " GEOMETRY OBRACE CBRACE ", ` $$ = { k: 'appendGeometry', v: null }; `],
+            [ " LIGHT ARROW args ", ` $$ = { k: 'appendLight', v: $3 }; `],
             [ " CAMERA OBRACE c_statements CBRACE ", `
                 $$ = { k: 'appendCamera', v: $3 };
             `],
