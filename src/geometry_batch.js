@@ -23,6 +23,8 @@ module.exports = class GeometryBatch {
     }
 
     toString () {
+        return '';
+        
         const r_hash = hash();
 
         return `

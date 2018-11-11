@@ -43,6 +43,7 @@ module.exports = class Scene {
         return [Phong].map(shader => shader(
             this.directional_lights, ambient_lights, this.point_lights
         ));
+        
     }
 
 }

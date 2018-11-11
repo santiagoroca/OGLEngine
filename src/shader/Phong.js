@@ -18,6 +18,7 @@ module.exports = (directional_l, ambient_l, point_l) => {
             }
 
             varying vec3 vNormal;
+            varying vec4 vVertexColor;
 
             void main() {
                 float attenuation = 0.0;
@@ -29,8 +30,8 @@ module.exports = (directional_l, ambient_l, point_l) => {
                 }
                 
                 gl_FragColor = 
-                    geometryColor * vec4(attenuation, attenuation, attenuation, 1.0) +
-                    geometryColor * ambient_light;
+                    vVertexColor * vec4(attenuation, attenuation, attenuation, 1.0) +
+                    vVertexColor * ambient_light;
             }
         \`;
 
@@ -38,18 +39,22 @@ module.exports = (directional_l, ambient_l, point_l) => {
 
             attribute lowp vec3 aVertexPosition; 
             attribute lowp vec3 aVertexNormal;
+            attribute lowp vec2 aVertexUV;
 
             uniform mat4 localTransform;
             uniform mat4 uPMVMatrix; 
-            uniform mat4 pMatrix; 
+            uniform mat4 pMatrix;
+            uniform sampler2D uSampler;
 
-            varying vec3 vNormal; 
+            varying vec3 vNormal;
+            varying vec4 vVertexColor;
             
             void main(void) {
                 gl_Position = pMatrix * uPMVMatrix * localTransform * vec4(aVertexPosition, 1.0); 
                 vNormal = (localTransform * vec4(aVertexNormal, 1.0)).xyz;
+                vVertexColor = texture2D(uSampler, aVertexUV);
             }
-            
+
         \`;
 
         // Fragment 
@@ -80,6 +85,7 @@ module.exports = (directional_l, ambient_l, point_l) => {
         // Attributes and uniforms
         PhongShaderProgram.vertexPositionAttribute = webgl.getAttribLocation(PhongShaderProgram, "aVertexPosition");
         PhongShaderProgram.vertexNormalAttribute = webgl.getAttribLocation(PhongShaderProgram, "aVertexNormal");
+        PhongShaderProgram.vertexUVAttribute = webgl.getAttribLocation(PhongShaderProgram, "aVertexUV");
 
         PhongShaderProgram.uPMVMatrix = webgl.getUniformLocation(PhongShaderProgram, "uPMVMatrix");
         PhongShaderProgram.pMatrix = webgl.getUniformLocation(PhongShaderProgram, 'pMatrix');
@@ -88,8 +94,7 @@ module.exports = (directional_l, ambient_l, point_l) => {
 
         webgl.enableVertexAttribArray(PhongShaderProgram.vertexPositionAttribute);
         webgl.enableVertexAttribArray(PhongShaderProgram.vertexNormalAttribute);
-
-        
+        webgl.enableVertexAttribArray(PhongShaderProgram.vertexUVAttribute);
 
     `;
 }

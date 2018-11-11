@@ -37,6 +37,7 @@ module.exports = {
             ["camera", "return 'CAMERA';"],
             ["projection", "return 'PROJECTION';"],
             ["light", "return 'LIGHT';"],
+            ["texture", "return 'TEXTURE';"],
 
             /* Constant Values */
             ["@", "return 'AT';"],
@@ -143,6 +144,7 @@ module.exports = {
             [ " STATIC transform ", " $$ = ['applyTransformation', $4] "],
             [ " ON ARROW args ", " $$ = [ 'addEvent', $3 ] "],
             [ " COLOR ARROW args ", " $$ = [ 'setColor', $3 ] "],
+            [ " TEXTURE ARROW args ", ` $$ = [ 'setTexture', $3 ]; `],
         ],
 
         transform:

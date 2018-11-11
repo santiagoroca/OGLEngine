@@ -69,10 +69,18 @@ function viewer (container) {
         for (const geometry of geometries) {
             webgl.uniformMatrix4fv(PhongShaderProgram.localTransform, false, geometry.transform.matrix);
             webgl.uniform4fv(PhongShaderProgram.geometryColor, geometry.color);
+            
             webgl.bindBuffer(webgl.ARRAY_BUFFER, geometry.vertexs);
             webgl.vertexAttribPointer(PhongShaderProgram.vertexPositionAttribute, 3, webgl.FLOAT, false, 0, 0);
+
             webgl.bindBuffer(webgl.ARRAY_BUFFER, geometry.normals);
             webgl.vertexAttribPointer(PhongShaderProgram.vertexNormalAttribute, 3, webgl.FLOAT, false, 0, 0);
+
+            webgl.bindBuffer(webgl.ARRAY_BUFFER, geometry.uvs);
+            webgl.vertexAttribPointer(PhongShaderProgram.vertexUVAttribute, 2, webgl.FLOAT, false, 0, 0);
+
+            webgl.bindTexture(webgl.TEXTURE_2D, geometry.texture);
+
             webgl.bindBuffer(webgl.ELEMENT_ARRAY_BUFFER, geometry.indexes);
             webgl.drawElements(webgl.TRIANGLES, geometry.count, webgl.UNSIGNED_SHORT, 0);
         }

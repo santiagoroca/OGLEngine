@@ -23,10 +23,8 @@ scene {
     geometry {
 
         # Picks the loader automatically, based on the extension
-        source -> src='./models/cube.json'
-
-        # Color can be defined in so many pretty ways
-        color -> r=1.0, g=0.0, b=0.0
+        source -> src='./models/earth.json'
+        texture -> src='./Earth_TEXTURE_CM.tga'
 
         transform {
             scale -> x=0.5, y=0.5, z=0.5

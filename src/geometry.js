@@ -10,6 +10,7 @@ module.exports = class Geometry {
         this.vertexs = [];
         this.indexes = [];
         this.normals = [];
+        this.uvs = [];
         this.color = { r: 0.5, g: 0.5, b: 0.5, a: 1.0 };
         this.transform = new Transform();
         this.events = new Events();
@@ -29,6 +30,12 @@ module.exports = class Geometry {
         }
 
         this.indexes = indexes;
+    }
+
+    // Configure Texture as externla object 
+    // and append to geometry
+    setTexture (args) {
+        this.texture_source = args.src;
     }
     
     applyTransformation (transformation) {
@@ -50,8 +57,7 @@ module.exports = class Geometry {
 
     loadFromFile (args) {
         const geometry = load(args.src);
-        this.vertexs = geometry.vertexs;
-        this.indexes = geometry.indexes;
+        Object.assign(this, geometry);
     }
 
     setColor (args) {
@@ -148,16 +154,35 @@ module.exports = class Geometry {
                 ${this.getNormals()}
             ]).buffer, webgl.STATIC_DRAW);
 
+            const uvs_buff_${r_hash} = webgl.createBuffer();
+            webgl.bindBuffer(webgl.ARRAY_BUFFER, n_buff_${r_hash});
+            webgl.bufferData(webgl.ARRAY_BUFFER, new Float32Array([
+                ${this.uvs}
+            ]).buffer, webgl.STATIC_DRAW);
+
             const f_buff_${r_hash} = webgl.createBuffer();
             webgl.bindBuffer(webgl.ELEMENT_ARRAY_BUFFER, f_buff_${r_hash});
             webgl.bufferData(webgl.ELEMENT_ARRAY_BUFFER, new Uint16Array([
                 ${this.indexes}
             ]).buffer, webgl.STATIC_DRAW);
+            
+            const texture_${r_hash} = webgl.createTexture();
+            const image_${r_hash} = new Image();
+            image_${r_hash}.onload = () => {
+                webgl.bindTexture(webgl.TEXTURE_2D, texture_${r_hash});
+                webgl.texImage2D(webgl.TEXTURE_2D, 0, webgl.RGBA, webgl.RGBA, webgl.UNSIGNED_BYTE, image_${r_hash});
+                webgl.texParameteri(webgl.TEXTURE_2D, webgl.TEXTURE_MAG_FILTER, webgl.LINEAR);
+                webgl.texParameteri(webgl.TEXTURE_2D, webgl.TEXTURE_MIN_FILTER, webgl.LINEAR_MIPMAP_NEAREST);
+                webgl.generateMipmap(webgl.TEXTURE_2D);
+            }
+            image_${r_hash}.src = '${this.texture_source}';
 
             const geometry_${g_hash} = Object.assign({
                 vertexs: v_buff_${r_hash},
                 indexes: f_buff_${r_hash},
                 normals: n_buff_${r_hash},
+                uvs: uvs_buff_${r_hash},
+                texture: texture_${r_hash},
                 count: ${this.indexes.length},
                 color: [${this.color.r}, ${this.color.g}, ${this.color.b}, ${this.color.a}],
                 transform: new Transform([${this.transform.transform}])
