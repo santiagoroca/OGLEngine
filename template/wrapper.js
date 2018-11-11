@@ -41,6 +41,8 @@ function viewer (container) {
     *
     */
     function updateMatrix () {
+        // TODO - Remember to encode the nomrla transformation matrix as the
+        // transpose of the inverse, to avoid errors when the object is scaled.
         webgl.uniformMatrix4fv(PhongShaderProgram.uPMVMatrix, false, activeCamera.transform.matrix);
         requestAnimationFrame(() => render());
     }
@@ -69,6 +71,8 @@ function viewer (container) {
             webgl.uniform4fv(PhongShaderProgram.geometryColor, geometry.color);
             webgl.bindBuffer(webgl.ARRAY_BUFFER, geometry.vertexs);
             webgl.vertexAttribPointer(PhongShaderProgram.vertexPositionAttribute, 3, webgl.FLOAT, false, 0, 0);
+            webgl.bindBuffer(webgl.ARRAY_BUFFER, geometry.normals);
+            webgl.vertexAttribPointer(PhongShaderProgram.vertexNormalAttribute, 3, webgl.FLOAT, false, 0, 0);
             webgl.bindBuffer(webgl.ELEMENT_ARRAY_BUFFER, geometry.indexes);
             webgl.drawElements(webgl.TRIANGLES, geometry.count, webgl.UNSIGNED_SHORT, 0);
         }

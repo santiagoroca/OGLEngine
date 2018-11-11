@@ -32,7 +32,7 @@ scene {
             translate -> x=-2.0
         }
 
-        on -> type=@INTERVAL, every=@FRAME, hndl=(rotate -> y=0.1)
+        on -> type=@INTERVAL, every=@FRAME, hndl=(rotate -> y=1deg)
     }
 
     # Add lights configurations/shader configuration

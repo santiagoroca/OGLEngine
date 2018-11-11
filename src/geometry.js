@@ -2,12 +2,14 @@ const Transform = require('./transform/Transform.js');
 const Events = require('./events/Events.js');
 const hash = require('./helper.js').hash;
 const load = require('./parser/Loader.js');
+const math = require('./math.js')
 
 module.exports = class Geometry {
 
     constructor () {
         this.vertexs = [];
         this.indexes = [];
+        this.normals = [];
         this.color = { r: 0.5, g: 0.5, b: 0.5, a: 1.0 };
         this.transform = new Transform();
         this.events = new Events();
@@ -38,6 +40,14 @@ module.exports = class Geometry {
         return this.vertexs;
     }
 
+    getNormals () {
+        if (!this.normals.length) {
+            this.generateNormals();
+        }
+
+        return this.normals;
+    }
+
     loadFromFile (args) {
         const geometry = load(args.src);
         this.vertexs = geometry.vertexs;
@@ -53,7 +63,63 @@ module.exports = class Geometry {
     }
 
     generateNormals () {
-        
+        this.normals = [];
+
+        for (var i = 0; i < this.vertexs.length; i++) {
+            this.normals[i] = 0;
+        }
+    
+        for (var i = 0; i < this.indexes.length; i += 3) {
+    
+            //Point A
+            var e1 = [
+                this.vertexs [this.indexes[i] * 3],
+                this.vertexs [this.indexes[i] * 3 + 1],
+                this.vertexs [this.indexes[i] * 3 + 2]
+            ];
+    
+            //Point B
+            var e2 = [
+                this.vertexs [this.indexes[i + 1] * 3],
+                this.vertexs [this.indexes[i + 1] * 3 + 1],
+                this.vertexs [this.indexes[i + 1] * 3 + 2]
+            ];
+    
+            //Point C
+            var e3 = [
+                this.vertexs [this.indexes[i + 2] * 3],
+                this.vertexs [this.indexes[i + 2] * 3 + 1],
+                this.vertexs [this.indexes[i + 2] * 3 + 2]
+            ];
+    
+            var n = math.vec3.cross(math.vec3.subtract(e2, e1), math.vec3.subtract(e3, e1));
+    
+            this.normals [this.indexes[i] * 3] += n [0];
+            this.normals [this.indexes[i] * 3 + 1] += n [1];
+            this.normals [this.indexes[i] * 3 + 2] += n [2];
+    
+            this.normals [this.indexes[i + 1] * 3] += n [0];
+            this.normals [this.indexes[i + 1] * 3 + 1] += n [1];
+            this.normals [this.indexes[i + 1] * 3 + 2] += n [2];
+    
+            this.normals [this.indexes[i + 2] * 3] += n [0];
+            this.normals [this.indexes[i + 2] * 3 + 1] += n [1];
+            this.normals [this.indexes[i + 2] * 3 + 2] += n [2];
+    
+        }
+    
+        for (var i = 0; i < this.normals.length; i += 3) {
+            var length = Math.sqrt(
+                this.normals [i] * this.normals [i] + 
+                this.normals [i + 1] * this.normals [i + 1] + 
+                this.normals [i + 2] * this.normals [i + 2]
+            );
+    
+            this.normals [i] /= length || 1;
+            this.normals [i + 1] /= length || 1;
+            this.normals [i + 2] /= length || 1;
+        }
+
     }
 
     addEvent (event) {
@@ -76,6 +142,12 @@ module.exports = class Geometry {
                 ${this.vertexs}
             ]).buffer, webgl.STATIC_DRAW);
 
+            const n_buff_${r_hash} = webgl.createBuffer();
+            webgl.bindBuffer(webgl.ARRAY_BUFFER, n_buff_${r_hash});
+            webgl.bufferData(webgl.ARRAY_BUFFER, new Float32Array([
+                ${this.getNormals()}
+            ]).buffer, webgl.STATIC_DRAW);
+
             const f_buff_${r_hash} = webgl.createBuffer();
             webgl.bindBuffer(webgl.ELEMENT_ARRAY_BUFFER, f_buff_${r_hash});
             webgl.bufferData(webgl.ELEMENT_ARRAY_BUFFER, new Uint16Array([
@@ -85,6 +157,7 @@ module.exports = class Geometry {
             const geometry_${g_hash} = Object.assign({
                 vertexs: v_buff_${r_hash},
                 indexes: f_buff_${r_hash},
+                normals: n_buff_${r_hash},
                 count: ${this.indexes.length},
                 color: [${this.color.r}, ${this.color.g}, ${this.color.b}, ${this.color.a}],
                 transform: new Transform([${this.transform.transform}])
