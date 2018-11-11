@@ -34,14 +34,14 @@ scene {
         }
 
         # Self Rotation
-        on -> type=@INTERVAL, every=@FRAME, hndl=(rotate -> y=1deg)
+        on -> type=@INTERVAL, every=@FRAME, hndl=(rotate -> y=0.01deg)
     }
 
     ## SHADER
     # Add color to directional_light
-    # Add ambient light
     # Add point light
     # Add alha to ambien light (?)
+    # Add texture mappings
 
     ## TRANSFORMATION
     # Create Geometries batches that share transform
@@ -50,11 +50,15 @@ scene {
     ## EVENTS
     # Check on keypress method to filter only alphanumeric keys
     # Use dictionary for all key events, all mouse events maybe
+    # Add scroll event
     
     ## STRUCTURES
     # Create abstract geometries
     # Try to unify all entities and all methods, make diferentiation in Javascript, not parser
     # Add alternative alpha to alphanumeric, to allow 0xFF 0xFFFF 0xFFFFFF 0xFFFFFF 0xFFF 0xFFFF
+    # Add elliptic function
+    # Add sin function
+    # Add cos function
 
     ## SOURCES
     # Check how to load geometries from different libraries / async

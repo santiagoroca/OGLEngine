@@ -37,9 +37,9 @@ module.exports = (directional_l, ambient_l, point_l) => {
         const PhongVertex = \`
 
             attribute lowp vec3 aVertexPosition; 
-            attribute lowp vec3 aVertexNormal; 
+            attribute lowp vec3 aVertexNormal;
 
-            uniform mat4 localTransform; 
+            uniform mat4 localTransform;
             uniform mat4 uPMVMatrix; 
             uniform mat4 pMatrix; 
 
@@ -49,6 +49,7 @@ module.exports = (directional_l, ambient_l, point_l) => {
                 gl_Position = pMatrix * uPMVMatrix * localTransform * vec4(aVertexPosition, 1.0); 
                 vNormal = (localTransform * vec4(aVertexNormal, 1.0)).xyz;
             }
+            
         \`;
 
         // Fragment 
