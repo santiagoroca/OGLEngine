@@ -165,6 +165,7 @@ module.exports = {
         [
             [ " transformations transformation ", " $$[$2[0]]($2[1]); " ],
             [ " transformation ", `
+                
                 $$ = new yy.Transform();
                 $$[$1[0]]($1[1]);
             `],

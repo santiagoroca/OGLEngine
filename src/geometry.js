@@ -145,7 +145,7 @@ module.exports = class Geometry {
             const v_buff_${r_hash} = webgl.createBuffer();
             webgl.bindBuffer(webgl.ARRAY_BUFFER, v_buff_${r_hash});
             webgl.bufferData(webgl.ARRAY_BUFFER, new Float32Array([
-                ${this.vertexs}
+                ${this.getTransformedVertexs()}
             ]).buffer, webgl.STATIC_DRAW);
 
             const n_buff_${r_hash} = webgl.createBuffer();
@@ -185,7 +185,7 @@ module.exports = class Geometry {
                 texture: texture_${r_hash},
                 count: ${this.indexes.length},
                 color: [${this.color.r}, ${this.color.g}, ${this.color.b}, ${this.color.a}],
-                transform: new Transform([${this.transform.transform}])
+                transform: new Transform()
             });
             geometries.push(geometry_${g_hash});
 

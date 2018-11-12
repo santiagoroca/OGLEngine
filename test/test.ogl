@@ -6,13 +6,7 @@ scene {
     camera {
 
         # Projection Configuration
-        projection -> fov=45.0, near=0.1, far=10.0
-        
-        # Check what happen with transformations
-        transform {
-            translate -> z=-5.0
-            rotate -> axis=@UP, amnt=160deg
-        }
+        projection -> fov=45.0, near=0.1, far=1000.0
 
         # Event Handlers
         on -> type=@DRAG, btn=@BUTTON0, hndl=(rotate -> x=(.delta_y * -1), y=.delta_x)
@@ -26,18 +20,15 @@ scene {
         # Picks the loader automatically, based on the extension
         source -> src='./models/earth.obj'
         texture -> src='./Earth_TEXTURE_CM.png'
-
+        
         transform {
-            scale -> x=0.5, y=0.5, z=0.5
+            translate -> z=15.0
         }
 
         # Self Rotation
-        on -> type=@INTERVAL, every=@FRAME, hndl=(rotate -> y=0.01deg)
+        on -> type=@INTERVAL, every=@FRAME, hndl=(rotate -> y=-1deg)
         
     }
-
-    ## LOADERS
-    # Create OBJ Loader
 
     ## SHADER
     # Add color to directional_light

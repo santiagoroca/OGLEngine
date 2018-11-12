@@ -1,5 +1,6 @@
 function Transform (transform = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]) {
-    this.matrix = transform;
+    this.start_transform = transform;
+    this.matrix = this.start_transform.slice();
     this.translation = [0, 0, 0];
     this.x_angle = 0;
     this.y_angle = 0;
@@ -22,7 +23,9 @@ Transform.prototype.translate = function (x, y, z) {
     ]), z);
 
     this.translation = vec3.add(
-        this.translation, vec3.add(vec3.add(right, up), back)
+        this.translation, 
+        [x, y, z]
+        //vec3.add(vec3.add(right, up), back)
     );
 
     this.calculateTransform();
@@ -37,7 +40,9 @@ Transform.prototype.rotate = function (x, y, z) {
 }
 
 Transform.prototype.calculateTransform = function () {
-    this.matrix = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
+    this.matrix = this.start_transform.slice();
+
+    this.matrix = mat4.translate(this.matrix, this.translation);
 
     this.matrix = mat4.rotate(this.matrix, this.y_angle, [
         this.matrix[1], this.matrix[5], this.matrix[9]
@@ -50,6 +55,5 @@ Transform.prototype.calculateTransform = function () {
     this.matrix = mat4.rotate(this.matrix, this.z_angle, [
         this.matrix[2], this.matrix[6], this.matrix[10]
     ]);
-
-    this.matrix = mat4.translate(this.matrix, this.translation);
+    
 }
