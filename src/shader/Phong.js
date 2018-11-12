@@ -8,6 +8,7 @@ module.exports = (directional_l, ambient_l, point_l) => {
 
             uniform mat4 uPMVMatrix;
             uniform vec4 geometryColor; 
+            uniform sampler2D uSampler;
 
             const vec4 ambient_light = vec4(${ambient_l});
 
@@ -18,10 +19,11 @@ module.exports = (directional_l, ambient_l, point_l) => {
             }
 
             varying vec3 vNormal;
-            varying vec4 vVertexColor;
+            varying vec2 vVertexUV;
 
             void main() {
                 float attenuation = 0.0;
+                vec4 color = texture2D(uSampler, vec2(vVertexUV.s, 1.0-vVertexUV.t));
                 
                 ${
                     directional_l.map(
@@ -30,8 +32,8 @@ module.exports = (directional_l, ambient_l, point_l) => {
                 }
                 
                 gl_FragColor = 
-                    vVertexColor * vec4(attenuation, attenuation, attenuation, 1.0) +
-                    vVertexColor * ambient_light;
+                    color * vec4(attenuation, attenuation, attenuation, 1.0) +
+                    color * ambient_light;
             }
         \`;
 
@@ -47,12 +49,12 @@ module.exports = (directional_l, ambient_l, point_l) => {
             uniform sampler2D uSampler;
 
             varying vec3 vNormal;
-            varying vec4 vVertexColor;
+            varying vec2 vVertexUV;
             
             void main(void) {
                 gl_Position = pMatrix * uPMVMatrix * localTransform * vec4(aVertexPosition, 1.0); 
                 vNormal = (localTransform * vec4(aVertexNormal, 1.0)).xyz;
-                vVertexColor = texture2D(uSampler, aVertexUV);
+                vVertexUV = aVertexUV;
             }
 
         \`;

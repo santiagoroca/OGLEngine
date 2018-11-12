@@ -11,6 +11,7 @@ function EventScheduler (canvas, update) {
     // Schedules Lists
     this.drag_schedules = [];
     this.key_down_schedules = [];
+    this.mouse_wheel_schedules = [];
     this.key_press_schedules = {};
 
     // Active Events List
@@ -40,6 +41,7 @@ function EventScheduler (canvas, update) {
 
     canvas.addEventListener('mousemove', (event) => this.ondrag(event));
     document.addEventListener('keydown', (event) => this.keydown(event));
+    document.addEventListener("mousewheel", (event) => this.mousewheel(event));
 
     /*
     * Start event loop - WOrk on the delay to make it once every 16ms
@@ -121,4 +123,20 @@ EventScheduler.prototype.scheduleKeyDown = function (schedule) {
 
 EventScheduler.prototype.scheduleInterval = function (schedule, timer) {
     setInterval(() => { schedule(); requestAnimationFrame(() => this.update()); }, timer);
+}
+
+EventScheduler.prototype.mousewheel = function (event) {
+    const variables = {
+        delta_z: Math.max(-1, Math.min(1, (event.wheelDelta || -event.deltaY || -event.detail)))
+    }
+
+    for (const schedule of this.mouse_wheel_schedules) {
+        schedule(variables);
+    }
+
+    this.update();
+}
+
+EventScheduler.prototype.scheduleMouseWheel = function (schedule) {
+    this.mouse_wheel_schedules.push(schedule);
 }

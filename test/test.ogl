@@ -16,15 +16,16 @@ scene {
 
         # Event Handlers
         on -> type=@DRAG, btn=@BUTTON0, hndl=(rotate -> x=(.delta_y * -1), y=.delta_x)
-        on -> type=@DRAG, btn=@BUTTON2, hndl=(translate -> x=(.delta_x * 2), y=(.delta_y * 2))
+        on -> type=@DRAG, btn=@BUTTON2, hndl=(translate -> x=(.delta_x * 4), y=(.delta_y * 4))
+        on -> type=@MOUSEWHEEL, hndl=(translate -> z=.delta_z)
         
     }
 
     geometry {
 
         # Picks the loader automatically, based on the extension
-        source -> src='./models/earth.json'
-        texture -> src='./Earth_TEXTURE_CM.tga'
+        source -> src='./models/test.json'
+        texture -> src='./Untitled.001.png'
 
         transform {
             scale -> x=0.5, y=0.5, z=0.5
@@ -44,6 +45,7 @@ scene {
     ## TRANSFORMATION
     # Create Geometries batches that share transform
     # Add parameter to indicate transformations relative to what
+    # Camera intial transformations are not correctly stored
 
     ## EVENTS
     # Check on keypress method to filter only alphanumeric keys

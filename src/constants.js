@@ -6,6 +6,7 @@ module.exports = {
     "KEYPRESS": 'keypress',
     "KEYDOWN": "keydown",
     "INTERVAL": "interval",
+    "MOUSEWHEEL": "mousewheel",
     "BUTTON0": 0,
     "BUTTON1": 1,
     "BUTTON2": 2,

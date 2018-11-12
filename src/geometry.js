@@ -48,7 +48,7 @@ module.exports = class Geometry {
     }
 
     getNormals () {
-        if (!this.normals.length) {
+        if (!this.normals.length||true) {
             this.generateNormals();
         }
 
@@ -57,6 +57,7 @@ module.exports = class Geometry {
 
     loadFromFile (args) {
         const geometry = load(args.src);
+        console.log(Object.keys(geometry).map(key => geometry[key].length));
         Object.assign(this, geometry);
     }
 
@@ -155,7 +156,7 @@ module.exports = class Geometry {
             ]).buffer, webgl.STATIC_DRAW);
 
             const uvs_buff_${r_hash} = webgl.createBuffer();
-            webgl.bindBuffer(webgl.ARRAY_BUFFER, n_buff_${r_hash});
+            webgl.bindBuffer(webgl.ARRAY_BUFFER, uvs_buff_${r_hash});
             webgl.bufferData(webgl.ARRAY_BUFFER, new Float32Array([
                 ${this.uvs}
             ]).buffer, webgl.STATIC_DRAW);
@@ -168,7 +169,7 @@ module.exports = class Geometry {
             
             const texture_${r_hash} = webgl.createTexture();
             const image_${r_hash} = new Image();
-            image_${r_hash}.onload = () => {
+            image_${r_hash}.onload = function () {
                 webgl.bindTexture(webgl.TEXTURE_2D, texture_${r_hash});
                 webgl.texImage2D(webgl.TEXTURE_2D, 0, webgl.RGBA, webgl.RGBA, webgl.UNSIGNED_BYTE, image_${r_hash});
                 webgl.texParameteri(webgl.TEXTURE_2D, webgl.TEXTURE_MAG_FILTER, webgl.LINEAR);

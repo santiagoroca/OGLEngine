@@ -20,6 +20,7 @@ module.exports = class Events {
                 case 'keypress': return this.scheduleKeyPressWrapper(object_id, event)
                 case 'keydown': return this.scheduleKeyDownWrapper(object_id, event)
                 case 'interval': return this.scheduleIntervalWrapper(object_id, event)
+                case 'mousewheel': return this.scheduleMouseWheelWrapper(object_id, event)
             }
 
         }).join('\n');
@@ -60,5 +61,13 @@ module.exports = class Events {
             }).bind(${object_id}));
         `;
     }
-    
+
+    scheduleMouseWheelWrapper (object_id, event) {
+        return `
+            eventScheduler.scheduleMouseWheel((function (event) {
+                ${event.hndl}
+            }).bind(${object_id}));
+        `;
+    }
+
 }
