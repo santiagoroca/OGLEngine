@@ -41,9 +41,6 @@ function viewer (container) {
     *
     */
     function updateMatrix () {
-        // TODO - Remember to encode the nomrla transformation matrix as the
-        // transpose of the inverse, to avoid errors when the object is scaled.
-        webgl.uniformMatrix4fv(PhongShaderProgram.uPMVMatrix, false, activeCamera.transform.matrix);
         requestAnimationFrame(() => render());
     }
 
@@ -51,40 +48,7 @@ function viewer (container) {
     *
     */
     function enableCamera (camera) {
-        activeCamera = camera;
-        webgl.uniformMatrix4fv(PhongShaderProgram.pMatrix, false, camera.projectionMatrix);
-        webgl.uniformMatrix4fv(PhongShaderProgram.uPMVMatrix, false, camera.transform.matrix);
-        requestAnimationFrame(() => render());
-    }
-
-    /*
-    * Render Geometry Objectsl
-    * TODO Remember to implement isDirty pattern
-    */
-    function render () {
-        
-        webgl.clear(webgl.DEPTH_BUFFER_BIT);
-        webgl.clear(webgl.COLOR_BUFFER_BIT);
-
-        for (const geometry of geometries) {
-            webgl.uniformMatrix4fv(PhongShaderProgram.localTransform, false, geometry.transform.matrix);
-            webgl.uniform4fv(PhongShaderProgram.geometryColor, geometry.color);
-            
-            webgl.bindBuffer(webgl.ARRAY_BUFFER, geometry.vertexs);
-            webgl.vertexAttribPointer(PhongShaderProgram.vertexPositionAttribute, 3, webgl.FLOAT, false, 0, 0);
-
-            webgl.bindBuffer(webgl.ARRAY_BUFFER, geometry.normals);
-            webgl.vertexAttribPointer(PhongShaderProgram.vertexNormalAttribute, 3, webgl.FLOAT, false, 0, 0);
-
-            webgl.bindBuffer(webgl.ARRAY_BUFFER, geometry.uvs);
-            webgl.vertexAttribPointer(PhongShaderProgram.vertexUVAttribute, 2, webgl.FLOAT, false, 0, 0);
-
-            webgl.bindTexture(webgl.TEXTURE_2D, geometry.texture);
-
-            webgl.bindBuffer(webgl.ELEMENT_ARRAY_BUFFER, geometry.indexes);
-            webgl.drawElements(webgl.TRIANGLES, geometry.count, webgl.UNSIGNED_SHORT, 0);
-        }
-
+        activeCamera = camera; requestAnimationFrame(() => render());
     }
 
     requestAnimationFrame(() => render());

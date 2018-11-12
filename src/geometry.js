@@ -13,9 +13,26 @@ module.exports = class Geometry {
         this.indexes = [];
         this.normals = [];
         this.uvs = [];
-        this.color = { r: 0.5, g: 0.5, b: 0.5, a: 1.0 };
+        this.color = null;
         this.transform = new Transform();
         this.events = new Events();
+        this.name = hash();
+    }
+
+    getName () {
+        return `geometry_${this.name}`;
+    }
+
+    hasTexture () {
+        return typeof this.texture_source != 'undefined';
+    }
+
+    hasNormals () {
+        return true;
+    }
+
+    hasUniformColor () {
+        return !!this.color;
     }
 
     setVertexs (vertexs) {
@@ -143,59 +160,77 @@ module.exports = class Geometry {
     }
 
     toString () {
-        const r_hash = hash();
-        const g_hash = hash();
+        
 
         return `
 
-            const v_buff_${r_hash} = webgl.createBuffer();
-            webgl.bindBuffer(webgl.ARRAY_BUFFER, v_buff_${r_hash});
+            const v_buff_${this.name} = webgl.createBuffer();
+            webgl.bindBuffer(webgl.ARRAY_BUFFER, v_buff_${this.name});
             webgl.bufferData(webgl.ARRAY_BUFFER, new Float32Array([
                 ${this.getTransformedVertexs()}
             ]).buffer, webgl.STATIC_DRAW);
 
-            const n_buff_${r_hash} = webgl.createBuffer();
-            webgl.bindBuffer(webgl.ARRAY_BUFFER, n_buff_${r_hash});
+            const n_buff_${this.name} = webgl.createBuffer();
+            webgl.bindBuffer(webgl.ARRAY_BUFFER, n_buff_${this.name});
             webgl.bufferData(webgl.ARRAY_BUFFER, new Float32Array([
                 ${this.getNormals()}
             ]).buffer, webgl.STATIC_DRAW);
 
-            const uvs_buff_${r_hash} = webgl.createBuffer();
-            webgl.bindBuffer(webgl.ARRAY_BUFFER, uvs_buff_${r_hash});
+            const uvs_buff_${this.name} = webgl.createBuffer();
+            webgl.bindBuffer(webgl.ARRAY_BUFFER, uvs_buff_${this.name});
             webgl.bufferData(webgl.ARRAY_BUFFER, new Float32Array([
                 ${this.uvs}
             ]).buffer, webgl.STATIC_DRAW);
 
-            const f_buff_${r_hash} = webgl.createBuffer();
-            webgl.bindBuffer(webgl.ELEMENT_ARRAY_BUFFER, f_buff_${r_hash});
+            const f_buff_${this.name} = webgl.createBuffer();
+            webgl.bindBuffer(webgl.ELEMENT_ARRAY_BUFFER, f_buff_${this.name});
             webgl.bufferData(webgl.ELEMENT_ARRAY_BUFFER, new Uint16Array([
                 ${this.indexes}
             ]).buffer, webgl.STATIC_DRAW);
             
-            const texture_${r_hash} = webgl.createTexture();
-            const image_${r_hash} = new Image();
-            image_${r_hash}.onload = function () {
-                webgl.bindTexture(webgl.TEXTURE_2D, texture_${r_hash});
-                webgl.texImage2D(webgl.TEXTURE_2D, 0, webgl.RGBA, webgl.RGBA, webgl.UNSIGNED_BYTE, image_${r_hash});
+            const texture_${this.name} = webgl.createTexture();
+            const image_${this.name} = new Image();
+            image_${this.name}.onload = function () {
+                webgl.bindTexture(webgl.TEXTURE_2D, texture_${this.name});
+                webgl.texImage2D(webgl.TEXTURE_2D, 0, webgl.RGBA, webgl.RGBA, webgl.UNSIGNED_BYTE, image_${this.name});
                 webgl.texParameteri(webgl.TEXTURE_2D, webgl.TEXTURE_MAG_FILTER, webgl.LINEAR);
                 webgl.texParameteri(webgl.TEXTURE_2D, webgl.TEXTURE_MIN_FILTER, webgl.LINEAR_MIPMAP_NEAREST);
                 webgl.generateMipmap(webgl.TEXTURE_2D);
             }
-            image_${r_hash}.src = '${this.texture_source}';
+            image_${this.name}.src = '${this.texture_source}';
 
-            const geometry_${g_hash} = Object.assign({
-                vertexs: v_buff_${r_hash},
-                indexes: f_buff_${r_hash},
-                normals: n_buff_${r_hash},
-                uvs: uvs_buff_${r_hash},
-                texture: texture_${r_hash},
+            const geometry_${this.name} = Object.assign({
+                vertexs: v_buff_${this.name},
+                indexes: f_buff_${this.name},
+                transform: new Transform(),
                 count: ${this.indexes.length},
-                color: [${this.color.r}, ${this.color.g}, ${this.color.b}, ${this.color.a}],
-                transform: new Transform()
-            });
-            geometries.push(geometry_${g_hash});
 
-            ${this.events.toString(`geometry_${g_hash}`)}
+                ${
+                    this.hasNormals() ?
+                    `
+                        normals: n_buff_${this.name},
+                    ` : ''
+                }
+
+                ${
+                    this.hasTexture() ?
+                    `
+                        uvs: uvs_buff_${this.name},
+                        texture: texture_${this.name},
+                    ` : ''
+                }
+
+                ${
+                    this.hasUniformColor() ?
+                    `
+                        color: [${this.color.r}, ${this.color.g}, ${this.color.b}, ${this.color.a}],
+                    ` : ''
+                }
+                
+            });
+            geometries.push(geometry_${this.name});
+
+            ${this.events.toString(`geometry_${this.name}`)}
 
         `;
     }

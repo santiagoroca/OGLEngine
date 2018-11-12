@@ -1,4 +1,4 @@
-const Phong = require('./Phong.js')
+const PhongShader = require('./Phong.js')
 
 module.exports = class Scene {
 
@@ -6,6 +6,29 @@ module.exports = class Scene {
         this.directional_lights = [];
         this.ambient_lights = [];
         this.point_lights = [];
+        this.shaders = {};
+    }
+
+    addGeometry (geometry) {
+        let index = 0;
+
+        if (geometry.hasUniformColor()) {
+            index |= 1;
+        }
+
+        if (geometry.hasTexture()) {
+            index |= 1 << 1;
+        }
+
+        if (geometry.hasNormals()) {
+            index |= 1 << 2;
+        }
+
+        if (!this.shaders[index]) {
+            this.shaders[index] = new PhongShader(index);
+        }
+
+        this.shaders[index].geometries.push(geometry.getName());
     }
 
     appendLight (light) {
@@ -24,7 +47,6 @@ module.exports = class Scene {
 
     }
 
-
     toString () {
 
         const ambient_lights = this.ambient_lights.reduce((out, light) => {
@@ -40,7 +62,7 @@ module.exports = class Scene {
             ambient_lights[2] /= this.ambient_lights.length * 255;
         }
 
-        return [Phong].map(shader => shader(
+        return Object.keys(this.shaders).map(shader => this.shaders[shader].generateInitializationBlock(
             this.directional_lights, ambient_lights, this.point_lights
         ));
         
