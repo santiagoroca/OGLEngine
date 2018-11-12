@@ -2,7 +2,9 @@ const Transform = require('./transform/Transform.js');
 const Events = require('./events/Events.js');
 const hash = require('./helper.js').hash;
 const load = require('./parser/Loader.js');
-const math = require('./math.js')
+const math = require('./math.js');
+const read = require('fs').readFileSync;
+const write = require('fs').writeFileSync;
 
 module.exports = class Geometry {
 
@@ -35,7 +37,11 @@ module.exports = class Geometry {
     // Configure Texture as externla object 
     // and append to geometry
     setTexture (args) {
-        this.texture_source = args.src;
+        const ext = args.src.match(/[^\.]+$/g)[0];
+        const name = hash();
+        const path = `assets/images/${name}.${ext}`;
+        write(`./dist/${path}`, read(args.src));
+        this.texture_source = path;
     }
     
     applyTransformation (transformation) {

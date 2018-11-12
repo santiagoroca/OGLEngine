@@ -19,7 +19,7 @@ scene {
 
         # Picks the loader automatically, based on the extension
         source -> src='./models/earth.obj'
-        texture -> src='./Earth_TEXTURE_CM.png'
+        texture -> src='./models/Earth_TEXTURE_CM.png'
         
         transform {
             translate -> z=15.0
@@ -27,6 +27,17 @@ scene {
 
         # Self Rotation
         on -> type=@INTERVAL, every=@FRAME, hndl=(rotate -> y=-1deg)
+        
+    }
+
+    geometry {
+
+        # Picks the loader automatically, based on the extension
+        source -> src='./models/earth.obj'
+        texture -> src='./models/Earth_TEXTURE_CM.png'
+
+        # Self Rotation
+        on -> type=@INTERVAL, every=@FRAME, hndl=(rotate -> y=0deg)
         
     }
 

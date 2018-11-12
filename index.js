@@ -1,4 +1,5 @@
 const read = require('fs').readFileSync;
+const write = require('fs').writeFileSync;
 const Parser = require('jison').Parser;
 const syntax = require('./syntax.js');
 const WRAPPER_TEMPLATE = read('./template/wrapper.js').toString();
@@ -20,7 +21,7 @@ parser.yy = {
 }
 
 // Output program
-console.log(`
+write('dist/build.js', `
     ${read('./template/mat.js')}
     ${read('./template/transform.js')}
     ${read('./template/eventscheduler.js')}
