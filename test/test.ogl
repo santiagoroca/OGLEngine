@@ -1,7 +1,7 @@
 scene {
 
     light -> type=@DIRECTIONAL, direction=vec3(0.5, 0.5, 0.5)
-    light -> type=@AMBIENT, color=0x444444
+    light -> type=@AMBIENT, color=0x111111
 
     camera {
 
@@ -24,17 +24,20 @@ scene {
     geometry {
 
         # Picks the loader automatically, based on the extension
-        source -> src='./models/test.json'
-        texture -> src='./Untitled.001.png'
+        source -> src='./models/earth.obj'
+        texture -> src='./Earth_TEXTURE_CM.png'
 
         transform {
             scale -> x=0.5, y=0.5, z=0.5
-            translate -> x=-2.0
         }
 
         # Self Rotation
         on -> type=@INTERVAL, every=@FRAME, hndl=(rotate -> y=0.01deg)
+        
     }
+
+    ## LOADERS
+    # Create OBJ Loader
 
     ## SHADER
     # Add color to directional_light

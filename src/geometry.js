@@ -57,7 +57,6 @@ module.exports = class Geometry {
 
     loadFromFile (args) {
         const geometry = load(args.src);
-        console.log(Object.keys(geometry).map(key => geometry[key].length));
         Object.assign(this, geometry);
     }
 
