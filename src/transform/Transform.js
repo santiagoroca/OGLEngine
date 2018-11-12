@@ -94,4 +94,14 @@ module.exports = class Transform {
 
     }
 
+    get () {
+        return JSON.stringify({
+            translation: this._translate,
+            x_angle: this._x_angle,
+            y_angle: this._y_angle,
+            z_angle: this._z_angle,
+            scale: this._scale
+        })
+    }
+
 }

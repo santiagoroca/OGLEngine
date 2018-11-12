@@ -9,11 +9,14 @@ const write = require('fs').writeFileSync;
 module.exports = class Geometry {
 
     constructor () {
+
         this.vertexs = [];
         this.indexes = [];
+
         this.normals = [];
         this.uvs = [];
         this.color = null;
+
         this.transform = new Transform();
         this.events = new Events();
         this.name = hash();

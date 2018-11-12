@@ -1,11 +1,11 @@
-function Transform (transform = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]) {
-    this.start_transform = transform;
-    this.matrix = this.start_transform.slice();
+function Transform (transform = {}) {
+    this.matrix = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
     this.translation = [0, 0, 0];
     this.x_angle = 0;
     this.y_angle = 0;
     this.z_angle = 0;
     this.scale = 1.0;
+    Object.assign(this, transform);
 }
 
 Transform.prototype.translate = function (x, y, z) {
@@ -40,7 +40,7 @@ Transform.prototype.rotate = function (x, y, z) {
 }
 
 Transform.prototype.calculateTransform = function () {
-    this.matrix = this.start_transform.slice();
+    this.matrix = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
 
     this.matrix = mat4.translate(this.matrix, this.translation);
 

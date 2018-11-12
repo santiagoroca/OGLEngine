@@ -13,7 +13,7 @@ module.exports = class Scene {
         let index = 0;
 
         if (geometry.hasUniformColor()) {
-            index |= 1;
+            index |= 1; // 1
         }
 
         if (geometry.hasTexture()) {

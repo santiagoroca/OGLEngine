@@ -24,16 +24,20 @@ module.exports = class PhongShader {
         const hash = this.name;
 
         const fragment_color = `
+        
             ${this.hasUniformColor() ? `
                 gl_FragColor = 
                 geometryColor * vec4(attenuation, attenuation, attenuation, 1.0) +
                 geometryColor * ambient_light;
             `: ''}
+
             ${this.hasTexture() ? `
+                vec4 color = texture2D(uSampler, vec2(vVertexUV.s, 1.0-vVertexUV.t));
                 gl_FragColor = 
                 color * vec4(attenuation, attenuation, attenuation, 1.0) +
                 color * ambient_light;
             `: ''}
+
         `;
 
         return `
@@ -82,8 +86,6 @@ module.exports = class PhongShader {
 
                 void main() {
                     float attenuation = 0.0;
-
-                    ${this.hasTexture() ? 'vec4 color = texture2D(uSampler, vec2(vVertexUV.s, 1.0-vVertexUV.t));': ''}
                     
                     ${
                         directional_l.map(

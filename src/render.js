@@ -15,7 +15,6 @@ module.exports = (shaders) => {
     return `
 
         let lastRender = new Date().getTime();
-
         function render () {
 
             const thisRender = new Date().getTime();

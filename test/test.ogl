@@ -8,6 +8,10 @@ scene {
         # Projection Configuration
         projection -> fov=45.0, near=0.1, far=1000.0
 
+        transform {
+            translate -> z=-25.0
+        }
+
         # Event Handlers
         on -> type=@DRAG, btn=@BUTTON0, hndl=(rotate -> x=(.delta_y * -1), y=.delta_x)
         on -> type=@DRAG, btn=@BUTTON2, hndl=(translate -> x=(.delta_x * 4), y=(.delta_y * 4))
@@ -16,46 +20,34 @@ scene {
     }
 
     geometry {
-
-        # Picks the loader automatically, based on the extension
         source -> src='./models/earth.obj'
         texture -> src='./models/Earth_TEXTURE_CM.png'
         
         transform {
             translate -> z=15.0
+            scale -> x=0.1, y=0.1, z=0.1
         }
 
-        # Self Rotation
-        on -> type=@INTERVAL, every=@FRAME, hndl=(rotate -> y=-1deg)
-        
+        on -> type=@INTERVAL, every=@FRAME, hndl=(rotate -> y=-0.1deg)
     }
 
     geometry {
-
-        # Picks the loader automatically, based on the extension
         source -> src='./models/earth.obj'
-        texture -> src='./models/Earth_TEXTURE_CM.png'
-
-        # Self Rotation
-        on -> type=@INTERVAL, every=@FRAME, hndl=(rotate -> y=0deg)
-        
+        texture -> src='./models/2k_sun.jpg'
     }
 
     ## SHADER
     # Add color to directional_light
     # Add point light
     # Add alha to ambien light (?)
-    # Add texture mappings
 
     ## TRANSFORMATION
     # Create Geometries batches that share transform
     # Add parameter to indicate transformations relative to what
-    # Camera intial transformations are not correctly stored
 
     ## EVENTS
     # Check on keypress method to filter only alphanumeric keys
     # Use dictionary for all key events, all mouse events maybe
-    # Add scroll event
     
     ## STRUCTURES
     # Create abstract geometries
@@ -68,12 +60,12 @@ scene {
     ## SOURCES
     # Check how to load geometries from different libraries / async
     # Check how to split your code in different files
-    # Check what about routes and external assets
 
     ## PERFORMANCE
     # Implement dirty pattern in render function and update function
     
     ## BUGS
     # TODO - Far plane might not be working properly
+    # Camerea does not start on the correct position until you do some transformation.
     
 }

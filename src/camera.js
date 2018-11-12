@@ -44,7 +44,7 @@ module.exports = class Camera {
                     0,         0,            -11 / ${j},           -1,
                     0,         0,            -(10 * 1 * 2) / ${j}, 0
                 ],
-                transform: new Transform([${this.transform.transform}])
+                transform: new Transform(${this.transform.get()})
             };
 
             cameras.push(camera_${_hash});
