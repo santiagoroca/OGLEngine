@@ -94,9 +94,9 @@ module.exports = class Events {
                 const variables = {
                     delta_z: Math.max(-1, Math.min(1, (event.wheelDelta || -event.deltaY || -event.detail)))
                 }
-            
+
                 ${this.events.mousewheel.map(event => event.hndl).join('\n')}
-            
+
                 render();
             });
 
