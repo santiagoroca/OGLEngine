@@ -20,16 +20,6 @@ function viewer (container) {
     webgl.enable(webgl.DEPTH_TEST);
 
     /*
-    * Geometries COnfiguration
-    */
-    const geometries = [];
-
-    /*
-    * Events Configuration
-    */
-    const eventScheduler = new EventScheduler(canvas, updateMatrix);
-
-    /*
     * There are multiple cameras but only one active
     */
     const cameras = [];

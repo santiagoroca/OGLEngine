@@ -1,72 +1,112 @@
 module.exports = class Events {
 
     constructor () {
-        this.events = [];
-    }
-
-    addEvent (event) {
-        this.events.push(event);
+        this.events = { drag: [], keypress: [], keydown: [], interval: [], mousewheel: [] };
     }
 
     addEvents (events) {
-        Array.prototype.push.apply(this.events, events);
+        for (const event of events) {
+            this.events [event.type].push(event);
+        }
     }
 
-    toString (object_id) {
-        return this.events.map(event => {
-
-            switch (event.type) {
-                case 'drag': return this.scheduleDragWrapper(object_id, event)
-                case 'keypress': return this.scheduleKeyPressWrapper(object_id, event)
-                case 'keydown': return this.scheduleKeyDownWrapper(object_id, event)
-                case 'interval': return this.scheduleIntervalWrapper(object_id, event)
-                case 'mousewheel': return this.scheduleMouseWheelWrapper(object_id, event)
-            }
-
-        }).join('\n');
-    }
-
-    scheduleDragWrapper (object_id, event) {
+    toString () {
         return `
-            eventScheduler.scheduleDrag((function (event) {
-                ${ typeof event.btn !== 'undefined' ? `if (event.button == ${event.btn}) {` : ''}
-                    ${event.hndl}
-                ${ typeof event.btn !== 'undefined' ? `}` : ''}
-            }).bind(${object_id}));
-        `;
-    }
 
-    scheduleKeyPressWrapper (object_id, event) {
-        return `
-            eventScheduler.scheduleKeyPress((function (event) {
-                ${event.hndl}
-            }).bind(${object_id}), '${event.key}');
-        `;
-    }
+            const pressed_keys = {};
+            let prevXPosition = 0;
+            let prevYPosition = 0;
+            let isMousePressed = false;
 
-    scheduleIntervalWrapper (object_id, event) {
-        return `
-            eventScheduler.scheduleInterval((function (event) {
-                ${event.hndl}
-            }).bind(${object_id}), ${event.every});
-        `;
-    }
+            canvas.addEventListener('mousedown', (event) => {
+                isMousePressed = event.button;
+                prevXPosition = event.x;
+                prevYPosition = event.y;
+            });
 
-    scheduleKeyDownWrapper (object_id, event) {
-        return `
-            eventScheduler.scheduleKeyDown((function (event) {
-                if (event.key == '${event.key}') {
-                    ${event.hndl}
+            document.addEventListener('mouseup', (event) => {
+                isMousePressed = false;
+            });
+
+            document.addEventListener('keydown', (event) => {
+                if (event.repeat) {
+                    return;
                 }
-            }).bind(${object_id}));
-        `;
-    }
+    
+                ${this.events.keydown.map(event => `
+                    if (pressed_keys["${event.key}"]) {
+                        ${event.hndl}
+                    }
+                `).join('\n')}
 
-    scheduleMouseWheelWrapper (object_id, event) {
-        return `
-            eventScheduler.scheduleMouseWheel((function (event) {
-                ${event.hndl}
-            }).bind(${object_id}));
+                pressed_keys[event.key] = true;
+            });
+
+            document.addEventListener('keyup', (event) => {
+                pressed_keys[event.key] = false;
+            });
+
+            /*
+            * Start event loop - WOrk on the delay to make it once every 16ms
+            */
+            const EventLoop = () => {
+                if (!Object.keys(pressed_keys).length) {
+                    requestAnimationFrame(() => EventLoop());
+                    return;
+                }
+
+                ${this.events.keypress.map(event => `
+                    if (pressed_keys["${event.key}"]) {
+                        ${event.hndl}
+                    }
+                `).join('\n')}
+                
+                requestAnimationFrame(() => render());
+                requestAnimationFrame(() => EventLoop());
+            };
+
+            requestAnimationFrame(() => EventLoop());
+
+            canvas.addEventListener('mousemove', (event) => {
+                if (this.isMousePressed === false) {
+                    return;
+                }
+            
+                const variables = {
+                    delta_x: (event.x - prevXPosition) * 0.001,
+                    delta_y: -(event.y - prevYPosition) * 0.001,
+                    up: [0, 1, 0], right: [1, 0 , 0], back: [0, 0, 1],
+                    button: isMousePressed
+                }
+            
+                ${this.events.drag.map(event => `
+                    if (variables.button === ${event.btn}) {
+                        ${event.hndl}
+                    }
+                `).join('\n')}
+            
+                prevXPosition = event.x;
+                prevYPosition = event.y;
+                render();
+            });
+
+            document.addEventListener("mousewheel", (event) => {
+                const variables = {
+                    delta_z: Math.max(-1, Math.min(1, (event.wheelDelta || -event.deltaY || -event.detail)))
+                }
+            
+                ${this.events.mousewheel.map(event => event.hndl).join('\n')}
+            
+                render();
+            });
+
+            ${this.events.interval.map(event => `
+                setInterval(() => { 
+                    ${event.hndl}
+                    requestAnimationFrame(() => render()); 
+                }, ${event.every});
+            `).join('\n')}
+            
         `;
     }
 

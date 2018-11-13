@@ -5,11 +5,16 @@ const hash = require('./helper.js').hash;
 module.exports = class Camera {
 
     constructor () {
+        this.name = hash();
         this.transform = new Transform();
-        this.events = new Events();
+        this.events = [];
         this.fov = 45;
         this.far = 10;
         this.near = 1;
+    }
+
+    getName () {
+        return `camera_${this.name}`;
     }
 
     setProjection (args) {
@@ -21,7 +26,9 @@ module.exports = class Camera {
     }
 
     addEvent (event) {
-        this.events.addEvent(event);
+        this.events.push({
+            ...event, hndl: event.hndl(this.getName())
+        });
     }
 
     isDynamic () {
@@ -37,7 +44,7 @@ module.exports = class Camera {
             const aspect = canvas.width / canvas.height;
             const b = ${a} * aspect;
             const h = b + b;
-            const camera_${_hash} = {
+            const ${this.getName()} = {
                 projectionMatrix: [
                     1 * 2 / h, 0,            0,                    0,
                     0,         1 * 2 / ${i}, 0,                    0,
@@ -47,9 +54,9 @@ module.exports = class Camera {
                 transform: new Transform(${this.transform.get()})
             };
 
-            cameras.push(camera_${_hash});
-            enableCamera(camera_${_hash});
-            ${this.events.toString(`camera_${_hash}`)}
+            cameras.push(${this.getName()});
+            enableCamera(${this.getName()});
+            
         `;
 
     }

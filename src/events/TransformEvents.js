@@ -4,7 +4,7 @@ const parseArg = arg => {
     }
 
     if (isNaN(arg)) {
-        return arg.replace(/\./, 'event.');
+        return arg.replace(/\./, 'variables.');
     }
 
     return arg;
@@ -13,18 +13,20 @@ const parseArg = arg => {
 module.exports = {
 
     TranslateEvent (args) {
-        return ` this.transform.translate(
+        args = Object.assign({x: 0, y: 0, z: 0}, args);
+        return object_id => `${object_id}.transform.translate(
             ${parseArg(args.x)}, ${parseArg(args.y)}, ${parseArg(args.z)}
         );`;
     },
 
     ScaleEvent (args) {
-        return `
-        `
+        args = Object.assign({x: 0, y: 0, z: 0}, args);
+        return () => ``;
     }, 
 
     RotateEvent (args) {
-        return ` this.transform.rotate(
+        args = Object.assign({x: 0, y: 0, z: 0}, args);
+        return object_id => `${object_id}.transform.rotate(
             ${parseArg(args.x)}, ${parseArg(args.y)}, ${parseArg(args.z)}
         );`;
     }

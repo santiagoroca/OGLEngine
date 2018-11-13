@@ -2,6 +2,7 @@ const Transform = require('./transform/Transform.js');
 const Shaders = require('./shader/Shaders.js');
 const GeometryBatch = require('./geometry_batch.js');
 const Render = require('./render.js');
+const Events = require('./events/Events');
 
 /*
 * @title Scene
@@ -17,9 +18,9 @@ module.exports = class Scene {
     constructor () {
         this.transform = new Transform();
         this.shaders = new Shaders();
+        this.events = new Events();
         this.cameras = [];
         this.geometries = [];
-        this.events = [];
     }
 
     appendLight (light) {
@@ -47,18 +48,22 @@ module.exports = class Scene {
     }
 
     toString () {
-        const geometryBatch = new GeometryBatch();
         let out = '';
 
         for (const geometry of this.geometries) {
             out += geometry.toString();
             this.shaders.addGeometry(geometry);
+            this.events.addEvents(geometry.events);
         }
 
-        out += geometryBatch.toString();
+        for (const camera of this.cameras) {
+            out += camera.toString();
+            this.events.addEvents(camera.events);
+        }
+        
         out += this.shaders.toString();
-        out += this.cameras.map(camera => camera.toString()).join('\n');
         out += Render(this.shaders.shaders);
+        out += this.events.toString();
         
         return out;
     }

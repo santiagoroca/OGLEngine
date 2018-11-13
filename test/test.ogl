@@ -4,19 +4,21 @@ scene {
     light -> type=@AMBIENT, color=0x111111
 
     camera {
-
-        # Projection Configuration
         projection -> fov=45.0, near=0.1, far=1000.0
 
         transform {
             translate -> z=-25.0
         }
 
-        # Event Handlers
-        on -> type=@DRAG, btn=@BUTTON0, hndl=(rotate -> x=(.delta_y * -1), y=.delta_x)
-        on -> type=@DRAG, btn=@BUTTON2, hndl=(translate -> x=(.delta_x * 4), y=(.delta_y * 4))
+        on -> type=@DRAG, btn=@BUTTON0, hndl=(
+            rotate -> x=(.delta_y * -1), y=.delta_x
+        )
+
+        on -> type=@DRAG, btn=@BUTTON2, hndl=(
+            translate -> x=(.delta_x * 4), y=(.delta_y * 4)
+        )
+
         on -> type=@MOUSEWHEEL, hndl=(translate -> z=.delta_z)
-        
     }
 
     geometry {

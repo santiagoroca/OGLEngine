@@ -1,5 +1,4 @@
 const Transform = require('./transform/Transform.js');
-const Events = require('./events/Events.js');
 const hash = require('./helper.js').hash;
 const load = require('./parser/Loader.js');
 const math = require('./math.js');
@@ -10,16 +9,31 @@ module.exports = class Geometry {
 
     constructor () {
 
+        /*
+        * Fixed arguments that should always 
+        * be present. If not, the geometry should
+        * fail, or not be added to the scene
+        */
+        this.name = hash();
         this.vertexs = [];
         this.indexes = [];
 
+        /*
+        * Optional arguments. If not present, 
+        * the shader will react and create a program
+        * that adjusts itself to these.
+        */
         this.normals = [];
         this.uvs = [];
         this.color = null;
 
+        /*
+        * Helper internal classes and arrays,
+        * used to build the AST.
+        */
         this.transform = new Transform();
-        this.events = new Events();
-        this.name = hash();
+        this.events = [];
+
     }
 
     getName () {
@@ -155,7 +169,9 @@ module.exports = class Geometry {
     }
 
     addEvent (event) {
-        this.events.addEvent(event);
+        this.events.push({
+            ...event, hndl: event.hndl(this.getName())
+        });
     }
 
     isDynamic () {
@@ -231,9 +247,6 @@ module.exports = class Geometry {
                 }
                 
             });
-            geometries.push(geometry_${this.name});
-
-            ${this.events.toString(`geometry_${this.name}`)}
 
         `;
     }
