@@ -1,3 +1,5 @@
+const fs = require('fs');
+const fse = require('fs-extra');
 const read = require('fs').readFileSync;
 const write = require('fs').writeFileSync;
 const Parser = require('jison').Parser;
@@ -20,6 +22,10 @@ parser.yy = {
     Constants: require('./src/constants.js'),
 }
 
+// Clear Dist folder
+fse.emptyDirSync('./dist/');
+fse.ensureDirSync('./dist/assets/images')
+
 // Output program
 write('dist/build.js', `
     ${read('./template/mat.js')}
@@ -28,7 +34,3 @@ write('dist/build.js', `
         read(process.argv[2]).toString()
     ))}
 `);
-
-/*WRAPPER_TEMPLATE.replace(/'%scene%'/g, parser.parse(
-    read('./test/test.ogl').toString()
-))*/

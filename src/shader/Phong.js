@@ -37,9 +37,9 @@ module.exports = class PhongShader {
 
             ${this.hasTexture() ? `
                 vec4 color = texture2D(uSampler, vec2(vVertexUV.s, 1.0-vVertexUV.t));
-                gl_FragColor = color;
-                    /*color * vec4(attenuation, attenuation, attenuation, 1.0) +
-                    color * ambient_light*/;
+                gl_FragColor = 
+                    color * vec4(attenuation, attenuation, attenuation, 1.0) +
+                    color * ambient_light;
             `: ''}
 
         `;
@@ -110,7 +110,7 @@ module.exports = class PhongShader {
                     ).join('\n')}
 
                     ${point_l.map(({}, index) => `
-                        vec3 surfaceToLight = (cameraWorld * cameraModel * world * model * point_${index}).xyz - vVertexPosition;
+                        vec3 surfaceToLight = (cameraWorld * cameraModel * point_${index}).xyz - vVertexPosition;
                         float brightness = dot(normal, surfaceToLight) / (length(surfaceToLight) * length(normal));
                         attenuation += brightness;
                     `).join('\n')}

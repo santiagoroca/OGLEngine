@@ -6,14 +6,8 @@ scene {
     camera {
         projection -> fov=45.0, near=0.1, far=1000.0
         
-        on -> type=@DRAG, btn=@BUTTON0, hndl=(
-            rotate -> x=(.delta_y * -1), y=.delta_x
-        )
-
-        on -> type=@DRAG, btn=@BUTTON2, hndl=(
-            translate -> x=(.delta_x * 4), y=(.delta_y * 4), space=@WORLD
-        )
-
+        on -> type=@DRAG, btn=@BUTTON0, hndl=(rotate -> x=(.delta_y * -1), y=.delta_x)
+        on -> type=@DRAG, btn=@BUTTON2, hndl=(translate -> x=(.delta_x * 4), y=(.delta_y * 4), space=@WORLD)
         on -> type=@MOUSEWHEEL, hndl=(translate -> z=.delta_z * 0.5, space=@WORLD)
     }
 

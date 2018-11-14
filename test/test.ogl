@@ -18,6 +18,10 @@ scene {
     geometry {
         source -> src='./models/earth.obj'
         texture -> src='./models/Earth_TEXTURE_CM.png'
+
+        transform {
+            translate -> space=@WORLD, z=-15.0
+        }
     }
 
     geometry {
@@ -32,11 +36,11 @@ scene {
 
     ## TRANSFORMATION
     # Create Geometries batches that share transform
-    # Add parameter to indicate transformations relative to what
+    # Add scale trasnformation
+    # Add transformations relatives to object
 
     ## EVENTS
     # Check on keypress method to filter only alphanumeric keys
-    # Use dictionary for all key events, all mouse events maybe
     
     ## STRUCTURES
     # Create abstract geometries
@@ -47,14 +51,14 @@ scene {
     # Add cos function
 
     ## SOURCES
-    # Check how to load geometries from different libraries / async
     # Check how to split your code in different files
+    # Put geometries in binary files stored as assets
 
     ## PERFORMANCE
     # Implement dirty pattern in render function and update function
-    
-    ## BUGS
-    # TODO - Far plane might not be working properly
-    # Camerea does not start on the correct position until you do some transformation.
+
+    # EXEC
+    # Create hierarchy when building dist folder
+    # Delete all sources from dist folder before building again
     
 }
