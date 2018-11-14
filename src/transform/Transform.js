@@ -108,7 +108,8 @@ module.exports = class Transform {
 
     transformVertices (vertices) {
         this.transformVerticesIntoSpace(vertices, this.transform[0]);
-        this.transformVerticesIntoSpace(vertices, this.transform[1]);
+        // It seems like I cannot "bake" the world transformations into the model
+        // this.transformVerticesIntoSpace(vertices, this.transform[1]);
     }
 
     get () {

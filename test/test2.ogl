@@ -20,11 +20,11 @@ scene {
         texture -> src='./models/Earth_TEXTURE_CM.png'
 
         transform {
-            translate -> z=-15.0, space=@WORLD
+            translate -> z=15.0, space=@WORLD
         }    
 
-        on -> type=@INTERVAL, every=@FRAME, hndl=(rotate -> y=1deg)
-        on -> type=@INTERVAL, key='a', hndl=(rotate -> y=0.01deg, space=@WORLD)
+        #on -> type=@INTERVAL, every=@FRAME, hndl=(rotate -> y=0deg)
+        on -> type=@INTERVAL, key='a', hndl=(rotate -> y=-0.1deg, space=@WORLD)
     }
 
     geometry {
