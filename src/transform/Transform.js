@@ -113,8 +113,8 @@ module.exports = class Transform {
 
     get () {
         return {
-            world: this.transform[0],
-            model: this.transform[1],
+            model: this.transform[0],
+            world: this.transform[1],
         };
     }
 

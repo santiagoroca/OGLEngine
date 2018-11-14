@@ -1,19 +1,35 @@
 scene {
 
-    light -> type=@POINT, position=vec3(0.0, 0.0, 0.0)
+    light -> type=@DIRECTIONAL, direction=vec3(0.5, 0.5, 0.5)
     light -> type=@AMBIENT, color=0x111111
 
     camera {
         projection -> fov=45.0, near=0.1, far=1000.0
         
+        transform {
+            translate -> space=@WORLD, z=-25.0
+        }
+
         on -> type=@DRAG, btn=@BUTTON0, hndl=(rotate -> x=(.delta_y * -1), y=.delta_x)
         on -> type=@DRAG, btn=@BUTTON2, hndl=(translate -> x=(.delta_x * 4), y=(.delta_y * 4), space=@WORLD)
-        on -> type=@MOUSEWHEEL, hndl=(translate -> z=.delta_z * 0.5, space=@WORLD)
+        on -> type=@MOUSEWHEEL, hndl=(translate -> z=.delta_z, space=@WORLD)
     }
 
     geometry {
         source -> src='./models/earth.obj'
         texture -> src='./models/Earth_TEXTURE_CM.png'
+
+        transform {
+            translate -> z=-15.0, space=@WORLD
+        }    
+
+        on -> type=@INTERVAL, every=@FRAME, hndl=(rotate -> y=1deg)
+        on -> type=@INTERVAL, key='a', hndl=(rotate -> y=0.01deg, space=@WORLD)
+    }
+
+    geometry {
+        source -> src='./models/earth.obj'
+        texture -> src='./models/2k_sun.jpg'
     }
 
 }

@@ -25,6 +25,7 @@ parser.yy = {
 // Clear Dist folder
 fse.emptyDirSync('./dist/');
 fse.ensureDirSync('./dist/assets/images')
+fse.copySync('./client/index.html', './dist/index.html')
 
 // Output program
 write('dist/build.js', `

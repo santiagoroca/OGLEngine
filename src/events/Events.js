@@ -118,7 +118,7 @@ module.exports = class Events {
 
                 ${this.dynamics.map(object_id => `
 
-                    if (${object_id}.model.isDirty) {
+                    if (${object_id}.model.isDirty || ${object_id}.world.isDirty) {
 
                         ${object_id}.model.matrix = [
                             1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1
@@ -139,12 +139,22 @@ module.exports = class Events {
                             ${object_id}.model.matrix[6],
                             ${object_id}.model.matrix[10]
                         ]);
-                        ${object_id}.model.matrix = mat4.translate(${object_id}.model.matrix, ${object_id}.model.translate);
 
-                        ${object_id}.model.isDirty = false;
-                    }
+                        let right = vec3.multiplyScalar(vec3.normalize([
+                            ${object_id}.model.matrix[0], ${object_id}.model.matrix[4], ${object_id}.model.matrix[8]
+                        ]), ${object_id}.model.translate[0]);
+                    
+                        let up = vec3.multiplyScalar(vec3.normalize([
+                            ${object_id}.model.matrix[1], ${object_id}.model.matrix[5], ${object_id}.model.matrix[9]
+                        ]), ${object_id}.model.translate[1]);
+                    
+                        let back = vec3.multiplyScalar(vec3.normalize([
+                            ${object_id}.model.matrix[2], ${object_id}.model.matrix[6], ${object_id}.model.matrix[10]
+                        ]), ${object_id}.model.translate[2]);
 
-                    if (${object_id}.world.isDirty) {
+                        ${object_id}.model.matrix[12] += right[0] + up[0] + back[0];
+                        ${object_id}.model.matrix[13] += right[1] + up[1] + back[1];
+                        ${object_id}.model.matrix[14] += right[2] + up[2] + back[2];
 
                         ${object_id}.world.matrix = [
                             1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1
@@ -165,8 +175,24 @@ module.exports = class Events {
                             ${object_id}.world.matrix[6],
                             ${object_id}.world.matrix[10]
                         ]);
-                        ${object_id}.world.matrix = mat4.translate(${object_id}.world.matrix, ${object_id}.world.translate);
 
+                        right = vec3.multiplyScalar(vec3.normalize([
+                            ${object_id}.world.matrix[0], ${object_id}.world.matrix[4], ${object_id}.world.matrix[8]
+                        ]), ${object_id}.world.translate[0]);
+                    
+                        up = vec3.multiplyScalar(vec3.normalize([
+                            ${object_id}.world.matrix[1], ${object_id}.world.matrix[5], ${object_id}.world.matrix[9]
+                        ]), ${object_id}.world.translate[1]);
+                    
+                        back = vec3.multiplyScalar(vec3.normalize([
+                            ${object_id}.world.matrix[2], ${object_id}.world.matrix[6], ${object_id}.world.matrix[10]
+                        ]), ${object_id}.world.translate[2]);
+
+                        ${object_id}.world.matrix[12] += right[0] + up[0] + back[0];
+                        ${object_id}.world.matrix[13] += right[1] + up[1] + back[1];
+                        ${object_id}.world.matrix[14] += right[2] + up[2] + back[2];
+
+                        ${object_id}.model.isDirty = false;
                         ${object_id}.world.isDirty = false;
                     }
 
