@@ -32,19 +32,18 @@ module.exports = class Transform {
 
     translate (args) {
         args = { x: 0, y: 0, z: 0, space: 0, ...args,  }
-
         this.transform[args.space].translate = math.vec3.add(
             this.transform[args.space].translate, [args.x, args.y, args.z]
         );
     }
 
     scale (args) {
-        return;
+        args = { size: 1, space: 0, ...args, }
+        this.transform[args.space].scale *= args.size;
     }
 
     rotate (args) {
         args = { x: 0, y: 0, z: 0, space: 0, ...args, }
-
         this.transform[args.space].x_angle += args.x;
         this.transform[args.space].y_angle += args.y;
         this.transform[args.space].z_angle += args.z;
@@ -77,7 +76,7 @@ module.exports = class Transform {
         }
 
         if (typeof transformation.scale == 'number' && !isNaN(transformation.scale)) {
-            space.scale += transformation.scale;
+            space.scale *= transformation.scale;
         }
 
     }

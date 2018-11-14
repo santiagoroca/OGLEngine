@@ -1,6 +1,6 @@
 scene {
 
-    light -> type=@DIRECTIONAL, direction=vec3(0.5, 0.5, 0.5)
+    light -> type=@POINT, position=vec3(0.0, 0.0, 0.0)
     light -> type=@AMBIENT, color=0x111111
 
     camera {
@@ -15,21 +15,136 @@ scene {
         on -> type=@MOUSEWHEEL, hndl=(translate -> z=.delta_z, space=@WORLD)
     }
 
+    # Mercury
     geometry {
         source -> src='./models/earth.obj'
         texture -> src='./models/Earth_TEXTURE_CM.png'
 
         transform {
-            translate -> z=15.0, space=@WORLD
-        }    
+            translate -> z=2.0, space=@WORLD
+            scale -> size=0.00359
+        }
 
         #on -> type=@INTERVAL, every=@FRAME, hndl=(rotate -> y=0deg)
-        on -> type=@INTERVAL, key='a', hndl=(rotate -> y=-0.1deg, space=@WORLD)
+        on -> type=@INTERVAL, hndl=(rotate -> y=-0.0245deg, space=@WORLD)
+    }
+
+    # Venus
+    geometry {
+        source -> src='./models/earth.obj'
+        texture -> src='./models/Earth_TEXTURE_CM.png'
+
+        transform {
+            translate -> z=3.625, space=@WORLD
+            scale -> size=0.00862
+        }
+
+        #on -> type=@INTERVAL, every=@FRAME, hndl=(rotate -> y=0deg)
+        on -> type=@INTERVAL, hndl=(rotate -> y=-0.0096deg, space=@WORLD)
+    }
+
+    # Earth
+    geometry {
+        source -> src='./models/earth.obj'
+        texture -> src='./models/Earth_TEXTURE_CM.png'
+
+        transform {
+            translate -> z=6.0, space=@WORLD
+            scale -> size=0.00933
+        }
+
+        #on -> type=@INTERVAL, every=@FRAME, hndl=(rotate -> y=0deg)
+        on -> type=@INTERVAL, hndl=(rotate -> y=-0.006deg, space=@WORLD)
+    }
+
+    # Mars
+    geometry {
+        source -> src='./models/earth.obj'
+        texture -> src='./models/Earth_TEXTURE_CM.png'
+
+        transform {
+            translate -> z=7.625, space=@WORLD
+            scale -> size=0.00502
+        }
+
+        #on -> type=@INTERVAL, every=@FRAME, hndl=(rotate -> y=0deg)
+        on -> type=@INTERVAL, key='a', hndl=(rotate -> y=-0.0031deg, space=@WORLD)
+    }
+
+    # Jupiter
+    geometry {
+        source -> src='./models/earth.obj'
+        texture -> src='./models/Earth_TEXTURE_CM.png'
+
+        transform {
+            translate -> z=26.0, space=@WORLD
+            scale -> size=0.102729
+        }
+
+        #on -> type=@INTERVAL, every=@FRAME, hndl=(rotate -> y=0deg)
+        on -> type=@INTERVAL, key='a', hndl=(rotate -> y=-0.0005129deg, space=@WORLD)
+    }
+
+    # Saturn
+    geometry {
+        source -> src='./models/earth.obj'
+        texture -> src='./models/Earth_TEXTURE_CM.png'
+
+        transform {
+            translate -> z=48.0, space=@WORLD
+            scale -> size=0.089798
+        }
+
+        #on -> type=@INTERVAL, every=@FRAME, hndl=(rotate -> y=0deg)
+        on -> type=@INTERVAL, key='a', hndl=(rotate -> y=-0.00325deg, space=@WORLD)
+    }
+
+    # Uranus
+    geometry {
+        source -> src='./models/earth.obj'
+        texture -> src='./models/Earth_TEXTURE_CM.png'
+
+        transform {
+            translate -> z=96.0, space=@WORLD
+            scale -> size=0.036637
+        }
+
+        #on -> type=@INTERVAL, every=@FRAME, hndl=(rotate -> y=0deg)
+        on -> type=@INTERVAL, key='a', hndl=(rotate -> y=-0.0007142deg, space=@WORLD)
+    }
+
+    # Neptune
+    geometry {
+        source -> src='./models/earth.obj'
+        texture -> src='./models/Earth_TEXTURE_CM.png'
+
+        transform {
+            translate -> z=150.5, space=@WORLD
+            scale -> size=0.035919
+        }
+
+        #on -> type=@INTERVAL, every=@FRAME, hndl=(rotate -> y=0deg)
+        on -> type=@INTERVAL, key='a', hndl=(rotate -> y=-0.000001245deg, space=@WORLD)
+    }
+
+    # Pluto
+    geometry {
+        source -> src='./models/earth.obj'
+        texture -> src='./models/Earth_TEXTURE_CM.png'
+
+        transform {
+            translate -> z=197.5, space=@WORLD
+            scale -> size=0.001652
+        }
+
+        #on -> type=@INTERVAL, every=@FRAME, hndl=(rotate -> y=0deg)
+        on -> type=@INTERVAL, key='a', hndl=(rotate -> y=-0.00002112, space=@WORLD)
     }
 
     geometry {
         source -> src='./models/earth.obj'
         texture -> src='./models/2k_sun.jpg'
+        on -> type=@INTERVAL, key='a', hndl=(rotate -> y=0.089deg, space=@WORLD)
     }
 
 }
