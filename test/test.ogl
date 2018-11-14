@@ -10,27 +10,14 @@ scene {
             translate -> z=-25.0
         }
 
-        on -> type=@DRAG, btn=@BUTTON0, hndl=(
-            rotate -> x=(.delta_y * -1), y=.delta_x
-        )
-
-        on -> type=@DRAG, btn=@BUTTON2, hndl=(
-            translate -> x=(.delta_x * 4), y=(.delta_y * 4)
-        )
-
+        on -> type=@DRAG, btn=@BUTTON0, hndl=(rotate -> x=(.delta_y * -1), y=.delta_x)
+        on -> type=@DRAG, btn=@BUTTON2, hndl=(translate -> x=(.delta_x * 4), y=(.delta_y * 4))
         on -> type=@MOUSEWHEEL, hndl=(translate -> z=.delta_z)
     }
 
     geometry {
         source -> src='./models/earth.obj'
         texture -> src='./models/Earth_TEXTURE_CM.png'
-        
-        transform {
-            translate -> z=15.0
-            scale -> x=0.1, y=0.1, z=0.1
-        }
-
-        on -> type=@INTERVAL, every=@FRAME, hndl=(rotate -> y=-0.1deg)
     }
 
     geometry {

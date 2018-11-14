@@ -20,22 +20,26 @@ module.exports = class PhongShader {
         return (this.config & 4) == 4;
     }
 
-    generateInitializationBlock (directional_l, ambient_l) {
+    generateInitializationBlock (directional_l, ambient_l, point_l) {
         const hash = this.name;
+
+        // Does the fragment shader needs a varying with the
+        // position of the current vertex?
+        const fragment_varying_vertex_position = point_l.length;
 
         const fragment_color = `
         
             ${this.hasUniformColor() ? `
                 gl_FragColor = 
-                geometryColor * vec4(attenuation, attenuation, attenuation, 1.0) +
-                geometryColor * ambient_light;
+                    geometryColor * vec4(attenuation, attenuation, attenuation, 1.0) +
+                    geometryColor * ambient_light;
             `: ''}
 
             ${this.hasTexture() ? `
                 vec4 color = texture2D(uSampler, vec2(vVertexUV.s, 1.0-vVertexUV.t));
-                gl_FragColor = 
-                color * vec4(attenuation, attenuation, attenuation, 1.0) +
-                color * ambient_light;
+                gl_FragColor = color;
+                    /*color * vec4(attenuation, attenuation, attenuation, 1.0) +
+                    color * ambient_light*/;
             `: ''}
 
         `;
@@ -49,17 +53,23 @@ module.exports = class PhongShader {
                 ${this.hasNormals() ? 'attribute lowp vec3 aVertexNormal;': ''}
                 ${this.hasTexture() ? 'attribute lowp vec2 aVertexUV;': ''}
 
-                uniform mat4 localTransform;
-                uniform mat4 uPMVMatrix; 
-                uniform mat4 pMatrix;
+                uniform mat4 model;
+                uniform mat4 world;
+
+                uniform mat4 cameraModel;
+                uniform mat4 cameraWorld;
+
+                uniform mat4 projection;
                 ${this.hasTexture() ? 'uniform sampler2D uSampler;': ''}
                 
                 ${this.hasNormals() ? 'varying vec3 vNormal;': ''}
                 ${this.hasTexture() ? 'varying vec2 vVertexUV;': ''}
+                ${fragment_varying_vertex_position ? 'varying vec3 vVertexPosition;': ''}
                 
                 void main(void) {
-                    gl_Position = pMatrix * uPMVMatrix * localTransform * vec4(aVertexPosition, 1.0);
-                    ${this.hasNormals() ? 'vNormal = (localTransform * vec4(aVertexNormal, 1.0)).xyz;': ''}
+                    gl_Position = projection * cameraWorld * cameraModel * world * model * vec4(aVertexPosition, 1.0);
+                    ${fragment_varying_vertex_position ? 'vVertexPosition = gl_Position.xyz;': ''}
+                    ${this.hasNormals() ? 'vNormal = mat3(world * model) * aVertexNormal;': ''}
                     ${this.hasTexture() ? 'vVertexUV = aVertexUV;': ''}
                 }
 
@@ -68,30 +78,42 @@ module.exports = class PhongShader {
             const PhongFragment_${hash} = \`
                 precision highp float;
 
-                uniform mat4 uPMVMatrix;
+                uniform mat4 model;
+                uniform mat4 world;
+
+                uniform mat4 cameraModel;
+                uniform mat4 cameraWorld;
 
                 ${this.hasUniformColor() ? 'uniform vec4 geometryColor;': ''}
                 ${this.hasTexture() ? 'uniform sampler2D uSampler;': ''}
 
                 const vec4 ambient_light = vec4(${ambient_l});
 
-                ${
-                    directional_l.map(
-                        ({ direction }, index) => `const vec3 dir_${index} = vec3(${direction});`
-                    ).join('\n')
-                }
+                ${directional_l.map(
+                    ({ direction }, index) => `const vec3 dir_${index} = vec3(${direction});`
+                ).join('\n')}
+
+                ${point_l.map(
+                    ({ position }, index) => `const vec4 point_${index} = vec4(${position}, 1.0);`
+                ).join('\n')}
 
                 ${this.hasNormals() ? 'varying vec3 vNormal;': ''}
                 ${this.hasTexture() ? 'varying vec2 vVertexUV;': ''}
+                ${fragment_varying_vertex_position ? 'varying vec3 vVertexPosition;': ''}
 
                 void main() {
                     float attenuation = 0.0;
+                    vec3 normal = normalize(vNormal);
                     
-                    ${
-                        directional_l.map(
-                            ({}, index) => ` attenuation += max(0.0, dot(vNormal, dir_${index}));`
-                        ).join('\n')
-                    }
+                    ${directional_l.map(
+                        ({}, index) => ` attenuation += max(0.0, dot(normal, dir_${index}));`
+                    ).join('\n')}
+
+                    ${point_l.map(({}, index) => `
+                        vec3 surfaceToLight = (cameraWorld * cameraModel * world * model * point_${index}).xyz - vVertexPosition;
+                        float brightness = dot(normal, surfaceToLight) / (length(surfaceToLight) * length(normal));
+                        attenuation += brightness;
+                    `).join('\n')}
                     
                     ${fragment_color}
                 }
@@ -136,9 +158,11 @@ module.exports = class PhongShader {
                 webgl.enableVertexAttribArray(PhongShaderProgram_${hash}.vertexUVAttribute);
             `: ''};
 
-            PhongShaderProgram_${hash}.uPMVMatrix = webgl.getUniformLocation(PhongShaderProgram_${hash}, "uPMVMatrix");
-            PhongShaderProgram_${hash}.pMatrix = webgl.getUniformLocation(PhongShaderProgram_${hash}, 'pMatrix');
-            PhongShaderProgram_${hash}.localTransform = webgl.getUniformLocation(PhongShaderProgram_${hash}, 'localTransform');
+            PhongShaderProgram_${hash}.world = webgl.getUniformLocation(PhongShaderProgram_${hash}, 'world');
+            PhongShaderProgram_${hash}.model = webgl.getUniformLocation(PhongShaderProgram_${hash}, 'model');
+            PhongShaderProgram_${hash}.cameraWorld = webgl.getUniformLocation(PhongShaderProgram_${hash}, 'cameraWorld');
+            PhongShaderProgram_${hash}.cameraModel = webgl.getUniformLocation(PhongShaderProgram_${hash}, 'cameraModel');
+            PhongShaderProgram_${hash}.projection = webgl.getUniformLocation(PhongShaderProgram_${hash}, 'projection');
             
             ${this.hasUniformColor() ?`
                 PhongShaderProgram_${hash}.geometryColor = webgl.getUniformLocation(PhongShaderProgram_${hash}, 'geometryColor');
@@ -151,13 +175,16 @@ module.exports = class PhongShader {
         const hash = this.name;
 
         return `
-            webgl.uniformMatrix4fv(PhongShaderProgram_${hash}.uPMVMatrix, false, activeCamera.transform.matrix);
-            webgl.uniformMatrix4fv(PhongShaderProgram_${hash}.pMatrix, false, activeCamera.projectionMatrix);
+            webgl.uniformMatrix4fv(PhongShaderProgram_${hash}.cameraWorld, false, activeCamera.world.matrix);
+            webgl.uniformMatrix4fv(PhongShaderProgram_${hash}.cameraModel, false, activeCamera.model.matrix);
+            webgl.uniformMatrix4fv(PhongShaderProgram_${hash}.projection, false, activeCamera.projectionMatrix);
 
             ${
                 this.geometries.map(geometry => `
 
-                    webgl.uniformMatrix4fv(PhongShaderProgram_${hash}.localTransform, false, ${geometry}.transform.matrix);
+                    webgl.uniformMatrix4fv(PhongShaderProgram_${hash}.world, false, ${geometry}.world.matrix);
+                    webgl.uniformMatrix4fv(PhongShaderProgram_${hash}.model, false, ${geometry}.model.matrix);
+
                     webgl.bindBuffer(webgl.ARRAY_BUFFER, ${geometry}.vertexs);
                     webgl.vertexAttribPointer(PhongShaderProgram_${hash}.vertexPositionAttribute, 3, webgl.FLOAT, false, 0, 0);
                     

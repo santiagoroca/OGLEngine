@@ -39,8 +39,10 @@ module.exports = class Camera {
         const _hash = hash();
         const a = 1 * Math.tan(this.fov * Math.PI / 360);
         const i = a + a, j = this.far - this.near;
+        const { world, model } = this.transform.get();
 
         return `
+
             const aspect = canvas.width / canvas.height;
             const b = ${a} * aspect;
             const h = b + b;
@@ -51,7 +53,10 @@ module.exports = class Camera {
                     0,         0,            -11 / ${j},           -1,
                     0,         0,            -(10 * 1 * 2) / ${j}, 0
                 ],
-                transform: new Transform(${this.transform.get()})
+                world: ${JSON.stringify(world)},
+                model: ${JSON.stringify(model)},
+                matrix: [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
+                isDirty: true
             };
 
             cameras.push(${this.getName()});

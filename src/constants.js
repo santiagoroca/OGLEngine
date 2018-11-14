@@ -15,5 +15,7 @@ module.exports = {
     "FRAME": 16,
     "DIRECTIONAL": 'directional',
     "AMBIENT": 'ambient',
-    "POINT": 'point'
+    "POINT": 'point',
+    "SELF": 0,
+    "WORLD": 1,
 }

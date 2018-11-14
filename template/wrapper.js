@@ -9,6 +9,7 @@ function viewer (container) {
     canvas.width = container.clientWidth;
     canvas.height = container.clientHeight;
     container.appendChild(canvas);
+    canvas.oncontextmenu = () => false;
 
     /*
     * WebGL Context Configuration
@@ -30,18 +31,9 @@ function viewer (container) {
     /*
     *
     */
-    function updateMatrix () {
-        requestAnimationFrame(() => render());
-    }
-
-    /*
-    *
-    */
     function enableCamera (camera) {
-        activeCamera = camera; requestAnimationFrame(() => render());
+        activeCamera = camera; 
     }
-
-    requestAnimationFrame(() => render());
 
 }
 

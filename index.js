@@ -25,7 +25,7 @@ write('dist/build.js', `
     ${read('./template/mat.js')}
     ${read('./template/transform.js')}
     ${WRAPPER_TEMPLATE.replace(/'%scene%'/g, parser.parse(
-        read('./test/test.ogl').toString()
+        read(process.argv[2]).toString()
     ))}
 `);
 

@@ -62,8 +62,23 @@ module.exports = class Scene {
             ambient_lights[2] /= this.ambient_lights.length * 255;
         }
 
+        const directional_lights = this.directional_lights.map(light => {
+            const direction = light.direction;
+            const length = Math.sqrt(
+                direction[0] * direction[0] + 
+                direction[1] * direction[1] + 
+                direction[2] * direction[2]
+            );
+
+            return { ...light, direction: [
+                direction[0] / length,
+                direction[1] / length,
+                direction[2] / length
+            ]};
+        });
+
         return Object.keys(this.shaders).map(shader => this.shaders[shader].generateInitializationBlock(
-            this.directional_lights, ambient_lights, this.point_lights
+            directional_lights, ambient_lights, this.point_lights
         ));
         
     }

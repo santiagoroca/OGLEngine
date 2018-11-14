@@ -179,7 +179,7 @@ module.exports = class Geometry {
     }
 
     toString () {
-        
+        const { world, model } = this.transform.get();
 
         return `
 
@@ -221,30 +221,25 @@ module.exports = class Geometry {
             const geometry_${this.name} = Object.assign({
                 vertexs: v_buff_${this.name},
                 indexes: f_buff_${this.name},
-                transform: new Transform(),
+                world: ${JSON.stringify(world)},
+                model: ${JSON.stringify(model)},
                 count: ${this.indexes.length},
 
-                ${
-                    this.hasNormals() ?
-                    `
-                        normals: n_buff_${this.name},
-                    ` : ''
-                }
+                ${this.hasNormals() ?
+                `
+                    normals: n_buff_${this.name},
+                ` : ''}
 
-                ${
-                    this.hasTexture() ?
-                    `
-                        uvs: uvs_buff_${this.name},
-                        texture: texture_${this.name},
-                    ` : ''
-                }
+                ${this.hasTexture() ?
+                `
+                    uvs: uvs_buff_${this.name},
+                    texture: texture_${this.name},
+                ` : ''}
 
-                ${
-                    this.hasUniformColor() ?
-                    `
-                        color: [${this.color.r}, ${this.color.g}, ${this.color.b}, ${this.color.a}],
-                    ` : ''
-                }
+                ${this.hasUniformColor() ?
+                `
+                    color: [${this.color.r}, ${this.color.g}, ${this.color.b}, ${this.color.a}],
+                ` : ''}
                 
             });
 

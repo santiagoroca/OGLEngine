@@ -53,12 +53,12 @@ module.exports = class Scene {
         for (const geometry of this.geometries) {
             out += geometry.toString();
             this.shaders.addGeometry(geometry);
-            this.events.addEvents(geometry.events);
+            this.events.addEvents(geometry.events, geometry.getName());
         }
 
         for (const camera of this.cameras) {
             out += camera.toString();
-            this.events.addEvents(camera.events);
+            this.events.addEvents(camera.events, camera.getName());
         }
         
         out += this.shaders.toString();

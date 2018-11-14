@@ -1,19 +1,30 @@
 module.exports = class Events {
 
     constructor () {
-        this.events = { drag: [], keypress: [], keydown: [], interval: [], mousewheel: [] };
+        this.dynamics = [];
+        this.events = {
+            drag: [], keypress: [],
+            keydown: [], interval: [], 
+            mousewheel: [] 
+        };
     }
 
-    addEvents (events) {
+    addEvents (events, object_id) {
         for (const event of events) {
             this.events [event.type].push(event);
         }
+
+        this.dynamics.push(object_id);
     }
 
     toString () {
         return `
 
             const pressed_keys = {};
+            const world = { transform: { matrix: [
+                1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1
+            ]}};
+
             let prevXPosition = 0;
             let prevYPosition = 0;
             let isMousePressed = false;
@@ -87,7 +98,6 @@ module.exports = class Events {
             
                 prevXPosition = event.x;
                 prevYPosition = event.y;
-                render();
             });
 
             document.addEventListener("mousewheel", (event) => {
@@ -96,16 +106,73 @@ module.exports = class Events {
                 }
 
                 ${this.events.mousewheel.map(event => event.hndl).join('\n')}
-
-                render();
             });
 
             ${this.events.interval.map(event => `
                 setInterval(() => { 
                     ${event.hndl}
-                    requestAnimationFrame(() => render()); 
                 }, ${event.every});
             `).join('\n')}
+
+            setInterval(() => {
+
+                ${this.dynamics.map(object_id => `
+
+                    if (${object_id}.model.isDirty) {
+
+                        ${object_id}.model.matrix = [
+                            1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1
+                        ];
+    
+                        ${object_id}.model.matrix = mat4.rotate(${object_id}.model.matrix, ${object_id}.model.y_angle, [
+                            ${object_id}.model.matrix[1], 
+                            ${object_id}.model.matrix[5], 
+                            ${object_id}.model.matrix[9]
+                        ]);
+                        ${object_id}.model.matrix = mat4.rotate(${object_id}.model.matrix, ${object_id}.model.x_angle, [
+                            ${object_id}.model.matrix[0], 
+                            ${object_id}.model.matrix[4], 
+                            ${object_id}.model.matrix[8]
+                        ]);
+                        ${object_id}.model.matrix = mat4.rotate(${object_id}.model.matrix, ${object_id}.model.z_angle, [
+                            ${object_id}.model.matrix[2], 
+                            ${object_id}.model.matrix[6],
+                            ${object_id}.model.matrix[10]
+                        ]);
+                        ${object_id}.model.matrix = mat4.translate(${object_id}.model.matrix, ${object_id}.model.translate);
+
+                        ${object_id}.model.isDirty = false;
+                    }
+
+                    if (${object_id}.world.isDirty) {
+
+                        ${object_id}.world.matrix = [
+                            1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1
+                        ];
+
+                        ${object_id}.world.matrix = mat4.rotate(${object_id}.world.matrix, ${object_id}.world.y_angle, [
+                            ${object_id}.world.matrix[1], 
+                            ${object_id}.world.matrix[5], 
+                            ${object_id}.world.matrix[9]
+                        ]);
+                        ${object_id}.world.matrix = mat4.rotate(${object_id}.world.matrix, ${object_id}.world.x_angle, [
+                            ${object_id}.world.matrix[0], 
+                            ${object_id}.world.matrix[4], 
+                            ${object_id}.world.matrix[8]
+                        ]);
+                        ${object_id}.matrix = mat4.rotate(${object_id}.world.matrix, ${object_id}.world.z_angle, [
+                            ${object_id}.world.matrix[2], 
+                            ${object_id}.world.matrix[6],
+                            ${object_id}.world.matrix[10]
+                        ]);
+                        ${object_id}.world.matrix = mat4.translate(${object_id}.world.matrix, ${object_id}.world.translate);
+
+                        ${object_id}.world.isDirty = false;
+                    }
+
+                `).join('\n')}
+
+            }, 16);
             
         `;
     }
