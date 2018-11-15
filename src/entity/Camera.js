@@ -6,16 +6,11 @@ const hash = require('../helper.js').hash;
 module.exports = class Camera extends Entity {
 
     defaults () {
-        this.name = hash();
         this.transform = new Transform();
         this.events = [];
         this.fov = 45;
         this.far = 10;
         this.near = 1;
-    }
-
-    set ([ property, value ]) {
-        this[property] = value;
     }
 
     getName () {
@@ -44,7 +39,6 @@ module.exports = class Camera extends Entity {
         const _hash = hash();
         const a = 1 * Math.tan(this.fov * Math.PI / 360);
         const i = a + a, j = this.far - this.near;
-        const { world, model } = this.transform.get();
 
         return `
 
@@ -58,10 +52,7 @@ module.exports = class Camera extends Entity {
                     0,         0,            -11 / ${j},           -1,
                     0,         0,            -(10 * 1 * 2) / ${j}, 0
                 ],
-                world: ${JSON.stringify(world)},
-                model: ${JSON.stringify(model)},
-                matrix: [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
-                isDirty: true
+                transform: ${this.transform.toString()}
             };
 
             cameras.push(${this.getName()});

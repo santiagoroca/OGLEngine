@@ -1,7 +1,7 @@
 const Entity = require('./Entity');
+const Camera = require('./Camera');
 const Transform = require('./Transform.js');
 const Shaders = require('../shader/Shaders.js');
-const GeometryBatch = require('../geometry_batch.js');
 const Render = require('../render.js');
 const Events = require('../events/Events');
 
@@ -24,19 +24,15 @@ module.exports = class Scene extends Entity {
         this.geometries = [];
     }
 
-    addCamera (camera) {
+    addCamera ([ camera ]) {
         this.cameras.push(camera);
     }
 
-    addLight (light) {
+    addLight ([ light ]) {
         this.shaders.appendLight(light);
     }
 
-    appendGeometry (geometry) {
-        if (!geometry) {
-            return;
-        }
-
+    addGeometry ([ geometry ]) {
         this.geometries.push(geometry);
     }
 

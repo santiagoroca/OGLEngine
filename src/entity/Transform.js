@@ -10,12 +10,7 @@ module.exports = class Transform extends Entity {
     }
 
     transformVerticesIntoSpace (vertices, space) {
-        let transform = math.mat4.identity();
-
-        transform = math.mat4.translate(transform, space.translate);
-        transform = math.mat4.rotate(transform, space.y_angle, [transform[1], transform[5], transform[9]]);
-        transform = math.mat4.rotate(transform, space.x_angle, [transform[0], transform[4], transform[8]]);
-        transform = math.mat4.rotate(transform, space.z_angle, [transform[2], transform[6], transform[10]]);
+        const transform = space.getMatrix();
 
         for (let i = 0; i < vertices.length; i += 3) {
             let x = vertices[i];
@@ -29,14 +24,14 @@ module.exports = class Transform extends Entity {
     }
 
     transformVertices (vertices) {
-        this.transformVerticesIntoSpace(vertices, this.transform[0]);
+        this.transformVerticesIntoSpace(vertices, this.model);
     }
 
-    get () {
-        return {
-            model: this.model,
-            world: this.world,
-        };
+    toString () {
+        return JSON.stringify({
+            model: this.model.get(),
+            world: this.world.get(),
+        });
     }
 
 }

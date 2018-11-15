@@ -8,21 +8,37 @@ scene {
         # This will ovewrite the model transform and add this new 
         # listener
         set transform {
-            set model { pass }
+
             set world {
                 translate -> z=-25.0
             }
+
         }
     }
 
     add light {
-        set type=@POINT
+        set type=ogl.POINT
         set position=vec3(0.0, 0.0, 0.0)
     }
 
     add light {
-        set type=@AMBIENT
+        set type=ogl.AMBIENT
         set color=0x111111
+    }
+
+    # Venus
+    add geometry {
+        set source='./models/earth.obj'
+        set texture='./models/Earth_TEXTURE_CM.png'
+
+        set transform {
+            set model {
+                scale -> size=1.0
+            }
+        }
+
+        #on -> type=@INTERVAL, every=@FRAME, hndl=(rotate -> y=0deg)
+        #on -> type=@INTERVAL, hndl=(rotate -> y=-0.0096deg, space=@WORLD)
     }
 
     ## SHADER

@@ -18,8 +18,8 @@ module.exports = {
         
         return object_id => {
             const space = [
-                `${object_id}.model`,
-                `${object_id}.world`
+                `${object_id}.transform.model`,
+                `${object_id}.transform.world`
             ][args.space];
 
             return `
@@ -42,8 +42,8 @@ module.exports = {
 
         return object_id => {
             const space = [
-                `${object_id}.model`,
-                `${object_id}.world`
+                `${object_id}.transform.model`,
+                `${object_id}.transform.world`
             ][args.space];
 
             return `

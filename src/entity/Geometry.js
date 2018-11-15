@@ -1,38 +1,38 @@
-const Transform = require('./entity/Transform.js');
-const hash = require('./helper.js').hash;
-const load = require('./parser/Loader.js');
-const math = require('./math.js');
+const Entity = require('./Entity');
+const Transform = require('./Transform');
+const load = require('../parser/Loader.js');
+const math = require('../math.js');
 const read = require('fs').readFileSync;
 const write = require('fs').writeFileSync;
+const hash = require('../helper').hash;
 
-module.exports = class Geometry {
+module.exports = class Geometry extends Entity {
 
-    constructor () {
+    defaults () {
 
         /*
         * Fixed arguments that should always 
         * be present. If not, the geometry should
         * fail, or not be added to the scene
         */
-        this.name = hash();
-        this.vertexs = [];
-        this.indexes = [];
+       this.vertexs = [];
+       this.indexes = [];
 
-        /*
-        * Optional arguments. If not present, 
-        * the shader will react and create a program
-        * that adjusts itself to these.
-        */
-        this.normals = [];
-        this.uvs = [];
-        this.color = null;
+       /*
+       * Optional arguments. If not present, 
+       * the shader will react and create a program
+       * that adjusts itself to these.
+       */
+       this.normals = [];
+       this.uvs = [];
+       this.color = null;
 
-        /*
-        * Helper internal classes and arrays,
-        * used to build the AST.
-        */
-        this.transform = new Transform();
-        this.events = [];
+       /*
+       * Helper internal classes and arrays,
+       * used to build the AST.
+       */
+       this.transform = new Transform();
+       this.events = [];
 
     }
 
@@ -41,7 +41,7 @@ module.exports = class Geometry {
     }
 
     hasTexture () {
-        return typeof this.texture_source != 'undefined';
+        return typeof this.texture != 'undefined';
     }
 
     hasNormals () {
@@ -70,12 +70,12 @@ module.exports = class Geometry {
 
     // Configure Texture as externla object 
     // and append to geometry
-    setTexture (args) {
-        const ext = args.src.match(/[^\.]+$/g)[0];
+    setTexture ([ texture ]) {
+        const ext = texture.match(/[^\.]+$/g)[0];
         const name = hash();
         const path = `assets/images/${name}.${ext}`;
-        write(`./dist/${path}`, read(args.src));
-        this.texture_source = path;
+        write(`./dist/${path}`, read(texture));
+        this.texture = path;
     }
     
     applyTransformation (transformation) {
@@ -93,11 +93,6 @@ module.exports = class Geometry {
         }
 
         return this.normals;
-    }
-
-    loadFromFile (args) {
-        const geometry = load(args.src);
-        Object.assign(this, geometry);
     }
 
     setColor (args) {
@@ -179,7 +174,9 @@ module.exports = class Geometry {
     }
 
     toString () {
-        const { world, model } = this.transform.get();
+        if (this.source) {
+            Object.assign(this, load(this.source));
+        }
 
         return `
 
@@ -216,13 +213,12 @@ module.exports = class Geometry {
                 webgl.texParameteri(webgl.TEXTURE_2D, webgl.TEXTURE_MIN_FILTER, webgl.LINEAR_MIPMAP_NEAREST);
                 webgl.generateMipmap(webgl.TEXTURE_2D);
             }
-            image_${this.name}.src = '${this.texture_source}';
+            image_${this.name}.src = '${this.texture}';
 
             const geometry_${this.name} = Object.assign({
                 vertexs: v_buff_${this.name},
                 indexes: f_buff_${this.name},
-                world: ${JSON.stringify(world)},
-                model: ${JSON.stringify(model)},
+                transform: ${this.transform},
                 count: ${this.indexes.length},
 
                 ${this.hasNormals() ?

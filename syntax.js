@@ -16,6 +16,7 @@ module.exports = {
             ["define", "return 'DEFINE';"],
             ["pass", "return 'PASS';"],
             ["scene", "return 'SCENE';"],
+            ["ogl\.[a-zA-Z]+", "return 'CONSTANT';"],
             ["[a-zA-Z]+=", "return 'VARNAME';"],
             ["[a-zA-Z]+ ?(?=->)", "return 'FUNC_NAME';"],
             ["[a-zA-Z]+ ?(?=\{)", "return 'CLASS_NAME';"],
@@ -40,7 +41,7 @@ module.exports = {
             ["texture", "return 'TEXTURE';"],
 
             /* Constant Values */
-            ["@", "return 'AT';"],
+            
 
             /* natives */
             ["0x[0-9A-Fa-f]{6}", "return 'HEXA';"],
@@ -77,7 +78,7 @@ module.exports = {
 
         run:
         [
-            [ " scene EOF ", " return ''; " ],
+            [ " scene EOF ", " return $1; " ],
             [ " EOF ", SKIP ],
         ],
 
@@ -94,10 +95,17 @@ module.exports = {
 
         statement:
         [
-            [ " ADD class ", " $$ = [ 'add' + $2[0], [ $2[1] ] ] " ],
+            [ " ADD class ", " $$ = [ 'add', [ $2[0], $2[1] ] ] " ],
             [ " SET class ", " $$ = [ 'set', [ $2[0], $2[1] ] ]; " ],
-            [ " SET arg ", " $$ = [ 'set', [ $2[0], $2[1] ] ]; " ],
-            [ " FUNC_NAME ARROW args ", " $$ = [ $1, $3 ]; " ],
+            [ " SET VARNAME value ", " $$ = [ 'set', [ $2.replace(/=/g, '').trim(), $3 ] ]; " ],
+            [ " function ", " $$ = $1; " ],
+        ],
+
+        function:
+        [
+            [ " FUNC_NAME ARROW args ", `
+                $$ = [ $1.trim(), $3 ];
+            `],
         ],
 
         class:
@@ -106,7 +114,7 @@ module.exports = {
                 const className = ($1.charAt(0).toUpperCase() + $1.slice(1)).trim();
 
                 try {
-                    $$ = [ className, new yy[className]($3) ];     
+                    $$ = [ $1.trim(), new yy[className]($3) ];     
                 } catch (error) {
                     console.log(error);
                     throw(new Error('Class ' + className + ' not found.'))
@@ -172,7 +180,7 @@ module.exports = {
         ],
 
         arg: [
-            [ " VARNAME value ", " $$ = [ $1.replace(/=/g, ''), $2 ]; " ],
+            [ " VARNAME value ", " $$ = { [`${$1.replace(/=/g, '')}`]: $2 }; " ],
         ],
 
         value: 
@@ -201,7 +209,7 @@ module.exports = {
 
         constant:
         [
-            [ " AT CONSTANT ", " $$ = yy.Constants[$2]; " ]
+            [ " CONSTANT ", " $$ = yy.Constants[$1.replace(/ogl\./g, '')]; " ]
         ]
 
     }

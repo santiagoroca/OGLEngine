@@ -175,15 +175,15 @@ module.exports = class PhongShader {
         const hash = this.name;
 
         return `
-            webgl.uniformMatrix4fv(PhongShaderProgram_${hash}.cameraWorld, false, activeCamera.world.matrix);
-            webgl.uniformMatrix4fv(PhongShaderProgram_${hash}.cameraModel, false, activeCamera.model.matrix);
+            webgl.uniformMatrix4fv(PhongShaderProgram_${hash}.cameraWorld, false, activeCamera.transform.world.matrix);
+            webgl.uniformMatrix4fv(PhongShaderProgram_${hash}.cameraModel, false, activeCamera.transform.model.matrix);
             webgl.uniformMatrix4fv(PhongShaderProgram_${hash}.projection, false, activeCamera.projectionMatrix);
 
             ${
                 this.geometries.map(geometry => `
 
-                    webgl.uniformMatrix4fv(PhongShaderProgram_${hash}.world, false, ${geometry}.world.matrix);
-                    webgl.uniformMatrix4fv(PhongShaderProgram_${hash}.model, false, ${geometry}.model.matrix);
+                    webgl.uniformMatrix4fv(PhongShaderProgram_${hash}.world, false, ${geometry}.transform.world.matrix);
+                    webgl.uniformMatrix4fv(PhongShaderProgram_${hash}.model, false, ${geometry}.transform.model.matrix);
 
                     webgl.bindBuffer(webgl.ARRAY_BUFFER, ${geometry}.vertexs);
                     webgl.vertexAttribPointer(PhongShaderProgram_${hash}.vertexPositionAttribute, 3, webgl.FLOAT, false, 0, 0);

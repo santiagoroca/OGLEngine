@@ -18,10 +18,11 @@ parser.yy = {
     Transform: require('./src/entity/Transform.js'),
     Model: require('./src/entity/Matrix.js'),
     World: require('./src/entity/Matrix.js'),
+    Geometry: require('./src/entity/Geometry.js'),
 
     Events: require('./src/events/Events.js'),
     TransformEvents: require('./src/events/TransformEvents.js'),
-    Geometry: require('./src/geometry.js'),
+    
     Math: require('./src/math.js'),
     Constants: require('./src/constants.js'),
 }
