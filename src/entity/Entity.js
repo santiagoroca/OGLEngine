@@ -5,6 +5,11 @@ module.exports = class Entity {
 
     constructor (statements = []) {
         this.defaults();
+        this.applyStatements(statements);
+        this.name = hash();
+    }
+
+    applyStatements (statements) {
         statements = statements.filter(statement => statement != null);
 
         for (const [ method, argument ] of statements) {
@@ -21,11 +26,9 @@ module.exports = class Entity {
 
                 this[method](argument);
             } catch (error) {
-                throw(new Error(`${this.constructor.name} does not contain '${method}' method.`));
+                throw(error);
             }
         }
-
-        this.name = hash();
     }
 
     set ([ property, value ]) {

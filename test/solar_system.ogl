@@ -1,158 +1,192 @@
 scene {
 
+    define Star extends geometry {
 
-    # Mercury
-    add geometry {
-        set source='./models/earth.obj'
-        set texture='./models/Earth_TEXTURE_CM.png'
+        # Internal Variables
+        set source='./models/star.obj'
 
         set transform {
             set world {
-                translate -> z=2.0
+                on -> type=ogl.INTERVAL, hndl=(rotate -> y=0.001)
+            }
+        }
+
+    }
+
+    add camera {
+        set fov=20.0
+        set near=0.1
+        set far=1000.0
+
+        # This will ovewrite the model transform and add this new 
+        # listener
+        set transform {
+
+            set model {
+                on -> type=ogl.DRAG, btn=ogl.BUTTON0, hndl=(
+                    rotate -> x=(.delta_y * -1), y=.delta_x
+                )
+            }
+
+            set world {
+                on -> type=ogl.MOUSEWHEEL, hndl=(
+                    translate -> z=.delta_z
+                )
+
+                on -> type=ogl.DRAG, btn=ogl.BUTTON2, hndl=(
+                    translate -> x=(.delta_x * 4), y=(.delta_y * 4)
+                )
+
+                translate -> z=-25.0
+            }
+
+        }
+    }
+
+    # Ambient Light
+    add light {
+        set type=ogl.AMBIENT
+        set color=0xaa0000
+    }
+
+    # Directional Light
+    add light {
+        set type=ogl.POINT
+        set position=vec3(0.0, 0.0, 0.0)
+    }
+
+    # Mercury
+    add Star {
+        set texture='./models/mercury.jpg'
+
+        set transform {
+            set world {
+                translate -> z=5.0
                 on -> type=ogl.INTERVAL, hndl=(rotate -> y=-0.0245deg)
             }
 
             set model {
-                scale -> size=0.00359
+                scale -> size=0.15
             }
         }
     }
 
     # Venus
-    add geometry {
-        set source='./models/earth.obj'
-        set texture='./models/Earth_TEXTURE_CM.png'
+    add Star {
+        set texture='./models/venus.jpg'
 
         set transform {
             set world {
-                translate -> z=3.625
+                translate -> z=9.0
                 on -> type=ogl.INTERVAL, hndl=(rotate -> y=-0.0096deg)
             }
 
             set model {
-                scale -> size=0.00862
+                scale -> size=0.35
             }
         }
     }
 
     # Earth
-    add geometry {
-        set source='./models/earth.obj'
-        set texture='./models/Earth_TEXTURE_CM.png'
+    add Star {
+        set texture='./models/earth.jpg'
 
         set transform {
             set model {
-                scale -> size=0.00933
+                scale -> size=0.25
             }
 
             set world {
-                translate -> z=6.0
+                translate -> z=15.0
                 on -> type=ogl.INTERVAL, hndl=(rotate -> y=-0.006deg)
             }
         }
     }
 
     # Mars
-    add geometry {
-        set source='./models/earth.obj'
-        set texture='./models/Earth_TEXTURE_CM.png'
+    add Star {
+        set texture='./models/mars.jpg'
 
         set transform {
             set world {
-                translate -> z=7.62
+                translate -> z=20.0
                 on -> type=ogl.INTERVAL, hndl=(rotate -> y=-0.0031deg)
             }
 
             set model {
-                scale -> size=0.00502
+                scale -> size=0.2
             }
         }
     }
 
     # Jupiter
-    add geometry {
-        set source='./models/earth.obj'
-        set texture='./models/Earth_TEXTURE_CM.png'
+    add Star {
+        set texture='./models/jupiter.jpg'
 
         set transform {
             set world {
-                translate -> z=26.0
+                translate -> z=25.0
                 on -> type=ogl.INTERVAL, hndl=(rotate -> y=-0.0005129deg)
             }
 
             set model {
-                scale -> size=0.102729
+                scale -> size=0.7
             }
             
         }   
     }
 
     # Saturn
-    add geometry {
-        set source='./models/earth.obj'
-        set texture='./models/Earth_TEXTURE_CM.png'
+    add Star {
+        set texture='./models/saturn.jpg'
 
         set transform {
             set model {
-                scale -> size=0.089798
+                scale -> size=0.5
             }
 
             set world {
-                translate -> z=48.0
+                translate -> z=32.0
                 on -> type=ogl.INTERVAL, hndl=(rotate -> y=-0.00325deg)
             }
         }
     }
 
     # Uranus
-    add geometry {
-        set source='./models/earth.obj'
-        set texture='./models/Earth_TEXTURE_CM.png'
+    add Star {
+        set texture='./models/uranus.jpg'
 
         set transform {
             set model {
-                scale -> size=0.036637
+                scale -> size=0.4
             }
 
             set world {
-                translate -> z=96.0
+                translate -> z=48.0
                 on -> type=ogl.INTERVAL, key='a', hndl=(rotate -> y=-0.0007142deg)
             }
         }
     }
 
     # Neptune
-    add geometry {
-        set source='./models/earth.obj'
-        set texture='./models/Earth_TEXTURE_CM.png'
+    add Star {
+        set texture='./models/neptune.jpg'
 
         set transform {
             set model {
-                scale -> size=0.035919
+                scale -> size=0.4
             }
 
             set world {
-                translate -> z=150.5
+                translate -> z=55.5
                 on -> type=ogl.INTERVAL, key='a', hndl=(rotate -> y=-0.000001245deg)
             }
         }
     }
 
-    # Pluto
-    add geometry {
-        set source='./models/earth.obj'
-        set texture='./models/Earth_TEXTURE_CM.png'
-
-        set transform {
-            set model {
-                scale -> size=0.001652
-            }
-
-            set world {
-                translate -> z=197.5
-                on -> type=ogl.INTERVAL, key='a', hndl=(rotate -> y=-0.00002112)
-            }
-        }
+    # Sun
+    add Star {
+        set texture='./models/sun.jpg'
     }
-
+   
 }
