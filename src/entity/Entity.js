@@ -1,10 +1,13 @@
+const TransformEvents = require('../events/TransformEvents');
 const hash = require('../helper.js').hash;
 
 module.exports = class Entity {
 
     constructor (statements = []) {
-        this.defaults();
+        this.defaults();        
         
+        statements = statements.filter(statement => statement != null);
+
         for (const [ method, argument ] of statements) {
             try {
                 if (method.match(/set|add/g)) {
@@ -19,7 +22,6 @@ module.exports = class Entity {
 
                 this[method](argument);
             } catch (error) {
-                console.log(error, argument);
                 throw(new Error(`${this.constructor.name} does not contain '${method}' method.`));
             }
         }
@@ -30,11 +32,16 @@ module.exports = class Entity {
     set ([ property, value ]) {
         this[property] = value;
     }
-    
+
     add ([ property, value]) {
-        console.log(property);
         if (this[property + 's'] && typeof this[property + 's'] == 'array') {
             this[property + 's'].push(value);
+        }
+    }
+
+    on (event) {
+        if (this.events) {
+            this.events.push({ ...event, hndl: TransformEvents[event.hndl[0]](event.hndl[1]) });
         }
     }
 

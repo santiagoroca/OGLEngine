@@ -13,46 +13,32 @@ const parseArg = arg => {
 
 module.exports = {
 
-    TranslateEvent (args) {
+    translate (args) {
         args = Object.assign({ x: 0, y: 0, z: 0, space: 0 }, args);
         
-        return object_id => {
-            const space = [
-                `${object_id}.transform.model`,
-                `${object_id}.transform.world`
-            ][args.space];
-
-            return `
-                ${space}.translate[0] += ${parseArg(args.x)};
-                ${space}.translate[1] += ${parseArg(args.y)};
-                ${space}.translate[2] += ${parseArg(args.z)};
-                ${space}.isDirty = true;
-            `;
-        };
+        return object_id => `
+            ${object_id}.translate[0] += ${parseArg(args.x)};
+            ${object_id}.translate[1] += ${parseArg(args.y)};
+            ${object_id}.translate[2] += ${parseArg(args.z)};
+            ${object_id}.isDirty = true;
+        `;
     },
 
-    ScaleEvent (args) {
+    scale (args) {
         args = Object.assign({x: 0, y: 0, z: 0, space: 0}, args);
         return () => ``;
     }, 
 
-    RotateEvent (args) {
+    rotate (args) {
         args = Object.assign({ x: 0, y: 0, z: 0, space: 0 }, args);
         
 
-        return object_id => {
-            const space = [
-                `${object_id}.transform.model`,
-                `${object_id}.transform.world`
-            ][args.space];
-
-            return `
-                ${space}.x_angle += ${parseArg(args.x)};
-                ${space}.y_angle += ${parseArg(args.y)};
-                ${space}.z_angle += ${parseArg(args.z)};
-                ${space}.isDirty = true;
-            `;
-        }
+        return object_id => `
+            ${object_id}.x_angle += ${parseArg(args.x)};
+            ${object_id}.y_angle += ${parseArg(args.y)};
+            ${object_id}.z_angle += ${parseArg(args.z)};
+            ${object_id}.isDirty = true;
+        `;
     }
 
 }

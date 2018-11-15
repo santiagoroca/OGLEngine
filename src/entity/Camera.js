@@ -13,22 +13,19 @@ module.exports = class Camera extends Entity {
         this.near = 1;
     }
 
+    getEvents () {
+        const object_id = this.getName();
+
+        return [
+            ...this.events.map(event => ({
+                ...event, hndl: event.hndl(object_id)
+            })),
+            ...this.transform.getEvents(`${object_id}.transform`)
+        ];
+    }
+
     getName () {
         return `camera_${this.name}`;
-    }
-
-    setProjection (args) {
-        Object.assign(this, args);
-    }
-
-    applyTransformation (transformation) {
-        this.transform.apply(transformation);
-    }
-
-    addEvent (event) {
-        this.events.push({
-            ...event, hndl: event.hndl(this.getName())
-        });
     }
 
     isDynamic () {

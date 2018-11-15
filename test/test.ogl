@@ -9,21 +9,52 @@ scene {
         # listener
         set transform {
 
+            set model {
+                on -> type=ogl.DRAG, btn=ogl.BUTTON0, hndl=(
+                    rotate -> x=(.delta_y * -1), y=.delta_x
+                )
+            }
+
             set world {
-                translate -> z=-25.0
+                on -> type=ogl.MOUSEWHEEL, hndl=(
+                    translate -> z=.delta_z
+                )
+                
+                on -> type=ogl.DRAG, btn=ogl.BUTTON2, hndl=(
+                    translate -> x=(.delta_x * 4), y=(.delta_y * 4)
+                )
             }
 
         }
     }
 
-    add light {
-        set type=ogl.POINT
-        set position=vec3(0.0, 0.0, 0.0)
-    }
-
+    # Ambient Light
     add light {
         set type=ogl.AMBIENT
-        set color=0x111111
+        set color=0x444444
+    }
+
+    # Directional Light
+    add light {
+        set type=ogl.DIRECTIONAL
+        set direction=vec3(0.5, 0.5, 0.5)
+    }
+
+    # Mercury
+    add geometry {
+        set source='./models/earth.obj'
+        set texture='./models/Earth_TEXTURE_CM.png'
+
+        set transform {
+            set world {
+                translate -> z=2.0
+                on -> type=ogl.INTERVAL, hndl=(rotate -> y=-0.0245deg)
+            }
+
+            set model {
+                scale -> size=0.00359
+            }
+        }
     }
 
     # Venus
@@ -32,13 +63,146 @@ scene {
         set texture='./models/Earth_TEXTURE_CM.png'
 
         set transform {
+            set world {
+                translate -> z=3.625
+                on -> type=ogl.INTERVAL, hndl=(rotate -> y=-0.0096deg)
+            }
+
             set model {
-                scale -> size=1.0
+                scale -> size=0.00862
             }
         }
+    }
 
-        #on -> type=@INTERVAL, every=@FRAME, hndl=(rotate -> y=0deg)
-        #on -> type=@INTERVAL, hndl=(rotate -> y=-0.0096deg, space=@WORLD)
+    # Earth
+    add geometry {
+        set source='./models/earth.obj'
+        set texture='./models/Earth_TEXTURE_CM.png'
+
+        set transform {
+            set model {
+                scale -> size=0.00933
+            }
+
+            set world {
+                translate -> z=6.0
+                on -> type=ogl.INTERVAL, hndl=(rotate -> y=-0.006deg)
+            }
+        }
+    }
+
+    # Mars
+    add geometry {
+        set source='./models/earth.obj'
+        set texture='./models/Earth_TEXTURE_CM.png'
+
+        set transform {
+            set world {
+                translate -> z=7.62
+                on -> type=ogl.INTERVAL, hndl=(rotate -> y=-0.0031deg)
+            }
+
+            set model {
+                scale -> size=0.00502
+            }
+        }
+    }
+
+    # Jupiter
+    add geometry {
+        set source='./models/earth.obj'
+        set texture='./models/Earth_TEXTURE_CM.png'
+
+        set transform {
+            set world {
+                translate -> z=26.0
+                on -> type=ogl.INTERVAL, hndl=(rotate -> y=-0.0005129deg)
+            }
+
+            set model {
+                scale -> size=0.102729
+            }
+            
+        }   
+    }
+
+    # Saturn
+    add geometry {
+        set source='./models/earth.obj'
+        set texture='./models/Earth_TEXTURE_CM.png'
+
+        set transform {
+            set model {
+                scale -> size=0.089798
+            }
+
+            set world {
+                translate -> z=48.0
+                on -> type=ogl.INTERVAL, hndl=(rotate -> y=-0.00325deg)
+            }
+        }
+    }
+
+    # Uranus
+    add geometry {
+        set source='./models/earth.obj'
+        set texture='./models/Earth_TEXTURE_CM.png'
+
+        set transform {
+            set model {
+                scale -> size=0.036637
+            }
+
+            set world {
+                translate -> z=96.0
+                on -> type=ogl.INTERVAL, key='a', hndl=(rotate -> y=-0.0007142deg)
+            }
+        }
+    }
+
+    # Neptune
+    add geometry {
+        set source='./models/earth.obj'
+        set texture='./models/Earth_TEXTURE_CM.png'
+
+        set transform {
+            set model {
+                scale -> size=0.035919
+            }
+
+            set world {
+                translate -> z=150.5
+                on -> type=ogl.INTERVAL, key='a', hndl=(rotate -> y=-0.000001245deg)
+            }
+        }
+    }
+
+    # Pluto
+    add geometry {
+        set source='./models/earth.obj'
+        set texture='./models/Earth_TEXTURE_CM.png'
+
+        set transform {
+            set model {
+                scale -> size=0.001652
+            }
+
+            set world {
+                translate -> z=197.5
+                on -> type=ogl.INTERVAL, key='a', hndl=(rotate -> y=-0.00002112)
+            }
+        }
+    }
+
+    add geometry {
+        set source='./models/earth.obj'
+        set texture='./models/2k_sun.jpg'
+
+        set transform {
+            set world {
+                on -> type=ogl.INTERVAL, key='a', hndl=(rotate -> y=0.089deg)
+            }
+        }
     }
 
     ## SHADER

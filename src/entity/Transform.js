@@ -5,6 +5,7 @@ const math = require('../math.js');
 module.exports = class Transform extends Entity {
 
     defaults () {
+        this.events = [];
         this.model = new Matrix;
         this.world = new Matrix;
     }
@@ -25,6 +26,16 @@ module.exports = class Transform extends Entity {
 
     transformVertices (vertices) {
         this.transformVerticesIntoSpace(vertices, this.model);
+    }
+
+    getEvents (object_id) {
+        return [
+            ...this.events.map(event => ({
+                ...event, hndl: event.hndl(object_id)
+            })),
+            ...this.model.getEvents(`${object_id}.model`),
+            ...this.world.getEvents(`${object_id}.world`)
+        ];
     }
 
     toString () {

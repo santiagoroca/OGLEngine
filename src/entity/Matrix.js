@@ -4,6 +4,7 @@ const math = require('../math.js');
 module.exports = class Matrix extends Entity {
 
     defaults () {
+        this.events = [];
         this._translate = [0, 0, 0];
         this._x_angle = 0;
         this._y_angle = 0;
@@ -42,6 +43,12 @@ module.exports = class Matrix extends Entity {
         transform = math.mat4.rotate(transform, this._z_angle, [transform[2], transform[6], transform[10]]);
 
         return transform;
+    }
+
+    getEvents (object_id) {
+        return this.events.map(event => ({
+            ...event, hndl: event.hndl(object_id)
+        }));
     }
 
     get () {

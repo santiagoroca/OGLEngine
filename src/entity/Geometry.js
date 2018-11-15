@@ -52,22 +52,6 @@ module.exports = class Geometry extends Entity {
         return !!this.color;
     }
 
-    setVertexs (vertexs) {
-        if (vertexs.length % 3 != 0) {
-            throw('Vertexs array not multiple of 3.')
-        }
-
-        this.vertexs = vertexs;
-    }
-        
-    setIndexes (indexes) {
-        if (indexes.length % 3 != 0) {
-            throw('Indexes array not multiple of 3.')
-        }
-
-        this.indexes = indexes;
-    }
-
     // Configure Texture as externla object 
     // and append to geometry
     setTexture ([ texture ]) {
@@ -76,10 +60,6 @@ module.exports = class Geometry extends Entity {
         const path = `assets/images/${name}.${ext}`;
         write(`./dist/${path}`, read(texture));
         this.texture = path;
-    }
-    
-    applyTransformation (transformation) {
-        this.transform.apply(transformation);
     }
     
     getTransformedVertexs () {
@@ -93,14 +73,6 @@ module.exports = class Geometry extends Entity {
         }
 
         return this.normals;
-    }
-
-    setColor (args) {
-        if (args.hex) {
-            Object.assign(this.color, args.hex);
-        }
-        
-        Object.assign(this.color, args);
     }
 
     generateNormals () {
@@ -162,15 +134,20 @@ module.exports = class Geometry extends Entity {
         }
 
     }
-
-    addEvent (event) {
-        this.events.push({
-            ...event, hndl: event.hndl(this.getName())
-        });
-    }
-
+    
     isDynamic () {
         return this.events.events.length;
+    }
+
+    getEvents () {
+        const object_id = this.getName();
+
+        return [
+            ...this.events.map(event => ({
+                ...event, hndl: event.hndl(object_id)
+            })),
+            ...this.transform.getEvents(`${object_id}.transform`)
+        ];
     }
 
     toString () {

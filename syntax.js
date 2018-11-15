@@ -16,10 +16,11 @@ module.exports = {
             ["define", "return 'DEFINE';"],
             ["pass", "return 'PASS';"],
             ["scene", "return 'SCENE';"],
-            ["ogl\.[a-zA-Z]+", "return 'CONSTANT';"],
+            ["extends", "return 'EXTENDS';"],
+            ["ogl\.[a-zA-Z0-9]+", "return 'CONSTANT';"],
             ["[a-zA-Z]+=", "return 'VARNAME';"],
             ["[a-zA-Z]+ ?(?=->)", "return 'FUNC_NAME';"],
-            ["[a-zA-Z]+ ?(?=\{)", "return 'CLASS_NAME';"],
+            ["[a-zA-Z]+ ?(?=(\{|extends))", "return 'CLASS_NAME';"],
             
 
             /* BUILT-IN FUNCTIONS */
@@ -95,7 +96,7 @@ module.exports = {
 
         statement:
         [
-            [ " ADD class ", " $$ = [ 'add', [ $2[0], $2[1] ] ] " ],
+            [ " ADD class ", " $$ = [ 'add', [ $2[0], $2[1] ] ]; " ],
             [ " SET class ", " $$ = [ 'set', [ $2[0], $2[1] ] ]; " ],
             [ " SET VARNAME value ", " $$ = [ 'set', [ $2.replace(/=/g, '').trim(), $3 ] ]; " ],
             [ " function ", " $$ = $1; " ],
@@ -110,8 +111,8 @@ module.exports = {
 
         class:
         [
-            [ " CLASS_NAME OBRACE statements CBRACE ", ` 
-                const className = ($1.charAt(0).toUpperCase() + $1.slice(1)).trim();
+            [ " CLASS_NAME OBRACE statements CBRACE ", `
+                className = ($1.charAt(0).toUpperCase() + $1.slice(1)).trim();
 
                 try {
                     $$ = [ $1.trim(), new yy[className]($3) ];     
@@ -190,7 +191,7 @@ module.exports = {
             [ " SCOPE_VARIABLE ", " $$ = $1; "],
             [ " vec3 ", " $$ = $1; "],
             [ " expression ", " $$ = $1; " ],
-            [ " OPAR transformation_event CPAR ", " $$ = $2; " ],
+            [ " OPAR function CPAR ", " $$ = $2; " ],
             [ " hexadecimal ", ` $$ = {
                     r: ($1 >> 16) & 255,
                     g: ($1 >> 8) & 255,
