@@ -1,16 +1,21 @@
-const Transform = require('./transform/Transform.js');
-const Events = require('./events/Events.js');
-const hash = require('./helper.js').hash;
+const Entity = require('./Entity');
+const Transform = require('./Transform.js');
+const Events = require('../events/Events.js');
+const hash = require('../helper.js').hash;
 
-module.exports = class Camera {
+module.exports = class Camera extends Entity {
 
-    constructor () {
+    defaults () {
         this.name = hash();
         this.transform = new Transform();
         this.events = [];
         this.fov = 45;
         this.far = 10;
         this.near = 1;
+    }
+
+    set ([ property, value ]) {
+        this[property] = value;
     }
 
     getName () {

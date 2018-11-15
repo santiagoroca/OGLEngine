@@ -1,8 +1,9 @@
-const Transform = require('./transform/Transform.js');
-const Shaders = require('./shader/Shaders.js');
-const GeometryBatch = require('./geometry_batch.js');
-const Render = require('./render.js');
-const Events = require('./events/Events');
+const Entity = require('./Entity');
+const Transform = require('./Transform.js');
+const Shaders = require('../shader/Shaders.js');
+const GeometryBatch = require('../geometry_batch.js');
+const Render = require('../render.js');
+const Events = require('../events/Events');
 
 /*
 * @title Scene
@@ -13,9 +14,9 @@ const Events = require('./events/Events');
 *
 * @return Scene
 */
-module.exports = class Scene {
+module.exports = class Scene extends Entity {
 
-    constructor () {
+    defaults () {
         this.transform = new Transform();
         this.shaders = new Shaders();
         this.events = new Events();
@@ -23,16 +24,12 @@ module.exports = class Scene {
         this.geometries = [];
     }
 
-    appendLight (light) {
-        this.shaders.appendLight(light);
+    addCamera (camera) {
+        this.cameras.push(camera);
     }
 
-    appendCamera (camera) {
-        if (!camera) {
-            return;
-        }
-
-        this.cameras.push(camera);
+    addLight (light) {
+        this.shaders.appendLight(light);
     }
 
     appendGeometry (geometry) {

@@ -12,14 +12,25 @@ module.exports = {
             /* Variables */
             ["[a-zA-Z]*?=", "return 'VARNAME';"],
 
+            /* BUILT-IN FUNCTIONS */
+            ["add", "return 'ADD';"],
+            ["set", "return 'SET';"],
+            ["define", "return 'DEFINE';"],
+            ["pass", "return 'PASS';"],
+
             /* KEYWORDS */
             ["\\s+", "/* skip whitespace */"],
             ["scene", "return 'SCENE';"],
+            ["camera", "return 'CAMERA';"],
+            ["transform", "return 'TRANSFORM';"],
+            ["light", "return 'LIGHT';"],
+            ["world", "return 'WORLD';"],
+            ["model", "return 'MODEL';"],
+
             ["print", "return 'PRINT';"],
             ["geometry", "return 'GEOMETRY';"],
             ["vertexs", "return 'VERTEXS';"],
             ["indexes", "return 'INDEXES';"],
-            ["transform", "return 'TRANSFORM';"],
             ["static", "return 'STATIC';"],
             ["dynamic", "return 'DYNAMIC';"],
             ["rotate", "return 'ROTATE';"],
@@ -34,9 +45,9 @@ module.exports = {
             ["drag", "return 'DRAG';"],
             ["source", "return 'SOURCE';"],
             ["color", "return 'COLOR';"],
-            ["camera", "return 'CAMERA';"],
+            
             ["projection", "return 'PROJECTION';"],
-            ["light", "return 'LIGHT';"],
+            
             ["texture", "return 'TEXTURE';"],
 
             /* Constant Values */
@@ -78,73 +89,55 @@ module.exports = {
 
         run:
         [
-            [ " scene EOF ", " return $1; " ],
+            [ " scene EOF ", " return ''; " ],
             [ " EOF ", SKIP ],
         ],
 
-        scene_definition:
-        [
-            [ " SCENE ",  SKIP ]
+        scene: [
+            [ " SCENE OBRACE statements CBRACE ",  ` $$ = new yy.Scene($3); `]
         ],
 
-        scene: [
-            [ " scene_definition body ",  ` 
-                $$ = $2.toString();
-            `]
+        statements: 
+        [
+            [ " statements statement ", " $$.push($2); " ],
+            [ " statement ", " $$ = [$1]; " ],
+            [ " PASS ", " $$ = []; " ],
+        ],
+
+        statement:
+        [
+            [ " ADD object ", " $$ = [ 'add' + $2[0], [ $2[1] ] ] " ],
+            [ " SET object ", " $$ = [ 'set', [ $2[0], $2[1] ] ]; " ],
+            [ " SET arg ", " $$ = [ 'set', [ $2[0], $2[1] ] ]; " ],
+        ],
+
+        object:
+        [
+            [ " CAMERA OBRACE statements CBRACE ", ` $$ = [ 'Camera', new yy.Camera($3) ]; `],
+            [ " GEOMETRY OBRACE statements CBRACE ", ` $$ = [ 'Geometry', new yy.Geometry($3) ]; `],
+            [ " TRANSFORM OBRACE statements CBRACE ", ` $$ = [ 'Transform', new yy.Transform($3) ]; `],
+            [ " WORLD OBRACE statements CBRACE ", ` $$ = [ 'World', new yy.Matrix($3) ]; `],
+            [ " MODEL OBRACE statements CBRACE ", ` $$ = [ 'Model', new yy.Matrix($3) ]; `],
+            [ " LIGHT OBRACE statements CBRACE ", ` $$ = [ 'Light', new yy.Light($3) ]; `]
+        ],
+
+        function:
+        [
+            [ " LIGHT ARROW args ", ` $$ = { k: 'appendLight', v: $3 }; `],
+            [ " PROJECTION ARROW args", `$$ = [ 'setProjection', $3 ];`],
+            [ " ON ARROW args ", " $$ = [ 'addEvent', $3 ] "],
+            [ " SOURCE ARROW arg ", `$$ = ['loadFromFile', $3];`],
+            [ " COLOR ARROW args ", " $$ = [ 'setColor', $3 ] "],
+            [ " TEXTURE ARROW args ", ` $$ = [ 'setTexture', $3 ]; `],
+            [ " ROTATE ARROW args ", " $$ = yy.TransformEvents.RotateEvent($3); "],
+            [ " TRANSLATE ARROW args ", " $$ = yy.TransformEvents.TranslateEvent($3); "],
+            [ " SCALE ARROW args ", " $$ = yy.TransformEvents.ScaleEvent($3); "]
         ],
 
         body:
         [
             [ " OBRACE CBRACE ", " $$ = new yy.Scene(); " ],
             [ " OBRACE statements CBRACE ", " $$ = $2; " ]
-        ],
-
-        statements: [
-            [ " statements statement ", " $$[$2.k]($2.v); " ],
-            [ " statement ", " $$ = new yy.Scene(); $$[$1.k]($1.v); " ]
-        ],
-
-        statement: [
-            [ " CAMERA OBRACE CBRACE ", ` $$ = { k: 'appendCamera', v: null }; `],
-            [ " GEOMETRY OBRACE CBRACE ", ` $$ = { k: 'appendGeometry', v: null }; `],
-            [ " LIGHT ARROW args ", ` $$ = { k: 'appendLight', v: $3 }; `],
-            [ " CAMERA OBRACE c_statements CBRACE ", `
-                $$ = { k: 'appendCamera', v: $3 };
-            `],
-            [ " GEOMETRY OBRACE g_statements CBRACE ", `
-                $$ = { k: 'appendGeometry', v: $3 };
-            `]
-        ],
-
-        c_statements:
-        [
-            [ " c_statements c_statement ", " $$[$2[0]]($2[1]); " ],
-            [ " c_statement ", " $$ = new yy.Camera(); $$[$1[0]]($1[1]); "],
-        ],
-
-        c_statement:
-        [
-            [ " transform ", `$$ = $1;`],
-            [ " PROJECTION ARROW args", `$$ = [ 'setProjection', $3 ];`],
-            [ " ON ARROW args ", " $$ = [ 'addEvent', $3 ] "],
-        ],
-
-        g_statements:
-        [
-            [ " g_statements g_statement ", " $$[$2[0]]($2[1]); " ],
-            [ " g_statement ", " $$ = new yy.Geometry(); $$[$1[0]]($1[1]); "]
-        ],
-
-        g_statement:
-        [
-            [ " VERTEXS array ", " $$ = ['setVertexs', $2] " ],
-            [ " INDEXES array ", " $$ = ['setIndexes', $2]; " ],
-            [ " SOURCE ARROW arg ", `$$ = ['loadFromFile', $3];`],
-            [ " transform ", `$$ = $1;`],
-            [ " STATIC transform ", " $$ = ['applyTransformation', $4] "],
-            [ " ON ARROW args ", " $$ = [ 'addEvent', $3 ] "],
-            [ " COLOR ARROW args ", " $$ = [ 'setColor', $3 ] "],
-            [ " TEXTURE ARROW args ", ` $$ = [ 'setTexture', $3 ]; `],
         ],
 
         transform:
@@ -156,9 +149,7 @@ module.exports = {
 
         transformation_event:
         [
-            [ " ROTATE ARROW args ", " $$ = yy.TransformEvents.RotateEvent($3); "],
-            [ " TRANSLATE ARROW args ", " $$ = yy.TransformEvents.TranslateEvent($3); "],
-            [ " SCALE ARROW args ", " $$ = yy.TransformEvents.ScaleEvent($3); "]
+            
         ],
 
         transformations:
@@ -235,7 +226,7 @@ module.exports = {
         ],
 
         arg: [
-            [ " VARNAME value ", " $$ = { [`${$1.replace(/=/g, '')}`]: $2 }; " ],
+            [ " VARNAME value ", " $$ = [ $1.replace(/=/g, ''), $2 ]; " ],
         ],
 
         value: 

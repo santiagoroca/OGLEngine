@@ -1,4 +1,4 @@
-const Transform = require('./transform/Transform.js');
+const Transform = require('./entity/Transform.js');
 const hash = require('./helper.js').hash;
 const load = require('./parser/Loader.js');
 const math = require('./math.js');

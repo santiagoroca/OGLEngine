@@ -1,32 +1,26 @@
 scene {
 
-    light -> type=@DIRECTIONAL, direction=vec3(0.5, 0.5, 0.5)
-    light -> type=@AMBIENT, color=0x111111
+    add camera {
+        set fov=20.0
+        set near=0.1
+        set far=1000.0
 
-    camera {
-        projection -> fov=45.0, near=0.1, far=1000.0
-
-        transform {
-            translate -> z=-25.0
-        }
-
-        on -> type=@DRAG, btn=@BUTTON0, hndl=(rotate -> x=(.delta_y * -1), y=.delta_x)
-        on -> type=@DRAG, btn=@BUTTON2, hndl=(translate -> x=(.delta_x * 4), y=(.delta_y * 4))
-        on -> type=@MOUSEWHEEL, hndl=(translate -> z=.delta_z)
-    }
-
-    geometry {
-        source -> src='./models/earth.obj'
-        texture -> src='./models/Earth_TEXTURE_CM.png'
-
-        transform {
-            translate -> space=@WORLD, z=-15.0
+        # This will ovewrite the model transform and add this new 
+        # listener
+        set transform {
+            set model { pass }
+            set world { pass }
         }
     }
 
-    geometry {
-        source -> src='./models/earth.obj'
-        texture -> src='./models/2k_sun.jpg'
+    add light {
+        set type=@POINT
+        set position=vec3(0.0, 0.0, 0.0)
+    }
+
+    add light {
+        set type=@AMBIENT
+        set color=0x111111
     }
 
     ## SHADER
@@ -34,9 +28,12 @@ scene {
     # Add point light
     # Add alha to ambien light (?)
 
+    # Cameras
+    # Multiple Cameras
+    # Switch Camera
+
     ## TRANSFORMATION
     # Create Geometries batches that share transform
-    # Add scale trasnformation
     # Add transformations relatives to object
 
     ## EVENTS
