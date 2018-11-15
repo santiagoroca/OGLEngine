@@ -1,7 +1,7 @@
 const Entity = require('./Entity');
 const math = require('../math.js');
 
-module.exports = class Matrix extends Entity {
+module.exports = class Model extends Entity {
 
     defaults () {
         this.events = [];

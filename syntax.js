@@ -36,13 +36,10 @@ module.exports = {
             ["drag", "return 'DRAG';"],
             ["source", "return 'SOURCE';"],
             ["color", "return 'COLOR';"],
-            
             ["projection", "return 'PROJECTION';"],
-            
             ["texture", "return 'TEXTURE';"],
 
             /* Constant Values */
-            
 
             /* natives */
             ["0x[0-9A-Fa-f]{6}", "return 'HEXA';"],
@@ -99,6 +96,15 @@ module.exports = {
             [ " ADD class ", " $$ = [ 'add', [ $2[0], $2[1] ] ]; " ],
             [ " SET class ", " $$ = [ 'set', [ $2[0], $2[1] ] ]; " ],
             [ " SET VARNAME value ", " $$ = [ 'set', [ $2.replace(/=/g, '').trim(), $3 ] ]; " ],
+            [ " DEFINE class_name EXTENDS class_name OBRACE statements CBRACE ", `
+                yy[$2] = class extends yy[$4] {
+                    constructor (statements = []) {
+                        super([ ...$6, ...statements ]);
+                    }
+                }
+
+                $$ = null;
+            ` ],
             [ " function ", " $$ = $1; " ],
         ],
 
@@ -109,18 +115,22 @@ module.exports = {
             `],
         ],
 
+        class_name:
+        [
+            [ " CLASS_NAME ", " $$ = ($1.charAt(0).toUpperCase() + $1.slice(1)).trim(); " ],
+        ],
+
         class:
         [
-            [ " CLASS_NAME OBRACE statements CBRACE ", `
-                className = ($1.charAt(0).toUpperCase() + $1.slice(1)).trim();
-
+            [" class_name OBRACE statements CBRACE ", `
                 try {
-                    $$ = [ $1.trim(), new yy[className]($3) ];     
+                    $$ = [
+                        yy[$1].name.toLowerCase(), new yy[$1]($3) 
+                    ];
                 } catch (error) {
                     console.log(error);
-                    throw(new Error('Class ' + className + ' not found.'))
+                    throw(new Error('Class ' + $1 + ' not found.'))
                 }
-                
             `],
         ],
 

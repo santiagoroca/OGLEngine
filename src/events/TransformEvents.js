@@ -32,7 +32,6 @@ module.exports = {
     rotate (args) {
         args = Object.assign({ x: 0, y: 0, z: 0, space: 0 }, args);
         
-
         return object_id => `
             ${object_id}.x_angle += ${parseArg(args.x)};
             ${object_id}.y_angle += ${parseArg(args.y)};

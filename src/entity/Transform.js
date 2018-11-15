@@ -1,13 +1,14 @@
 const Entity = require('./Entity');
-const Matrix = require('./Matrix');
+const World = require('./World');
+const Model = require('./Model');
 const math = require('../math.js');
 
 module.exports = class Transform extends Entity {
 
     defaults () {
         this.events = [];
-        this.model = new Matrix;
-        this.world = new Matrix;
+        this.model = new Model;
+        this.world = new World;
     }
 
     transformVerticesIntoSpace (vertices, space) {

@@ -4,8 +4,7 @@ const hash = require('../helper.js').hash;
 module.exports = class Entity {
 
     constructor (statements = []) {
-        this.defaults();        
-        
+        this.defaults();
         statements = statements.filter(statement => statement != null);
 
         for (const [ method, argument ] of statements) {
@@ -40,8 +39,11 @@ module.exports = class Entity {
     }
 
     on (event) {
+
         if (this.events) {
-            this.events.push({ ...event, hndl: TransformEvents[event.hndl[0]](event.hndl[1]) });
+            this.events.push({
+                ...event, hndl: TransformEvents[event.hndl[0]](event.hndl[1]) 
+            });
         }
     }
 

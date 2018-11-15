@@ -12,12 +12,13 @@ parser.generate();
 
 // Load all context classes
 parser.yy = {
+    Entity: require('./src/entity/Entity.js'),
     Scene: require('./src/entity/Scene.js'),
     Camera: require('./src/entity/Camera.js'),
     Light: require('./src/entity/Light.js'),
     Transform: require('./src/entity/Transform.js'),
-    Model: require('./src/entity/Matrix.js'),
-    World: require('./src/entity/Matrix.js'),
+    Model: require('./src/entity/Model.js'),
+    World: require('./src/entity/World.js'),
     Geometry: require('./src/entity/Geometry.js'),
 
     Events: require('./src/events/Events.js'),
