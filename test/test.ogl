@@ -9,7 +9,9 @@ scene {
         # listener
         set transform {
             set model { pass }
-            set world { pass }
+            set world {
+                translate -> z=-25.0
+            }
         }
     }
 

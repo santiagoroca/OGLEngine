@@ -14,6 +14,8 @@ module.exports = class Matrix extends Entity {
 
     translate (args) {
         args = { x: 0, y: 0, z: 0, space: 0, ...args,  }
+
+        console.log(args);
         this.transform[args.space].translate = math.vec3.add(
             this.transform[args.space].translate, [args.x, args.y, args.z]
         );

@@ -9,33 +9,22 @@ module.exports = {
 
         "rules": [
 
-            /* Variables */
-            ["[a-zA-Z]*?=", "return 'VARNAME';"],
 
-            /* BUILT-IN FUNCTIONS */
+            ["\\s+", "/* skip whitespace */"],
             ["add", "return 'ADD';"],
             ["set", "return 'SET';"],
             ["define", "return 'DEFINE';"],
             ["pass", "return 'PASS';"],
+            ["scene", "return 'SCENE';"],
+            ["[a-zA-Z]+=", "return 'VARNAME';"],
+            ["[a-zA-Z]+ ?(?=->)", "return 'FUNC_NAME';"],
+            ["[a-zA-Z]+ ?(?=\{)", "return 'CLASS_NAME';"],
+            
+
+            /* BUILT-IN FUNCTIONS */
+            
 
             /* KEYWORDS */
-            ["\\s+", "/* skip whitespace */"],
-            ["scene", "return 'SCENE';"],
-            ["camera", "return 'CAMERA';"],
-            ["transform", "return 'TRANSFORM';"],
-            ["light", "return 'LIGHT';"],
-            ["world", "return 'WORLD';"],
-            ["model", "return 'MODEL';"],
-
-            ["print", "return 'PRINT';"],
-            ["geometry", "return 'GEOMETRY';"],
-            ["vertexs", "return 'VERTEXS';"],
-            ["indexes", "return 'INDEXES';"],
-            ["static", "return 'STATIC';"],
-            ["dynamic", "return 'DYNAMIC';"],
-            ["rotate", "return 'ROTATE';"],
-            ["translate", "return 'TRANSLATE';"],
-            ["scale", "return 'SCALE';"],
             ["vec3", "return 'VEC3';"],
             ["deg", "return 'DEG';"],
             ["rad", "return 'RAD';"],
@@ -71,7 +60,6 @@ module.exports = {
             ["\\*", "return 'PRODUCT';"],
             ["->", "return 'ARROW';"],
             ["\\.[a-zA-Z0-9_/]*", "return 'SCOPE_VARIABLE';"],
-            ["[a-zA-Z0-9_/]+", "return 'CONSTANT';"],
             ["'", "return 'QUOTE';"],
             [
                 "[#|\\.]-?[_a-zA-Z]+[_a-zA-Z0-9-]*",
@@ -106,67 +94,25 @@ module.exports = {
 
         statement:
         [
-            [ " ADD object ", " $$ = [ 'add' + $2[0], [ $2[1] ] ] " ],
-            [ " SET object ", " $$ = [ 'set', [ $2[0], $2[1] ] ]; " ],
+            [ " ADD class ", " $$ = [ 'add' + $2[0], [ $2[1] ] ] " ],
+            [ " SET class ", " $$ = [ 'set', [ $2[0], $2[1] ] ]; " ],
             [ " SET arg ", " $$ = [ 'set', [ $2[0], $2[1] ] ]; " ],
+            [ " FUNC_NAME ARROW args ", " $$ = [ $1, $3 ]; " ],
         ],
 
-        object:
+        class:
         [
-            [ " CAMERA OBRACE statements CBRACE ", ` $$ = [ 'Camera', new yy.Camera($3) ]; `],
-            [ " GEOMETRY OBRACE statements CBRACE ", ` $$ = [ 'Geometry', new yy.Geometry($3) ]; `],
-            [ " TRANSFORM OBRACE statements CBRACE ", ` $$ = [ 'Transform', new yy.Transform($3) ]; `],
-            [ " WORLD OBRACE statements CBRACE ", ` $$ = [ 'World', new yy.Matrix($3) ]; `],
-            [ " MODEL OBRACE statements CBRACE ", ` $$ = [ 'Model', new yy.Matrix($3) ]; `],
-            [ " LIGHT OBRACE statements CBRACE ", ` $$ = [ 'Light', new yy.Light($3) ]; `]
-        ],
+            [ " CLASS_NAME OBRACE statements CBRACE ", ` 
+                const className = ($1.charAt(0).toUpperCase() + $1.slice(1)).trim();
 
-        function:
-        [
-            [ " LIGHT ARROW args ", ` $$ = { k: 'appendLight', v: $3 }; `],
-            [ " PROJECTION ARROW args", `$$ = [ 'setProjection', $3 ];`],
-            [ " ON ARROW args ", " $$ = [ 'addEvent', $3 ] "],
-            [ " SOURCE ARROW arg ", `$$ = ['loadFromFile', $3];`],
-            [ " COLOR ARROW args ", " $$ = [ 'setColor', $3 ] "],
-            [ " TEXTURE ARROW args ", ` $$ = [ 'setTexture', $3 ]; `],
-            [ " ROTATE ARROW args ", " $$ = yy.TransformEvents.RotateEvent($3); "],
-            [ " TRANSLATE ARROW args ", " $$ = yy.TransformEvents.TranslateEvent($3); "],
-            [ " SCALE ARROW args ", " $$ = yy.TransformEvents.ScaleEvent($3); "]
-        ],
-
-        body:
-        [
-            [ " OBRACE CBRACE ", " $$ = new yy.Scene(); " ],
-            [ " OBRACE statements CBRACE ", " $$ = $2; " ]
-        ],
-
-        transform:
-        [
-            [ " TRANSFORM OBRACE transformations CBRACE ", `
-                $$ = ['applyTransformation', $3];
-            `],
-        ],
-
-        transformation_event:
-        [
-            
-        ],
-
-        transformations:
-        [
-            [ " transformations transformation ", " $$[$2[0]]($2[1]); " ],
-            [ " transformation ", `
+                try {
+                    $$ = [ className, new yy[className]($3) ];     
+                } catch (error) {
+                    console.log(error);
+                    throw(new Error('Class ' + className + ' not found.'))
+                }
                 
-                $$ = new yy.Transform();
-                $$[$1[0]]($1[1]);
             `],
-        ],
-
-        transformation:
-        [
-            [ " ROTATE ARROW args ", " $$ = ['rotate', $3]; "],
-            [ " TRANSLATE ARROW args ", " $$ = ['translate', $3]; "],
-            [ " SCALE ARROW args ", " $$ = ['scale', $3]; "]
         ],
 
         vec3:

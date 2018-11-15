@@ -16,7 +16,8 @@ parser.yy = {
     Camera: require('./src/entity/Camera.js'),
     Light: require('./src/entity/Light.js'),
     Transform: require('./src/entity/Transform.js'),
-    Matrix: require('./src/entity/Matrix.js'),
+    Model: require('./src/entity/Matrix.js'),
+    World: require('./src/entity/Matrix.js'),
 
     Events: require('./src/events/Events.js'),
     TransformEvents: require('./src/events/TransformEvents.js'),
