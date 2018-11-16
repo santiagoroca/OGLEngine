@@ -6,7 +6,7 @@ scene {
         set source='./models/star.obj'
 
         set transform {
-            set world {
+            set model {
                 on -> type=ogl.INTERVAL, hndl=(rotate -> y=0.001)
             }
         }
@@ -36,17 +36,9 @@ scene {
                 on -> type=ogl.DRAG, btn=ogl.BUTTON2, hndl=(
                     translate -> x=(.delta_x * 4), y=(.delta_y * 4)
                 )
-
-                translate -> z=-25.0
             }
 
         }
-    }
-
-    # Ambient Light
-    add light {
-        set type=ogl.AMBIENT
-        set color=0xaa0000
     }
 
     # Directional Light

@@ -64,11 +64,11 @@ module.exports = class PhongShader {
                 
                 ${this.hasNormals() ? 'varying vec3 vNormal;': ''}
                 ${this.hasTexture() ? 'varying vec2 vVertexUV;': ''}
-                ${fragment_varying_vertex_position ? 'varying vec3 vVertexPosition;': ''}
+                ${fragment_varying_vertex_position ? 'varying vec4 vVertexPosition;': ''}
                 
                 void main(void) {
                     gl_Position = projection * cameraWorld * cameraModel * world * model * vec4(aVertexPosition, 1.0);
-                    ${fragment_varying_vertex_position ? 'vVertexPosition = gl_Position.xyz;': ''}
+                    ${fragment_varying_vertex_position ? 'vVertexPosition = world * model * vec4(aVertexPosition, 1.0);': ''}
                     ${this.hasNormals() ? 'vNormal = mat3(world * model) * aVertexNormal;': ''}
                     ${this.hasTexture() ? 'vVertexUV = aVertexUV;': ''}
                 }
@@ -99,7 +99,7 @@ module.exports = class PhongShader {
 
                 ${this.hasNormals() ? 'varying vec3 vNormal;': ''}
                 ${this.hasTexture() ? 'varying vec2 vVertexUV;': ''}
-                ${fragment_varying_vertex_position ? 'varying vec3 vVertexPosition;': ''}
+                ${fragment_varying_vertex_position ? 'varying vec4 vVertexPosition;': ''}
 
                 void main() {
                     float attenuation = 0.0;
@@ -110,11 +110,10 @@ module.exports = class PhongShader {
                     ).join('\n')}
 
                     ${point_l.map(({}, index) => `
-                        vec3 surfaceToLight = (cameraWorld * cameraModel * point_${index}).xyz - vVertexPosition;
-                        float brightness = dot(normal, surfaceToLight) / (length(surfaceToLight) * length(normal));
-                        attenuation += brightness;
+                        vec3 surfaceToLight = normalize(vVertexPosition.xyz - (point_${index}).xyz);
+                        attenuation += 1.0 - max(0.0, dot(normal, surfaceToLight));
                     `).join('\n')}
-                    
+             
                     ${fragment_color}
                 }
             \`;
