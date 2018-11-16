@@ -1,7 +1,15 @@
 scene {
 
+    # Create Materials
+
+    ## Entities
+    # Add SkyBox
+
     ## SHADER
     # Add color to directional_light
+    # Make per fragment calculations for smoother lights
+    # Add Specular Map
+    # Add Normal Map
 
     # Cameras
     # Multiple Cameras

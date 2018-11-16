@@ -42,7 +42,8 @@ module.exports = {
             /* Constant Values */
 
             /* natives */
-            ["0x[0-9A-Fa-f]{6}", "return 'HEXA';"],
+            ["0x[0-9A-Fa-f]{8}", "return 'HEXA8';"],
+            ["0x[0-9A-Fa-f]{6}", "return 'HEXA6';"],
             ["\\-?[0-9]+(?:\\.[0-9]+)?", "return 'NUMBER';"],
             ["'[a-zA-Z0-9\\._/]+'", "return 'STRING';"],
 
@@ -165,7 +166,23 @@ module.exports = {
         ],
 
         hexadecimal: [
-            [ " HEXA ", " $$ = parseInt($1.replace(/0x/, ''), 16); " ],
+            [ " HEXA6 ", `
+                $$ = parseInt($1.replace(/0x/, ''), 16); 
+                $$ = {
+                    r: ($$ >> 16) & 255,
+                    g: ($$ >> 8) & 255,
+                    b: ($$ >> 0) & 255
+                };
+            `],
+            [ " HEXA8 ", `
+                $$ = parseInt($1.replace(/0x/, ''), 16); 
+                $$ = {
+                    r: ($$ >> 24) & 255,
+                    g: ($$ >> 16) & 255,
+                    b: ($$ >> 8) & 255,
+                    a: ($$ >> 0) & 255,
+                };
+            `],
         ],
 
         number:
@@ -202,12 +219,7 @@ module.exports = {
             [ " vec3 ", " $$ = $1; "],
             [ " expression ", " $$ = $1; " ],
             [ " OPAR function CPAR ", " $$ = $2; " ],
-            [ " hexadecimal ", ` $$ = {
-                    r: ($1 >> 16) & 255,
-                    g: ($1 >> 8) & 255,
-                    b: ($1 >> 0) & 255
-                };
-            `],
+            [ " hexadecimal ", " $$ = $1; "],
             [ " constant ", " $$ = $1; "]
         ],
 

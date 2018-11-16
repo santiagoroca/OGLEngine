@@ -25,7 +25,7 @@ module.exports = class PhongShader {
 
         // Does the fragment shader needs a varying with the
         // position of the current vertex?
-        const fragment_varying_vertex_position = point_l.length;
+        const fragment_varying_vertex_position = directional_l.length || point_l.length;
 
         const fragment_color = `
         
@@ -103,8 +103,11 @@ module.exports = class PhongShader {
 
                 void main() {
                     float light = 0.0;
-                    vec3 normal = normalize(vNormal);
-                    vec3 eye = -normalize(vVertexPosition);
+
+                    ${fragment_varying_vertex_position ? `
+                        vec3 normal = normalize(vNormal);
+                        vec3 eye = -normalize(vVertexPosition);
+                    ` : ''}
                     
                     ${directional_l.map(({ name, shininess }) => `
 

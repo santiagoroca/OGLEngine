@@ -26,6 +26,15 @@ module.exports = class Geometry extends Entity {
        this.normals = [];
        this.uvs = [];
        this.color = null;
+       
+       /*
+       * Smooth
+       *
+       * If set to true, when the normals are generated, or
+       * loaded from any file, are going to be smoothed, this is
+       * get the average value of all the 
+       */
+       this.smooth = false;
 
        /*
        * Helper internal classes and arrays,
@@ -41,7 +50,8 @@ module.exports = class Geometry extends Entity {
     }
 
     hasTexture () {
-        return typeof this.texture != 'undefined';
+        return typeof this.texture != 'undefined' &&
+                this.uvs.length > 0;
     }
 
     hasNormals () {
@@ -169,11 +179,13 @@ module.exports = class Geometry extends Entity {
                 ${this.getNormals()}
             ]).buffer, webgl.STATIC_DRAW);
 
-            const uvs_buff_${this.name} = webgl.createBuffer();
-            webgl.bindBuffer(webgl.ARRAY_BUFFER, uvs_buff_${this.name});
-            webgl.bufferData(webgl.ARRAY_BUFFER, new Float32Array([
-                ${this.uvs}
-            ]).buffer, webgl.STATIC_DRAW);
+            ${this.hasTexture() ? `
+                const uvs_buff_${this.name} = webgl.createBuffer();
+                webgl.bindBuffer(webgl.ARRAY_BUFFER, uvs_buff_${this.name});
+                webgl.bufferData(webgl.ARRAY_BUFFER, new Float32Array([
+                    ${this.uvs}
+                ]).buffer, webgl.STATIC_DRAW);
+            ` : ''}
 
             const f_buff_${this.name} = webgl.createBuffer();
             webgl.bindBuffer(webgl.ELEMENT_ARRAY_BUFFER, f_buff_${this.name});
@@ -181,16 +193,18 @@ module.exports = class Geometry extends Entity {
                 ${this.indexes}
             ]).buffer, webgl.STATIC_DRAW);
             
-            const texture_${this.name} = webgl.createTexture();
-            const image_${this.name} = new Image();
-            image_${this.name}.onload = function () {
-                webgl.bindTexture(webgl.TEXTURE_2D, texture_${this.name});
-                webgl.texImage2D(webgl.TEXTURE_2D, 0, webgl.RGBA, webgl.RGBA, webgl.UNSIGNED_BYTE, image_${this.name});
-                webgl.texParameteri(webgl.TEXTURE_2D, webgl.TEXTURE_MAG_FILTER, webgl.LINEAR);
-                webgl.texParameteri(webgl.TEXTURE_2D, webgl.TEXTURE_MIN_FILTER, webgl.LINEAR_MIPMAP_NEAREST);
-                webgl.generateMipmap(webgl.TEXTURE_2D);
-            }
-            image_${this.name}.src = '${this.texture}';
+            ${this.hasTexture() ? `
+                const texture_${this.name} = webgl.createTexture();
+                const image_${this.name} = new Image();
+                image_${this.name}.onload = function () {
+                    webgl.bindTexture(webgl.TEXTURE_2D, texture_${this.name});
+                    webgl.texImage2D(webgl.TEXTURE_2D, 0, webgl.RGBA, webgl.RGBA, webgl.UNSIGNED_BYTE, image_${this.name});
+                    webgl.texParameteri(webgl.TEXTURE_2D, webgl.TEXTURE_MAG_FILTER, webgl.LINEAR);
+                    webgl.texParameteri(webgl.TEXTURE_2D, webgl.TEXTURE_MIN_FILTER, webgl.LINEAR_MIPMAP_NEAREST);
+                    webgl.generateMipmap(webgl.TEXTURE_2D);
+                }
+                image_${this.name}.src = '${this.texture}';
+            ` : ''}
 
             const geometry_${this.name} = Object.assign({
                 vertexs: v_buff_${this.name},
@@ -209,9 +223,13 @@ module.exports = class Geometry extends Entity {
                     texture: texture_${this.name},
                 ` : ''}
 
-                ${this.hasUniformColor() ?
-                `
-                    color: [${this.color.r}, ${this.color.g}, ${this.color.b}, ${this.color.a}],
+                ${this.hasUniformColor() ? `
+                    color: [
+                        ${this.color.r/255}, 
+                        ${this.color.g/255}, 
+                        ${this.color.b/255}, 
+                        ${this.color.a/255}
+                    ],
                 ` : ''}
                 
             });
