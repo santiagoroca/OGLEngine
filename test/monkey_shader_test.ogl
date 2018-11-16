@@ -2,7 +2,7 @@ scene {
 
     add geometry { 
         set source='./models/monkey.obj'
-        set color=0xff0000ff
+        set color=0xbbbbbbff
     }
 
     add camera {
@@ -44,7 +44,7 @@ scene {
     # Ambient Light
     add light {
         set type=ogl.POINT
-        set position=vec3(0.0, 1.0, 1.0)
+        set position=vec3(0.0, 1.0, 0.0)
     }
    
 }

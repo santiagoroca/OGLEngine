@@ -50,7 +50,7 @@ module.exports = class Geometry extends Entity {
        * previous data on the normals array.
        *
        */
-       this.gen_normals = true;
+       this.generate_normals = true;
        
        /*
        * Inline Data
@@ -104,7 +104,7 @@ module.exports = class Geometry extends Entity {
     }
 
     getNormals () {
-        if (!this.normals.length || this.gen_normals) {
+        if (!(this.normals.length) || this.generate_normals) {
             this.generateNormals();
         }
 

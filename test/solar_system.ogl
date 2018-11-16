@@ -1,6 +1,8 @@
 scene {
 
     define Star extends geometry {
+        set  remove_duplicated_vertexs=false
+        set  generate_normals=false
 
         # Internal Variables
         set source='./models/star.obj'
@@ -26,6 +28,8 @@ scene {
                 on -> type=ogl.DRAG, btn=ogl.BUTTON0, hndl=(
                     rotate -> x=(.delta_y * -1), y=.delta_x
                 )
+
+                rotate -> y=-160deg
             }
 
             set world {
@@ -36,6 +40,8 @@ scene {
                 on -> type=ogl.DRAG, btn=ogl.BUTTON2, hndl=(
                     translate -> x=(.delta_x * 4), y=(.delta_y * 4)
                 )
+
+                translate -> z=-50.0, x=5.0
             }
 
         }
@@ -63,6 +69,7 @@ scene {
             }
 
             set model {
+                on -> type=ogl.INTERVAL, hndl=(rotate -> y=0.001)
                 scale -> size=0.15
             }
         }
@@ -79,6 +86,7 @@ scene {
             }
 
             set model {
+                on -> type=ogl.INTERVAL, hndl=(rotate -> y=0.001)
                 scale -> size=0.35
             }
         }
@@ -90,6 +98,7 @@ scene {
 
         set transform {
             set model {
+                on -> type=ogl.INTERVAL, hndl=(rotate -> y=0.001)
                 scale -> size=0.25
             }
 
@@ -111,6 +120,7 @@ scene {
             }
 
             set model {
+                on -> type=ogl.INTERVAL, hndl=(rotate -> y=0.001)
                 scale -> size=0.2
             }
         }
@@ -127,6 +137,7 @@ scene {
             }
 
             set model {
+                on -> type=ogl.INTERVAL, hndl=(rotate -> y=0.001)
                 scale -> size=0.7
             }
             
@@ -139,6 +150,7 @@ scene {
 
         set transform {
             set model {
+                on -> type=ogl.INTERVAL, hndl=(rotate -> y=0.001)
                 scale -> size=0.5
             }
 
@@ -155,6 +167,7 @@ scene {
 
         set transform {
             set model {
+                on -> type=ogl.INTERVAL, hndl=(rotate -> y=0.001)
                 scale -> size=0.4
             }
 
@@ -171,6 +184,7 @@ scene {
 
         set transform {
             set model {
+                on -> type=ogl.INTERVAL, hndl=(rotate -> y=0.001)
                 scale -> size=0.4
             }
 

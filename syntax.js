@@ -215,8 +215,8 @@ module.exports = {
         value: 
         [
             [ " number ", " $$ = $1 " ],
-            [ " string ", " $$ = $1 " ],
-            [ " BOOL ", " $$ = $1 " ],
+            [ " string ", " $$ = $1; " ],
+            [ " BOOL ", " $$ = $1 == 'true'; " ],
             [ " SCOPE_VARIABLE ", " $$ = $1; "],
             [ " vec3 ", " $$ = $1; "],
             [ " expression ", " $$ = $1; " ],
