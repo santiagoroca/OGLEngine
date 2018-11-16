@@ -31,14 +31,14 @@ module.exports = class PhongShader {
         
             ${this.hasUniformColor() ? `
                 gl_FragColor = 
-                    geometryColor * vec4(attenuation, attenuation, attenuation, 1.0) +
+                    geometryColor * vec4(light, light, light, 1.0) +
                     geometryColor * ambient_light;
             `: ''}
 
             ${this.hasTexture() ? `
                 vec4 color = texture2D(uSampler, vec2(vVertexUV.s, 1.0-vVertexUV.t));
                 gl_FragColor = 
-                    color * vec4(attenuation, attenuation, attenuation, 1.0) +
+                    color * vec4(light, light, light, 1.0) +
                     color * ambient_light;
             `: ''}
 
@@ -64,11 +64,11 @@ module.exports = class PhongShader {
                 
                 ${this.hasNormals() ? 'varying vec3 vNormal;': ''}
                 ${this.hasTexture() ? 'varying vec2 vVertexUV;': ''}
-                ${fragment_varying_vertex_position ? 'varying vec4 vVertexPosition;': ''}
+                ${fragment_varying_vertex_position ? 'varying vec3 vVertexPosition;': ''}
                 
                 void main(void) {
                     gl_Position = projection * cameraWorld * cameraModel * world * model * vec4(aVertexPosition, 1.0);
-                    ${fragment_varying_vertex_position ? 'vVertexPosition = world * model * vec4(aVertexPosition, 1.0);': ''}
+                    ${fragment_varying_vertex_position ? 'vVertexPosition = (world * model * vec4(aVertexPosition, 1.0)).xyz;': ''}
                     ${this.hasNormals() ? 'vNormal = mat3(world * model) * aVertexNormal;': ''}
                     ${this.hasTexture() ? 'vVertexUV = aVertexUV;': ''}
                 }
@@ -90,28 +90,45 @@ module.exports = class PhongShader {
                 const vec4 ambient_light = vec4(${ambient_l});
 
                 ${directional_l.map(
-                    ({ direction }, index) => `const vec3 dir_${index} = vec3(${direction});`
+                    ({ name, direction }) => `const vec3 dir_${name} = vec3(${direction});`
                 ).join('\n')}
 
                 ${point_l.map(
-                    ({ position }, index) => `const vec4 point_${index} = vec4(${position}, 1.0);`
+                    ({ name, position }) => `const vec3 point_${name} = vec3(${position});`
                 ).join('\n')}
 
                 ${this.hasNormals() ? 'varying vec3 vNormal;': ''}
                 ${this.hasTexture() ? 'varying vec2 vVertexUV;': ''}
-                ${fragment_varying_vertex_position ? 'varying vec4 vVertexPosition;': ''}
+                ${fragment_varying_vertex_position ? 'varying vec3 vVertexPosition;': ''}
 
                 void main() {
-                    float attenuation = 0.0;
+                    float light = 0.0;
                     vec3 normal = normalize(vNormal);
+                    vec3 eye = -normalize(vVertexPosition);
                     
-                    ${directional_l.map(
-                        ({}, index) => ` attenuation += max(0.0, dot(normal, dir_${index}));`
-                    ).join('\n')}
+                    ${directional_l.map(({ name, shininess }) => `
 
-                    ${point_l.map(({}, index) => `
-                        vec3 surfaceToLight = normalize((point_${index}).xyz - vVertexPosition.xyz);
-                        attenuation += max(0.0, dot(normal, surfaceToLight));
+                        float diffuse_${name} = max(0.0, dot(normal, dir_${name}));
+                        
+                        float specular_${name} = 0.0;
+                        if(diffuse_${name} > 0.0)
+                            specular_${name} = pow(max(0.0, dot(eye, reflect(-dir_${name}, normal))), ${shininess}.0);
+
+                        light += (diffuse_${name} + specular_${name});
+
+                    `).join('\n')}
+
+                    ${point_l.map(({ name, shininess }, index) => `
+
+                        vec3 surfaceToLight_${name} = normalize(point_${name} - vVertexPosition);
+                        float diffuse_${name} = max(0.0, dot(normal, surfaceToLight_${name}));
+                        
+                        float specular_${name} = 0.0;
+                        if(diffuse_${name} > 0.0)
+                            specular_${name} = pow(max(0.0, dot(eye, reflect(-surfaceToLight_${name}, normal))), ${shininess}.0);
+
+                        light += (diffuse_${name} + specular_${name});
+
                     `).join('\n')}
              
                     ${fragment_color}

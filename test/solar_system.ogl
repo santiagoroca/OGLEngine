@@ -47,6 +47,11 @@ scene {
         set position=vec3(0.0, 0.0, 0.0)
     }
 
+    add light {
+        set type=ogl.AMBIENT
+        set color=0x333333
+    }
+
     # Mercury
     add Star {
         set texture='./models/mercury.jpg'
