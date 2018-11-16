@@ -1,11 +1,15 @@
-const fs = require('fs');
+const createWriteStream = require('fs').createWriteStream;
 const Entity = require('./Entity');
 const Transform = require('./Transform');
 const load = require('../parser/Loader.js');
-const math = require('../math.js');
 const read = require('fs').readFileSync;
 const write = require('fs').writeFileSync;
 const hash = require('../helper').hash;
+
+// Helper Procceses
+const GenerateNormals = require('../process/generate_normals')
+const RemoveDuplicatedVertexs = require('../process/remove_duplicated_vertexs');
+
 
 module.exports = class Geometry extends Entity {
 
@@ -29,14 +33,34 @@ module.exports = class Geometry extends Entity {
        this.color = null;
        
        /*
-       * Smooth
+       * Remove Duplicated Vertexs
        *
-       * If set to true, when the geometry is about to be
-       * saved, the normals are going to be regenerated,
-       * for every compilation
+       * If set to true, the duplicated vertex
+       * of the geometry will be removed before the normals
+       * regeneration, so that you obtain a more smooth render
        * 
        */
-       this.regenerate_normals = false;
+       this.remove_duplicated_vertexs = true;
+
+       /*
+       * Generate Normals
+       * 
+       * If set to true, the normals
+       * will be generated, regardless of the 
+       * previous data on the normals array.
+       *
+       */
+       this.gen_normals = true;
+       
+       /*
+       * Inline Data
+       *
+       * If set to true, the buffer data of the mesh
+       * will be written in the destiny file, instead of
+       * external files.
+       *
+       */
+       this.inline_data = false;
 
        /*
        * Helper internal classes and arrays,
@@ -80,71 +104,47 @@ module.exports = class Geometry extends Entity {
     }
 
     getNormals () {
-        if (!this.normals.length || this.regenerate_normals) {
+        if (!this.normals.length || this.gen_normals) {
             this.generateNormals();
         }
 
         return this.normals;
     }
 
+    /*
+    * @title Generate Normals
+    *
+    * @description If, when the geometry is about to be exported, 
+    * does not contains normals, or the flag gen_normals
+    * is set to true, this function will generate the normals.
+    * 
+    */
     generateNormals () {
-        this.normals = [];
+        this.normals = GenerateNormals (
+            this.vertexs, 
+            this.indexes
+        );
+    }
 
-        for (var i = 0; i < this.vertexs.length; i++) {
-            this.normals[i] = 0;
-        }
-    
-        for (var i = 0; i < this.indexes.length; i += 3) {
-    
-            //Point A
-            var e1 = [
-                this.vertexs [this.indexes[i] * 3],
-                this.vertexs [this.indexes[i] * 3 + 1],
-                this.vertexs [this.indexes[i] * 3 + 2]
-            ];
-    
-            //Point B
-            var e2 = [
-                this.vertexs [this.indexes[i + 1] * 3],
-                this.vertexs [this.indexes[i + 1] * 3 + 1],
-                this.vertexs [this.indexes[i + 1] * 3 + 2]
-            ];
-    
-            //Point C
-            var e3 = [
-                this.vertexs [this.indexes[i + 2] * 3],
-                this.vertexs [this.indexes[i + 2] * 3 + 1],
-                this.vertexs [this.indexes[i + 2] * 3 + 2]
-            ];
-    
-            var n = math.vec3.cross(math.vec3.subtract(e2, e1), math.vec3.subtract(e3, e1));
-    
-            this.normals [this.indexes[i] * 3] += n [0];
-            this.normals [this.indexes[i] * 3 + 1] += n [1];
-            this.normals [this.indexes[i] * 3 + 2] += n [2];
-    
-            this.normals [this.indexes[i + 1] * 3] += n [0];
-            this.normals [this.indexes[i + 1] * 3 + 1] += n [1];
-            this.normals [this.indexes[i + 1] * 3 + 2] += n [2];
-    
-            this.normals [this.indexes[i + 2] * 3] += n [0];
-            this.normals [this.indexes[i + 2] * 3 + 1] += n [1];
-            this.normals [this.indexes[i + 2] * 3 + 2] += n [2];
-    
-        }
-    
-        for (var i = 0; i < this.normals.length; i += 3) {
-            var length = Math.sqrt(
-                this.normals [i] * this.normals [i] + 
-                this.normals [i + 1] * this.normals [i + 1] + 
-                this.normals [i + 2] * this.normals [i + 2]
-            );
-    
-            this.normals [i] /= length || 1;
-            this.normals [i + 1] /= length || 1;
-            this.normals [i + 2] /= length || 1;
-        }
-
+    /*
+    * @title Remove Duplicated Vertex
+    *
+    * @description If, when the geometry is about to be exported, 
+    * the flag smooth_mesh is set to true, duplicated vertexs
+    * will be merged
+    * 
+    * In the future, this option will identify when a vertex should be 
+    * merged and when should not.
+    * 
+    */
+    removeDuplicatedVertexs () {
+        // This function returns an object that contains 3 keys
+        // vertex, indexes and normals, with the new data in it.
+        Object.assign(this, RemoveDuplicatedVertexs (
+            this.vertexs, 
+            this.indexes, 
+            this.normals
+        ));
     }
 
     isDynamic () {
@@ -164,17 +164,17 @@ module.exports = class Geometry extends Entity {
 
     saveToFile () {
 
-        fs.createWriteStream(`./dist/models/${this.getName()}.faces`)
+        createWriteStream(`./dist/models/${this.getName()}.faces`)
             .write(new Buffer(new Uint16Array(this.indexes).buffer));
 
-        fs.createWriteStream(`./dist/models/${this.getName()}.vertexs`)
+        createWriteStream(`./dist/models/${this.getName()}.vertexs`)
             .write(new Buffer(new Float32Array(this.getTransformedVertexs()).buffer));
 
-        fs.createWriteStream(`./dist/models/${this.getName()}.normals`)
+        createWriteStream(`./dist/models/${this.getName()}.normals`)
             .write(new Buffer(new Float32Array(this.getNormals()).buffer));
 
         if (this.hasTexture()) {
-            fs.createWriteStream(`./dist/models/${this.getName()}.uvs`)
+            createWriteStream(`./dist/models/${this.getName()}.uvs`)
                 .write(new Buffer(new Float32Array(this.uvs).buffer));
         }
 
@@ -185,7 +185,17 @@ module.exports = class Geometry extends Entity {
             Object.assign(this, load(this.source));
         }
 
-        this.saveToFile();
+        // TODO External process needs improvement
+        if (this.remove_duplicated_vertexs) {
+            this.removeDuplicatedVertexs();
+        }
+
+        // Save Mesh data to external files
+        // TODO Needs improvement to merge all the files into one
+        // Probably all the geometries into one
+        if (!this.inline_data) {
+            this.saveToFile();
+        }
 
         return `
 

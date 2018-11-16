@@ -3,7 +3,6 @@ scene {
     add geometry { 
         set source='./models/monkey.obj'
         set color=0xff0000ff
-        set regenerate_normals=true
     }
 
     add camera {
