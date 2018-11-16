@@ -110,8 +110,8 @@ module.exports = class PhongShader {
                     ).join('\n')}
 
                     ${point_l.map(({}, index) => `
-                        vec3 surfaceToLight = normalize(vVertexPosition.xyz - (point_${index}).xyz);
-                        attenuation += 1.0 - max(0.0, dot(normal, surfaceToLight));
+                        vec3 surfaceToLight = normalize((point_${index}).xyz - vVertexPosition.xyz);
+                        attenuation += max(0.0, dot(normal, surfaceToLight));
                     `).join('\n')}
              
                     ${fragment_color}
