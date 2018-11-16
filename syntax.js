@@ -18,7 +18,7 @@ module.exports = {
             ["scene", "return 'SCENE';"],
             ["extends", "return 'EXTENDS';"],
             ["ogl\.[a-zA-Z0-9]+", "return 'CONSTANT';"],
-            ["[a-zA-Z]+=", "return 'VARNAME';"],
+            ["[a-zA-Z_]+=", "return 'VARNAME';"],
             ["[a-zA-Z]+ ?(?=->)", "return 'FUNC_NAME';"],
             ["[a-zA-Z]+ ?(?=(\{|extends))", "return 'CLASS_NAME';"],
             
@@ -27,6 +27,7 @@ module.exports = {
             
 
             /* KEYWORDS */
+            ["(true|false)", "return 'BOOL';"],
             ["vec3", "return 'VEC3';"],
             ["deg", "return 'DEG';"],
             ["rad", "return 'RAD';"],
@@ -215,6 +216,7 @@ module.exports = {
         [
             [ " number ", " $$ = $1 " ],
             [ " string ", " $$ = $1 " ],
+            [ " BOOL ", " $$ = $1 " ],
             [ " SCOPE_VARIABLE ", " $$ = $1; "],
             [ " vec3 ", " $$ = $1; "],
             [ " expression ", " $$ = $1; " ],

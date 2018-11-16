@@ -1,26 +1,9 @@
 scene {
 
-    define Monkey extends geometry {
+    add geometry { 
         set source='./models/monkey.obj'
         set color=0xff0000ff
-    }
-
-    add Monkey { pass }
-
-    add Monkey { 
-        set transform {
-            set world {
-                translate -> x=4.0
-            }
-        }
-    }
-
-    add Monkey { 
-        set transform {
-            set world {
-                translate -> x=-4.0
-            }
-        }
+        set regenerate_normals=true
     }
 
     add camera {

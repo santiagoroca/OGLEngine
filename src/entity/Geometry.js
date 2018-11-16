@@ -1,3 +1,4 @@
+const fs = require('fs');
 const Entity = require('./Entity');
 const Transform = require('./Transform');
 const load = require('../parser/Loader.js');
@@ -30,11 +31,12 @@ module.exports = class Geometry extends Entity {
        /*
        * Smooth
        *
-       * If set to true, when the normals are generated, or
-       * loaded from any file, are going to be smoothed, this is
-       * get the average value of all the 
+       * If set to true, when the geometry is about to be
+       * saved, the normals are going to be regenerated,
+       * for every compilation
+       * 
        */
-       this.smooth = false;
+       this.regenerate_normals = false;
 
        /*
        * Helper internal classes and arrays,
@@ -67,7 +69,7 @@ module.exports = class Geometry extends Entity {
     setTexture ([ texture ]) {
         const ext = texture.match(/[^\.]+$/g)[0];
         const name = hash();
-        const path = `assets/images/${name}.${ext}`;
+        const path = `textures/${name}.${ext}`;
         write(`./dist/${path}`, read(texture));
         this.texture = path;
     }
@@ -78,7 +80,7 @@ module.exports = class Geometry extends Entity {
     }
 
     getNormals () {
-        if (!this.normals.length||true) {
+        if (!this.normals.length || this.regenerate_normals) {
             this.generateNormals();
         }
 
@@ -144,7 +146,7 @@ module.exports = class Geometry extends Entity {
         }
 
     }
-    
+
     isDynamic () {
         return this.events.events.length;
     }
@@ -160,39 +162,79 @@ module.exports = class Geometry extends Entity {
         ];
     }
 
+    saveToFile () {
+
+        fs.createWriteStream(`./dist/models/${this.getName()}.faces`)
+            .write(new Buffer(new Uint16Array(this.indexes).buffer));
+
+        fs.createWriteStream(`./dist/models/${this.getName()}.vertexs`)
+            .write(new Buffer(new Float32Array(this.getTransformedVertexs()).buffer));
+
+        fs.createWriteStream(`./dist/models/${this.getName()}.normals`)
+            .write(new Buffer(new Float32Array(this.getNormals()).buffer));
+
+        if (this.hasTexture()) {
+            fs.createWriteStream(`./dist/models/${this.getName()}.uvs`)
+                .write(new Buffer(new Float32Array(this.uvs).buffer));
+        }
+
+    }
+
     toString () {
         if (this.source) {
             Object.assign(this, load(this.source));
         }
 
+        this.saveToFile();
+
         return `
 
             const v_buff_${this.name} = webgl.createBuffer();
-            webgl.bindBuffer(webgl.ARRAY_BUFFER, v_buff_${this.name});
-            webgl.bufferData(webgl.ARRAY_BUFFER, new Float32Array([
-                ${this.getTransformedVertexs()}
-            ]).buffer, webgl.STATIC_DRAW);
-
             const n_buff_${this.name} = webgl.createBuffer();
-            webgl.bindBuffer(webgl.ARRAY_BUFFER, n_buff_${this.name});
-            webgl.bufferData(webgl.ARRAY_BUFFER, new Float32Array([
-                ${this.getNormals()}
-            ]).buffer, webgl.STATIC_DRAW);
+            const f_buff_${this.name} = webgl.createBuffer();
 
             ${this.hasTexture() ? `
                 const uvs_buff_${this.name} = webgl.createBuffer();
-                webgl.bindBuffer(webgl.ARRAY_BUFFER, uvs_buff_${this.name});
-                webgl.bufferData(webgl.ARRAY_BUFFER, new Float32Array([
-                    ${this.uvs}
-                ]).buffer, webgl.STATIC_DRAW);
             ` : ''}
 
-            const f_buff_${this.name} = webgl.createBuffer();
-            webgl.bindBuffer(webgl.ELEMENT_ARRAY_BUFFER, f_buff_${this.name});
-            webgl.bufferData(webgl.ELEMENT_ARRAY_BUFFER, new Uint16Array([
-                ${this.indexes}
-            ]).buffer, webgl.STATIC_DRAW);
-            
+            fetch('models/${this.getName()}.faces')
+            .then(response => {
+                response.arrayBuffer()
+                .then(buffer => {
+                    webgl.bindBuffer(webgl.ELEMENT_ARRAY_BUFFER, f_buff_${this.name});
+                    webgl.bufferData(webgl.ELEMENT_ARRAY_BUFFER, buffer, webgl.STATIC_DRAW);
+                })
+            });
+
+            fetch('models/${this.getName()}.vertexs')
+            .then(response => {
+                response.arrayBuffer()
+                .then(buffer => {
+                    webgl.bindBuffer(webgl.ARRAY_BUFFER, v_buff_${this.name});
+                    webgl.bufferData(webgl.ARRAY_BUFFER, buffer, webgl.STATIC_DRAW);
+                })
+            });
+
+            fetch('models/${this.getName()}.normals')
+            .then(response => {
+                response.arrayBuffer()
+                .then(buffer => {
+                    webgl.bindBuffer(webgl.ARRAY_BUFFER, n_buff_${this.name});
+                    webgl.bufferData(webgl.ARRAY_BUFFER, buffer, webgl.STATIC_DRAW);
+                })
+            });
+
+            ${this.hasTexture() ? `
+                fetch('models/${this.getName()}.uvs')
+                .then(response => {
+                    response.arrayBuffer()
+                    .then(buffer => {
+                        webgl.bindBuffer(webgl.ARRAY_BUFFER, uvs_buff_${this.name});
+                        webgl.bufferData(webgl.ARRAY_BUFFER, buffer, webgl.STATIC_DRAW);
+                    })
+                });
+            ` : ''}
+                
             ${this.hasTexture() ? `
                 const texture_${this.name} = webgl.createTexture();
                 const image_${this.name} = new Image();
@@ -209,13 +251,9 @@ module.exports = class Geometry extends Entity {
             const geometry_${this.name} = Object.assign({
                 vertexs: v_buff_${this.name},
                 indexes: f_buff_${this.name},
+                normals: n_buff_${this.name},
                 transform: ${this.transform},
                 count: ${this.indexes.length},
-
-                ${this.hasNormals() ?
-                `
-                    normals: n_buff_${this.name},
-                ` : ''}
 
                 ${this.hasTexture() ?
                 `

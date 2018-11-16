@@ -30,7 +30,8 @@ parser.yy = {
 
 // Clear Dist folder
 fse.emptyDirSync('./dist/');
-fse.ensureDirSync('./dist/assets/images')
+fse.ensureDirSync('./dist/textures')
+fse.ensureDirSync('./dist/models')
 fse.copySync('./client/index.html', './dist/index.html')
 
 // Output program
