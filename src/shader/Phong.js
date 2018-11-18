@@ -67,9 +67,10 @@ module.exports = class PhongShader {
                 ${fragment_varying_vertex_position ? 'varying vec3 vVertexPosition;': ''}
                 
                 void main(void) {
-                    gl_Position = projection * cameraWorld * cameraModel * world * model * vec4(aVertexPosition, 1.0);
-                    ${fragment_varying_vertex_position ? 'vVertexPosition = (world * model * vec4(aVertexPosition, 1.0)).xyz;': ''}
-                    ${this.hasNormals() ? 'vNormal = mat3(world * model) * aVertexNormal;': ''}
+                    vec4 worldModelSpaceVertex = world * model * vec4(aVertexPosition, 1.0);
+                    gl_Position = projection * cameraWorld * cameraModel * worldModelSpaceVertex;
+                    ${fragment_varying_vertex_position ? 'vVertexPosition = worldModelSpaceVertex.xyz;': ''}
+                    ${this.hasNormals() ? 'vNormal = mat3(world) * mat3(model) * aVertexNormal;': ''}
                     ${this.hasTexture() ? 'vVertexUV = aVertexUV;': ''}
                 }
 
@@ -90,7 +91,7 @@ module.exports = class PhongShader {
                 const vec4 ambient_light = vec4(${ambient_l});
 
                 ${directional_l.map(
-                    ({ name, direction }) => `const vec3 dir_${name} = vec3(${direction});`
+                    ({ name, direction }) => `const vec3 dir_${name} = normalize(vec3(${direction}));`
                 ).join('\n')}
 
                 ${point_l.map(
@@ -115,7 +116,7 @@ module.exports = class PhongShader {
                         
                         float specular_${name} = 0.0;
                         if(diffuse_${name} > 0.0)
-                            specular_${name} = pow(max(0.0, dot(eye, reflect(-dir_${name}, normal))), ${shininess}.0);
+                            specular_${name} = pow(max(0.0, dot(eye, reflect(dir_${name}, normal))), ${shininess}.0);
 
                         light += (diffuse_${name} + specular_${name});
 
@@ -130,7 +131,7 @@ module.exports = class PhongShader {
                         if(diffuse_${name} > 0.0)
                             specular_${name} = pow(max(0.0, dot(eye, reflect(-surfaceToLight_${name}, normal))), ${shininess}.0);
 
-                        light += (diffuse_${name} + specular_${name});
+                        light += (diffuse_${name});
 
                     `).join('\n')}
              
