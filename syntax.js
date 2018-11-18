@@ -9,8 +9,8 @@ module.exports = {
 
         "rules": [
 
-
-            ["\\s+", "/* skip whitespace */"],
+            /* Reserver Words */
+            ["\\s+", "/* skip whitespace */"],  
             ["add", "return 'ADD';"],
             ["set", "return 'SET';"],
             ["define", "return 'DEFINE';"],
@@ -21,32 +21,16 @@ module.exports = {
             ["[a-zA-Z_]+=", "return 'VARNAME';"],
             ["[a-zA-Z]+ ?(?=->)", "return 'FUNC_NAME';"],
             ["[a-zA-Z]+ ?(?=(\{|extends))", "return 'CLASS_NAME';"],
-            
-
-            /* BUILT-IN FUNCTIONS */
-            
-
-            /* KEYWORDS */
-            ["(true|false)", "return 'BOOL';"],
-            ["vec3", "return 'VEC3';"],
-            ["deg", "return 'DEG';"],
-            ["rad", "return 'RAD';"],
-            ["import", "return 'IMPORT';"],
-            ["ogl", "return 'OGL';"],
-            ["on", "return 'ON';"],
-            ["drag", "return 'DRAG';"],
-            ["source", "return 'SOURCE';"],
-            ["color", "return 'COLOR';"],
-            ["projection", "return 'PROJECTION';"],
-            ["texture", "return 'TEXTURE';"],
-
-            /* Constant Values */
 
             /* natives */
             ["0x[0-9A-Fa-f]{8}", "return 'HEXA8';"],
             ["0x[0-9A-Fa-f]{6}", "return 'HEXA6';"],
             ["\\-?[0-9]+(?:\\.[0-9]+)?", "return 'NUMBER';"],
             ["'[a-zA-Z0-9\\._/]+'", "return 'STRING';"],
+            ["(true|false)", "return 'BOOL';"],
+            ["vec3", "return 'VEC3';"],
+            ["deg", "return 'DEG';"],
+            ["rad", "return 'RAD';"],
 
             /* Tokens */
             ["\\{", "return 'OBRACE';"],

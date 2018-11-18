@@ -74,7 +74,7 @@ scene {
         }
     }
   
-    # Mercury
+    # Sun
     add Star {
         set texture='./models/sun.jpg'
 
@@ -90,7 +90,7 @@ scene {
         }
 
         set material {
-            set shininess=20.0
+            set shininess=150.0
         }
     }
 
