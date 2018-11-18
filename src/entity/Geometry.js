@@ -31,7 +31,9 @@ module.exports = class Geometry extends Entity {
        */
        this.normals = [];
        this.uvs = [];
-       this.color = null;
+       this.color = undefined;
+       this.texture = undefined;
+       this.specularmap = undefined;
        
        /*
        * Remove Duplicated Vertexs
@@ -77,8 +79,21 @@ module.exports = class Geometry extends Entity {
         return `geometry_${this.name}`;
     }
 
+    includeUVs () {
+        return this.uvs.length > 0 &&
+            (
+                this.hasTexture() ||
+                this.hasSpecularMap()
+            );
+    }
+
     hasTexture () {
         return typeof this.texture != 'undefined' &&
+                this.uvs.length > 0;
+    }
+
+    hasSpecularMap () {
+        return typeof this.specularmap != 'undefined' &&
                 this.uvs.length > 0;
     }
 
@@ -98,6 +113,16 @@ module.exports = class Geometry extends Entity {
         const path = `textures/${name}.${ext}`;
         write(`./dist/${path}`, read(texture));
         this.texture = path;
+    }
+
+    // Configure Texture as externla object 
+    // and append to geometry
+    setSpecularmap ([ texture ]) {
+        const ext = texture.match(/[^\.]+$/g)[0];
+        const name = hash();
+        const path = `textures/${name}.${ext}`;
+        write(`./dist/${path}`, read(texture));
+        this.specularmap = path;
     }
     
     getTransformedVertexs () {
@@ -260,6 +285,19 @@ module.exports = class Geometry extends Entity {
                 image_${this.name}.src = '${this.texture}';
             ` : ''}
 
+            ${this.hasSpecularMap() ? `
+                const specular_map_${this.name} = webgl.createTexture();
+                const specular_image_${this.name} = new Image();
+                specular_image_${this.name}.onload = function () {
+                    webgl.bindTexture(webgl.TEXTURE_2D, specular_map_${this.name});
+                    webgl.texImage2D(webgl.TEXTURE_2D, 0, webgl.RGBA, webgl.RGBA, webgl.UNSIGNED_BYTE, specular_image_${this.name});
+                    webgl.texParameteri(webgl.TEXTURE_2D, webgl.TEXTURE_MAG_FILTER, webgl.LINEAR);
+                    webgl.texParameteri(webgl.TEXTURE_2D, webgl.TEXTURE_MIN_FILTER, webgl.LINEAR_MIPMAP_NEAREST);
+                    webgl.generateMipmap(webgl.TEXTURE_2D);
+                }
+                specular_image_${this.name}.src = '${this.specularmap}';
+            ` : ''}
+
             const geometry_${this.name} = Object.assign({
                 vertexs: v_buff_${this.name},
                 indexes: f_buff_${this.name},
@@ -267,10 +305,19 @@ module.exports = class Geometry extends Entity {
                 transform: ${this.transform},
                 count: ${this.indexes.length},
 
-                ${this.hasTexture() ?
+                ${this.includeUVs() ?
                 `
                     uvs: uvs_buff_${this.name},
+                ` : ''}
+
+                ${this.hasTexture() ?
+                `
                     texture: texture_${this.name},
+                ` : ''}
+
+                ${this.hasSpecularMap() ?
+                `
+                    specularmap: specular_map_${this.name},
                 ` : ''}
 
                 ${this.hasUniformColor() ? `

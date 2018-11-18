@@ -57,14 +57,20 @@ scene {
         set color=0x333333
     }
 
-    # Mercury
+    # Eerth
     add Star {
-        set texture='./models/earth.jpg'
+        set source='./models/earth/mesh.obj'
+        set texture='./models/earth/texture.jpg'
+        set specularmap='./models/earth/specular.jpg'
 
         set transform {
             set model {
                 on -> type=ogl.INTERVAL, every=ogl.FRAME, hndl=(rotate -> y=0.05deg)
             }
+        }
+
+        set material {
+            set shininess=20.0
         }
     }
   
@@ -84,7 +90,7 @@ scene {
         }
 
         set material {
-            set shininess=255.0
+            set shininess=20.0
         }
     }
 

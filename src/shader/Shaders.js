@@ -1,4 +1,5 @@
-const PhongShader = require('./Phong.js')
+const PhongShader = require('./Phong')
+const Config = require('./Config')
 
 module.exports = class Scene {
 
@@ -10,31 +11,19 @@ module.exports = class Scene {
     }
 
     addGeometry (geometry) {
-        let index = 0;
+        let config = new Config();
 
-        if (geometry.hasUniformColor()) {
-            index |= 1; // 1
+        config.setUniformColor(geometry.hasUniformColor() ? 1 : 0);
+        config.setTexture(geometry.hasTexture() ? 1 : 0);
+        config.setNormals(geometry.hasNormals() ? 1 : 0);
+        config.setShininess(Math.min(parseInt(geometry.material.shininess), 255));
+        config.setSpecularMap(geometry.hasSpecularMap() ? 1 : 0);
+
+        if (!this.shaders[config.key]) {
+            this.shaders[config.key] = new PhongShader(config);
         }
 
-        if (geometry.hasTexture()) {
-            index |= 1 << 1;
-        }
-
-        if (geometry.hasNormals()) {
-            index |= 1 << 2;
-        }
-
-        // Next 8 bits correspond to material shininess
-        // Shift a zero in the front to eliminate sign
-        const shininess = 255 - Math.min(parseInt(geometry.material.shininess), 255);
-        index |= ((shininess) << 3);
-        index = index >>> 0;
-
-        if (!this.shaders[index]) {
-            this.shaders[index] = new PhongShader(index);
-        }
-
-        this.shaders[index].geometries.push(geometry.getName());
+        this.shaders[config.key].geometries.push(geometry.getName());
     }
 
     appendLight (light) {
