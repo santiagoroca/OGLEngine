@@ -20,6 +20,10 @@ module.exports = class PhongShader {
         return (this.config & 4) == 4;
     }
 
+    getMaterialShininess () {
+        return (this.config >> 3) & 255;
+    }
+
     generateInitializationBlock (directional_l, ambient_l, point_l) {
         const hash = this.name;
 
@@ -67,10 +71,10 @@ module.exports = class PhongShader {
                 ${fragment_varying_vertex_position ? 'varying vec3 vVertexPosition;': ''}
                 
                 void main(void) {
-                    vec4 worldModelSpaceVertex = world * model * vec4(aVertexPosition, 1.0);
-                    gl_Position = projection * cameraWorld * cameraModel * worldModelSpaceVertex;
+                    vec4 worldModelSpaceVertex = cameraWorld * cameraModel * world * model * vec4(aVertexPosition, 1.0);
+                    gl_Position = projection * worldModelSpaceVertex;
                     ${fragment_varying_vertex_position ? 'vVertexPosition = worldModelSpaceVertex.xyz;': ''}
-                    ${this.hasNormals() ? 'vNormal = mat3(world) * mat3(model) * aVertexNormal;': ''}
+                    ${this.hasNormals() ? 'vNormal = mat3(cameraWorld) * mat3(cameraModel) * mat3(world) * mat3(model) * aVertexNormal;': ''}
                     ${this.hasTexture() ? 'vVertexUV = aVertexUV;': ''}
                 }
 
@@ -107,16 +111,18 @@ module.exports = class PhongShader {
 
                     ${fragment_varying_vertex_position ? `
                         vec3 normal = normalize(vNormal);
-                        vec3 eye = -normalize(vVertexPosition);
+                        vec3 cameraPosition = (cameraWorld * cameraModel)[3].xyz;
+                        vec3 eye = normalize(-vVertexPosition);
                     ` : ''}
                     
                     ${directional_l.map(({ name, shininess }) => `
 
-                        float diffuse_${name} = max(0.0, dot(normal, dir_${name}));
+                        vec3 camera_space_${name} = vec3(mat3(cameraWorld) * mat3(cameraModel) * vec3(dir_${name}));
+                        float diffuse_${name} = max(0.0, dot(normal, camera_space_${name}));
                         
                         float specular_${name} = 0.0;
                         if(diffuse_${name} > 0.0)
-                            specular_${name} = pow(max(0.0, dot(eye, reflect(dir_${name}, normal))), ${shininess}.0);
+                            specular_${name} = pow(max(0.0, dot(eye, reflect(-camera_space_${name}, normal))), ${this.getMaterialShininess()}.0);
 
                         light += (diffuse_${name} + specular_${name});
 
@@ -124,14 +130,15 @@ module.exports = class PhongShader {
 
                     ${point_l.map(({ name, shininess }, index) => `
 
-                        vec3 surfaceToLight_${name} = normalize(point_${name} - vVertexPosition);
+                        vec3 camera_space_${name} = vec3(cameraWorld * cameraModel * vec4(point_${name}, 1.0));
+                        vec3 surfaceToLight_${name} = normalize(camera_space_${name} - vVertexPosition);
                         float diffuse_${name} = max(0.0, dot(normal, surfaceToLight_${name}));
                         
-                        float specular_${name} = 0.0;
-                        if(diffuse_${name} > 0.0)
-                            specular_${name} = pow(max(0.0, dot(eye, reflect(-surfaceToLight_${name}, normal))), ${shininess}.0);
+                        float specular_${name} = 2.0 * pow(max(0.0, dot(
+                            eye, reflect(-surfaceToLight_${name}, normal)
+                        )), ${this.getMaterialShininess()}.0);
 
-                        light += (diffuse_${name});
+                        light += (diffuse_${name} + specular_${name});
 
                     `).join('\n')}
              
@@ -195,6 +202,7 @@ module.exports = class PhongShader {
         const hash = this.name;
 
         return `
+            webgl.useProgram(PhongShaderProgram_${hash});
             webgl.uniformMatrix4fv(PhongShaderProgram_${hash}.cameraWorld, false, activeCamera.transform.world.matrix);
             webgl.uniformMatrix4fv(PhongShaderProgram_${hash}.cameraModel, false, activeCamera.transform.model.matrix);
             webgl.uniformMatrix4fv(PhongShaderProgram_${hash}.projection, false, activeCamera.projectionMatrix);

@@ -18,7 +18,6 @@ module.exports = class Light extends Entity {
 
         // Specular
         this.attenuation = 1.0;
-        this.shininess = 10.0;
 
     }
 

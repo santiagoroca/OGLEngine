@@ -24,6 +24,12 @@ module.exports = class Scene {
             index |= 1 << 2;
         }
 
+        // Next 8 bits correspond to material shininess
+        // Shift a zero in the front to eliminate sign
+        const shininess = 255 - Math.min(parseInt(geometry.material.shininess), 255);
+        index |= ((shininess) << 3);
+        index = index >>> 0;
+
         if (!this.shaders[index]) {
             this.shaders[index] = new PhongShader(index);
         }
@@ -79,7 +85,7 @@ module.exports = class Scene {
 
         return Object.keys(this.shaders).map(shader => this.shaders[shader].generateInitializationBlock(
             directional_lights, ambient_lights, this.point_lights
-        ));
+        )).join('\n');
         
     }
 

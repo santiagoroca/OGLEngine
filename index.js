@@ -18,6 +18,7 @@ parser.yy = {
     Light: require('./src/entity/Light.js'),
     Transform: require('./src/entity/Transform.js'),
     Model: require('./src/entity/Model.js'),
+    Material: require('./src/entity/Material.js'),
     World: require('./src/entity/World.js'),
     Geometry: require('./src/entity/Geometry.js'),
 

@@ -1,18 +1,10 @@
 scene {
 
     add geometry { 
-        set source='./models/teapot.obj'
+        set source='./models/monkey.obj'
         set color=0xffbbbbff
         set generate_normals=true
         set remove_duplicated_vertexs=true
-
-        set transform {
-            set model {
-                on -> type=ogl.DRAG, btn=ogl.BUTTON0, hndl=(
-                    rotate -> x=(.delta_y * -3), y=(.delta_x * 3)
-                )
-            }
-        }
     }
 
     add camera {
@@ -23,6 +15,12 @@ scene {
         # This will ovewrite the model transform and add this new 
         # listener
         set transform {
+
+            set model {
+                on -> type=ogl.DRAG, btn=ogl.BUTTON0, hndl=(
+                    rotate -> x=(.delta_y * -3), y=(.delta_x * 3)
+                )
+            }
 
             set world {
                 on -> type=ogl.MOUSEWHEEL, hndl=(
@@ -47,8 +45,8 @@ scene {
 
     # Ambient Light
     add light {
-        set type=ogl.DIRECTIONAL
-        set direction=vec3(1.0, 1.0, 1.0)
+        set type=ogl.POINT
+        set position=vec3(0.0, 0.0, 10.0)
     }
    
 }

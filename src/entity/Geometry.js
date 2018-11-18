@@ -1,6 +1,7 @@
 const createWriteStream = require('fs').createWriteStream;
 const Entity = require('./Entity');
 const Transform = require('./Transform');
+const Material = require('./Material');
 const load = require('../parser/Loader.js');
 const read = require('fs').readFileSync;
 const write = require('fs').writeFileSync;
@@ -67,6 +68,7 @@ module.exports = class Geometry extends Entity {
        * used to build the AST.
        */
        this.transform = new Transform();
+       this.material = new Material();
        this.events = [];
 
     }

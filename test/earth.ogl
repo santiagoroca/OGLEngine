@@ -1,0 +1,91 @@
+scene {
+
+    define Star extends geometry {
+        set  remove_duplicated_vertexs=false
+        set  generate_normals=false
+
+        # Internal Variables
+        set source='./models/star.obj'
+
+        set material {
+            set shininess=250.0
+        }
+    }
+
+    add camera {
+        set fov=20.0
+        set near=0.1
+        set far=1000.0
+
+        # This will ovewrite the model transform and add this new 
+        # listener
+        set transform {
+
+            set model {
+                on -> type=ogl.DRAG, btn=ogl.BUTTON0, hndl=(
+                    rotate -> x=(.delta_y * -1), y=.delta_x
+                )
+
+                rotate -> y=-160deg
+            }
+
+            set world {
+                on -> type=ogl.MOUSEWHEEL, hndl=(
+                    translate -> z=.delta_z
+                )
+
+                on -> type=ogl.DRAG, btn=ogl.BUTTON2, hndl=(
+                    translate -> x=(.delta_x * 4), y=(.delta_y * 4)
+                )
+
+                translate -> z=-25.0
+                translate -> x=5.0
+                translate -> y=-1.5
+            }
+
+        }
+    }
+
+    # Directional Light
+    add light {
+        set type=ogl.POINT
+        set position=vec3(0.0, 0.0, 20.0)
+    }
+
+    add light {
+        set type=ogl.AMBIENT
+        set color=0x333333
+    }
+
+    # Mercury
+    add Star {
+        set texture='./models/earth.jpg'
+
+        set transform {
+            set model {
+                on -> type=ogl.INTERVAL, every=ogl.FRAME, hndl=(rotate -> y=0.05deg)
+            }
+        }
+    }
+  
+    # Mercury
+    add Star {
+        set texture='./models/sun.jpg'
+
+        set transform {
+            set model {
+                on -> type=ogl.INTERVAL, every=ogl.FRAME, hndl=(rotate -> y=0.01deg)
+            }
+
+            set world {
+                translate -> z=100.0
+                scale -> size=20.0
+            }
+        }
+
+        set material {
+            set shininess=255.0
+        }
+    }
+
+}
