@@ -1,5 +1,6 @@
 const Entity = require('./Entity');
 const math = require('../math.js');
+const TransformEvents = require('../events/TransformEvents');
 
 module.exports = class Model extends Entity {
 
@@ -10,14 +11,6 @@ module.exports = class Model extends Entity {
         this._y_angle = 0;
         this._z_angle = 0;
         this._scale = 1.0;
-    }
-
-    parseArg (arg) {
-        if (typeof arg == 'string') {
-            return this.getVariable(arg);
-        }
-
-        return arg;
     }
 
     translate (args) {
@@ -59,7 +52,9 @@ module.exports = class Model extends Entity {
 
     getEvents (object_id) {
         return this.events.map(event => ({
-            ...event, hndl: event.hndl(this.getVariable, object_id)
+            ...event, hndl: TransformEvents[event.hndl[0]](
+                arg => this.parseArg(arg), object_id, event.hndl[1]
+            )
         }));
     }
 

@@ -183,7 +183,7 @@ module.exports = {
 
         value: 
         [
-            [ " number ", " $$ = $1 " ],
+            [ " number ", " $$ = parseFloat($1); " ],
             [ " string ", " $$ = $1; " ],
             [ " BOOL ", " $$ = $1 == 'true'; " ],
             [ " SCOPE_VARIABLE ", " $$ = $1.replace(/\./, ''); "],
@@ -197,7 +197,7 @@ module.exports = {
         expression:
         [
             [ " OPAR expression CPAR ", " $$ = $2; " ],
-            [ " SCOPE_VARIABLE PRODUCT number ", " $$ = $1 + '*' + $3; " ],
+            [ " SCOPE_VARIABLE PRODUCT number ", " $$ = $1.replace(/\./, '') + '*' + $3; " ],
             [ " number PRODUCT number ", " $$ = $1 * $3; " ]
         ],
 

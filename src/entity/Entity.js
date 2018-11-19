@@ -36,6 +36,14 @@ module.exports = class Entity {
         this[property] = value;
     }
 
+    parseArg (arg) {
+        if (typeof arg === 'string') {
+            return this.getVariable(arg);
+        }
+
+        return arg;
+    }
+
     getVariable (varname) {
         try {
             if (this[varname]) {
@@ -44,7 +52,7 @@ module.exports = class Entity {
     
             return this.parent.getVariable(varname);
         } catch (exception) {
-            throw(new Error(`Variable ${varname} does not exists.`))
+            return `variables.${varname}`;
         }
         
     }
@@ -57,10 +65,12 @@ module.exports = class Entity {
 
     on (event) {
         if (this.events) {
-            this.events.push({
-                ...event, hndl: TransformEvents[event.hndl[0]](event.hndl[1]) 
-            });
+            this.events.push(event);
         }
+    }
+
+    getEvents () {
+        return this.events || [];
     }
 
 }

@@ -1,5 +1,6 @@
 const Entity = require('./Entity');
 const math = require('../math.js');
+const TransformEvents = require('../events/TransformEvents');
 
 module.exports = class World extends Entity {
 
@@ -59,7 +60,9 @@ module.exports = class World extends Entity {
 
     getEvents (object_id) {
         return this.events.map(event => ({
-            ...event, hndl: event.hndl(this.getVariable, object_id)
+            ...event, hndl: TransformEvents[event.hndl[0]](
+                arg => this.parseArg(arg), object_id, event.hndl[1]
+            )
         }));
     }
 
