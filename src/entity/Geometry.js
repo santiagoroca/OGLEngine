@@ -5,7 +5,7 @@ const Material = require('./Material');
 const load = require('../parser/Loader.js');
 const read = require('fs').readFileSync;
 const write = require('fs').writeFileSync;
-const hash = require('../helper').hash;
+const hash = require('../runtime/helper').hash;
 
 // Helper Procceses
 const GenerateNormals = require('../process/generate_normals')
@@ -13,6 +13,14 @@ const RemoveDuplicatedVertexs = require('../process/remove_duplicated_vertexs');
 
 
 module.exports = class Geometry extends Entity {
+
+    static getConfig () {
+        return ({
+            isUniqueInstance: true, 
+            plural: 'geometries',
+            singular: 'geometry'
+        });
+    }
 
     defaults () {
 
@@ -75,18 +83,6 @@ module.exports = class Geometry extends Entity {
 
     }
 
-    setTransform ([ statements ]) {
-        this.transform = new Transform(this, statements);
-    }
-
-    setMaterial ([ statements ]) {
-        this.material = new Material(this, statements);
-    }
-
-    getName () {
-        return `geometry_${this.name}`;
-    }
-
     includeUVs () {
         return this.uvs.length > 0 &&
             (
@@ -115,7 +111,7 @@ module.exports = class Geometry extends Entity {
 
     // Configure Texture as externla object 
     // and append to geometry
-    setTexture ([ texture ]) {
+    setTexture (texture) {
         const ext = texture.match(/[^\.]+$/g)[0];
         const name = hash();
         const path = `textures/${name}.${ext}`;
@@ -125,7 +121,7 @@ module.exports = class Geometry extends Entity {
 
     // Configure Texture as externla object 
     // and append to geometry
-    setSpecularmap ([ texture ]) {
+    setSpecularmap (texture) {
         const ext = texture.match(/[^\.]+$/g)[0];
         const name = hash();
         const path = `textures/${name}.${ext}`;

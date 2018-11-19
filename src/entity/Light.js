@@ -2,6 +2,14 @@ const Entity = require('./Entity');
 
 module.exports = class Light extends Entity {
 
+    static getConfig () {
+        return ({
+            isUniqueInstance: true, 
+            plural: 'lights',
+            singular: 'light'
+        });
+    }
+
     defaults () {
 
         // Defaults

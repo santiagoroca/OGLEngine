@@ -1,4 +1,4 @@
-const generate_unique_hash = require('../helper.js').hash;
+const generate_unique_hash = require('../runtime/helper.js').hash;
 
 module.exports = {
 

@@ -2,6 +2,14 @@ const Entity = require('./Entity');
 
 module.exports = class Matrix extends Entity {
 
+    static getConfig () {
+        return ({
+            isUniqueInstance: true, 
+            plural: 'meshes',
+            singular: 'mesh'
+        });
+    }
+
     defaults () {
         this.vertices = [];
         this.faces = [];

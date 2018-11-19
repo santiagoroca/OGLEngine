@@ -8,6 +8,7 @@
 * @return Scene
 */
 module.exports = (shaders) => {
+
     return `
 
         let lastRender = new Date().getTime();

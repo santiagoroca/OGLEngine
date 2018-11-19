@@ -1,9 +1,17 @@
 const Entity = require('./Entity');
 const Transform = require('./Transform.js');
 const Events = require('../events/Events.js');
-const hash = require('../helper.js').hash;
+const hash = require('../runtime/helper.js').hash;
 
 module.exports = class Camera extends Entity {
+
+    static getConfig () {
+        return ({
+            isUniqueInstance: true, 
+            plural: 'cameras',
+            singular: 'camera'
+        });
+    }
 
     defaults () {
         this.transform = new Transform(this);
@@ -12,11 +20,6 @@ module.exports = class Camera extends Entity {
         this.far = 10;
         this.near = 1;
     }
-
-    setTransform ([ statements ]) {
-        this.transform = new Transform(this, statements);
-    }
-
     getEvents () {
         const object_id = this.getName();
 
@@ -26,10 +29,6 @@ module.exports = class Camera extends Entity {
             })),
             ...this.transform.getEvents(`${object_id}.transform`)
         ];
-    }
-
-    getName () {
-        return `camera_${this.name}`;
     }
 
     isDynamic () {

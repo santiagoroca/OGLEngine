@@ -1,22 +1,21 @@
 const Entity = require('./Entity');
 const World = require('./World');
 const Model = require('./Model');
-const math = require('../math.js');
 
 module.exports = class Transform extends Entity {
+
+    static getConfig () {
+        return ({
+            isUniqueInstance: true, 
+            plural: 'scenes',
+            singular: 'transform'
+        });
+    }
 
     defaults () {
         this.events = [];
         this.model = new Model(this);
         this.world = new World(this);
-    }
-
-    setModel ([ statements ]) {
-        this.model = new Model(this, statements);
-    }
-
-    setWorld ([ statements ]) {
-        this.world = new World(this, statements);
     }
 
     transformVerticesIntoSpace (vertices, space) {

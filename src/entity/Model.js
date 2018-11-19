@@ -1,8 +1,16 @@
 const Entity = require('./Entity');
-const math = require('../math.js');
+const math = require('../runtime/math.js');
 const TransformEvents = require('../events/TransformEvents');
 
 module.exports = class Model extends Entity {
+
+    static getConfig () {
+        return ({
+            isUniqueInstance: true, 
+            plural: 'models',
+            singular: 'model'
+        });
+    }
 
     defaults () {
         this.events = [];

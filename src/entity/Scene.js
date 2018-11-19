@@ -3,7 +3,7 @@ const Camera = require('./Camera');
 const Geometry = require('./Geometry');
 const Light = require('./Light');
 const Shaders = require('../shader/Shaders.js');
-const Render = require('../render.js');
+const Render = require('./Render.js');
 const Events = require('../events/Events');
 
 /*
@@ -17,11 +17,18 @@ const Events = require('../events/Events');
 */
 module.exports = class Scene extends Entity {
 
+    static getConfig () {
+        return ({
+            isUniqueInstance: true, 
+            plural: 'scenes',
+            singular: 'scene'
+        });
+    }
+
     defaults () {
-        this.shaders = new Shaders();
-        this.events = new Events();
         this.cameras = [];
         this.geometries = [];
+        this.lights = [];
     }
 
     addCamera ([ statements ]) {
@@ -29,7 +36,7 @@ module.exports = class Scene extends Entity {
     }
 
     addLight ([ statements ]) {
-        this.shaders.appendLight(new Light(this, statements));
+        this.lights(new Light(this, statements));
     }
 
     addGeometry ([ statements ]) {
@@ -43,26 +50,26 @@ module.exports = class Scene extends Entity {
     toString () {
         let out = '';
 
+        const shaders = new Shaders(this.lights);
+        const events = new Events();
+        
+
         for (const geometry of this.geometries) {
             out += geometry.toString();
-            this.shaders.addGeometry(geometry);
-            this.events.addEvents(geometry.getEvents(), geometry.getName());
+            shaders.addGeometry(geometry);
+            events.addEvents(geometry.getEvents(), geometry.getName());
         }
 
         for (const camera of this.cameras) {
             out += camera.toString();
-            this.events.addEvents(camera.getEvents(), camera.getName());
+            events.addEvents(camera.getEvents(), camera.getName());
         }
         
-        out += this.shaders.toString();
-        out += Render(this.shaders.shaders);
-        out += this.events.toString();
+        out += shaders.toString();
+        out += Render(shaders.shaders);
+        out += events.toString();
         
         return out;
-    }
-
-    addEvents (events) {
-        Array.prototype.push.apply(this.events, events.events);
     }
 
 }

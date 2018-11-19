@@ -1,38 +1,91 @@
-const TransformEvents = require('../events/TransformEvents');
-const hash = require('../helper.js').hash;
+const { hash, capitalize } = require('../runtime/helper.js');
 
 module.exports = class Entity {
 
+    static getConfig () {
+        return ({
+            isUniqueInstance: true,
+            plural: 'entities',
+            singular: 'entity'
+        });
+    }
+
     constructor (parent, statements = []) {
+        statements = statements.filter(statement => statement != null);
+
         this.parent = parent;
         this.defaults();
-        this.applyStatements(statements);
+
+        for (let [ method, argument ] of statements) {
+            method = method.trim();
+
+            // If the method exists in the class, execute it and
+            // go to the next statement
+            if (this[method]) {
+                this[method](argument);
+                continue;
+            }
+
+            switch (method) {
+                case 'addClass': this.addClass(argument); break;
+                case 'setClass': this.setClass(argument); break;
+                case 'setVariable': this.set(argument); break;
+                default: break;
+            }
+        }
+
         this.name = hash();
     }
 
-    applyStatements (statements) {
-        statements = statements.filter(statement => statement != null);
+    getName () {
+        return `${this.constructor.getConfig().singular}_${this.name}`;
+    }
 
-        for (let [ method, argument ] of statements) {
-            try {
-                if (method.match(/set|add/g)) {
-                    const entity = argument[0].trim();
-                    const methodName = method + entity.charAt(0).toUpperCase() + entity.slice(1);
+    setClass ([ className, statements ]) {
+        const TargetClass = ClassResolver.get(className);
 
-                    if (this[methodName]) {
-                        this[methodName](argument.slice(1));
-                        continue;
-                    }
-                }
+        if (TargetClass) {
+            const customSetter = `set${capitalize(TargetClass.getConfig().singular)}`;
 
-                this[method.trim()](argument);
-            } catch (error) {
-                throw(error);
+            if (this[customSetter]) {
+                this[customSetter](this, statements);
+                return;
             }
+
+            this[TargetClass.getConfig().singular] = new TargetClass(this, statements);
+            return;
         }
+
+        throw(new Error('Class not found', `Class ${className} was not found.`));
+    }
+
+    addClass ([ className, statements ]) {
+        const TargetClass = ClassResolver.get(className);
+
+        if (TargetClass) {
+            const baseClassPluralName = TargetClass.getConfig().plural;
+
+            if (this[baseClassPluralName] && Array.isArray(this[baseClassPluralName])) {
+                this[baseClassPluralName].push(new TargetClass(this, statements));
+                return;
+            }
+
+            throw(new Error(`
+                Class ${this.constructor.getConfig().singular} does not support multiples ${baseClassPluralName}.
+            `));
+        }
+
+        throw(new Error(`Class ${className} was not found.`));
     }
 
     set ([ property, value ]) {
+        const customSetter = `set${capitalize(property)}`;
+
+        if (this[customSetter]) {
+            this[customSetter](value);
+            return;
+        }
+        
         this[property] = value;
     }
 

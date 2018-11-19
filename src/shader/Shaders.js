@@ -3,11 +3,15 @@ const Config = require('./Config')
 
 module.exports = class Scene {
 
-    constructor () {
+    constructor (lights) {
         this.directional_lights = [];
         this.ambient_lights = [];
         this.point_lights = [];
         this.shaders = {};
+
+        for (const light of lights) {
+            this.appendLight(light);
+        }
     }
 
     addGeometry (geometry) {

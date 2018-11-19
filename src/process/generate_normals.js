@@ -1,4 +1,4 @@
-const math = require('../math');
+const math = require('../runtime/math');
 
 module.exports = (vertexs, indexes) => {
     const normals = [];

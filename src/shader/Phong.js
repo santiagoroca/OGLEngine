@@ -1,4 +1,4 @@
-const generate_unique_hash = require('../helper.js').hash;
+const generate_unique_hash = require('../runtime/helper.js').hash;
 
 module.exports = class PhongShader {
 
@@ -14,25 +14,6 @@ module.exports = class PhongShader {
         // Does the fragment shader needs a varying with the
         // position of the current vertex?
         const fragment_varying_vertex_position = directional_l.length || point_l.length;
-
-        const fragment_color = `
-        
-            ${this.config.hasUniformColor() ? `
-                gl_FragColor = 
-                    geometryColor * vec4(light, light, light, 1.0) +
-                    specular +
-                    geometryColor * ambient_light;
-            `: ''}
-
-            ${this.config.hasTexture() ? `
-                vec4 color = texture2D(uSampler, vec2(vVertexUV.s, 1.0-vVertexUV.t));
-                gl_FragColor = 
-                    color * vec4(light, light, light, 1.0) +
-                    specular +
-                    color * ambient_light;
-            `: ''}
-
-        `;
 
         return `
 
@@ -133,7 +114,10 @@ module.exports = class PhongShader {
                         `specular *= texture2D(specularMapSampler, vec2(vVertexUV.s, 1.0-vVertexUV.t));` : ''
                     }
              
-                    ${fragment_color}
+                    gl_FragColor = (
+                        ${this.config.hasUniformColor() ? `geometryColor +` : '' }
+                        ${this.config.hasTexture() ? `texture2D(uSampler, vec2(vVertexUV.s, 1.0-vVertexUV.t))` : ''}
+                    ) * (vec4(light, light, light, 1.0) + ambient_light) + specular;
 
                 }
             \`;

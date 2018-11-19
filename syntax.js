@@ -79,11 +79,11 @@ module.exports = {
 
         statement:
         [
-            [ " ADD class ", " $$ = [ 'add', $2 ]; " ],
-            [ " SET class ", " $$ = [ 'set', $2 ]; " ],
-            [ " SET VARNAME value ", " $$ = [ 'set', [ $2.replace(/=/, '').trim(), $3 ] ]; " ],
+            [ " ADD class ", " $$ = [ 'addClass', $2 ]; " ],
+            [ " SET class ", " $$ = [ 'setClass', $2 ]; " ],
+            [ " SET VARNAME value ", " $$ = [ 'setVariable', [ $2.replace(/=/, '').trim(), $3 ] ]; " ],
             [ " DEFINE class_name EXTENDS class_name OBRACE statements CBRACE ", `
-                $$ = [ 'extends', [ $2, $4, $6 ] ];
+                $$ = [ 'extendClass', [ $2, $4, $6 ] ];
             `],
             [ " function ", " $$ = $1; " ],
         ],
@@ -97,7 +97,7 @@ module.exports = {
 
         class_name:
         [
-            [ " CLASS_NAME ", " $$ = $1; " ],
+            [ " CLASS_NAME ", " $$ = $1.trim(); " ],
         ],
 
         class:
@@ -141,7 +141,8 @@ module.exports = {
                 $$ = {
                     r: ($$ >> 16) & 255,
                     g: ($$ >> 8) & 255,
-                    b: ($$ >> 0) & 255
+                    b: ($$ >> 0) & 255, 
+                    a: 255
                 };
             `],
             [ " HEXA8 ", `
