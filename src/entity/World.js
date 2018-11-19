@@ -12,26 +12,38 @@ module.exports = class World extends Entity {
         this._scale = 1.0;
     }
 
+    parseArg (arg) {
+        if (typeof arg == 'string') {
+            return this.getVariable(arg);
+        }
+
+        return arg;
+    }
+
     translate (args) {
         args = { x: 0, y: 0, z: 0, space: 0, ...args,  }
 
         this._translate = math.vec3.add(
-            this._translate, [args.x, args.y, args.z]
+            this._translate, [
+                this.parseArg(args.x),
+                this.parseArg(args.y),
+                this.parseArg(args.z)
+            ]
         );
     }
 
     scale (args) {
         args = { size: 1, space: 0, ...args, }
 
-        this._scale *= args.size;
+        this._scale *= this.parseArg(args.size);
     }
 
     rotate (args) {
         args = { x: 0, y: 0, z: 0, space: 0, ...args, }
 
-        this._x_angle += args.x;
-        this._y_angle += args.y;
-        this._z_angle += args.z;
+        this._x_angle += this.parseArg(args.x);
+        this._y_angle += this.parseArg(args.y);
+        this._z_angle += this.parseArg(args.z);
     }
 
     getMatrix () {
@@ -47,7 +59,7 @@ module.exports = class World extends Entity {
 
     getEvents (object_id) {
         return this.events.map(event => ({
-            ...event, hndl: event.hndl(object_id)
+            ...event, hndl: event.hndl(this.getVariable, object_id)
         }));
     }
 

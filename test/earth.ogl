@@ -1,17 +1,5 @@
 scene {
 
-    define Star extends geometry {
-        set  remove_duplicated_vertexs=false
-        set  generate_normals=false
-
-        # Internal Variables
-        set source='./models/star.obj'
-
-        set material {
-            set shininess=250.0
-        }
-    }
-
     add camera {
         set fov=20.0
         set near=0.1
@@ -58,7 +46,9 @@ scene {
     }
 
     # Eerth
-    add Star {
+    add geometry {
+        set remove_duplicated_vertexs=false
+        set  generate_normals=false
         set source='./models/earth/mesh.obj'
         set texture='./models/earth/texture.jpg'
         set specularmap='./models/earth/specular.jpg'
@@ -75,8 +65,14 @@ scene {
     }
   
     # Sun
-    add Star {
+    add geometry {
+        set remove_duplicated_vertexs=false
+        set  generate_normals=false
+        set source='./models/star.obj'
         set texture='./models/sun.jpg'
+
+        # World Translation
+        set translate_z=100.0
 
         set transform {
             set model {
@@ -84,13 +80,13 @@ scene {
             }
 
             set world {
-                translate -> z=100.0
+                translate -> z=.translate_z
                 scale -> size=20.0
             }
         }
 
         set material {
-            set shininess=150.0
+            set shininess=255.0
         }
     }
 

@@ -1,6 +1,7 @@
 const Entity = require('./Entity');
 const Camera = require('./Camera');
-const Transform = require('./Transform.js');
+const Geometry = require('./Geometry');
+const Light = require('./Light');
 const Shaders = require('../shader/Shaders.js');
 const Render = require('../render.js');
 const Events = require('../events/Events');
@@ -17,23 +18,22 @@ const Events = require('../events/Events');
 module.exports = class Scene extends Entity {
 
     defaults () {
-        this.transform = new Transform();
         this.shaders = new Shaders();
         this.events = new Events();
         this.cameras = [];
         this.geometries = [];
     }
 
-    addCamera ([ camera ]) {
-        this.cameras.push(camera);
+    addCamera ([ statements ]) {
+        this.cameras.push(new Camera(this, statements));
     }
 
-    addLight ([ light ]) {
-        this.shaders.appendLight(light);
+    addLight ([ statements ]) {
+        this.shaders.appendLight(new Light(this, statements));
     }
 
-    addGeometry ([ geometry ]) {
-        this.geometries.push(geometry);
+    addGeometry ([ statements ]) {
+        this.geometries.push(new Geometry(this, statements));
     }
 
     getGeometries () {

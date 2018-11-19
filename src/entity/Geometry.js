@@ -69,10 +69,18 @@ module.exports = class Geometry extends Entity {
        * Helper internal classes and arrays,
        * used to build the AST.
        */
-       this.transform = new Transform();
-       this.material = new Material();
+       this.transform = new Transform(this);
+       this.material = new Material(this);
        this.events = [];
 
+    }
+
+    setTransform ([ statements ]) {
+        this.transform = new Transform(this, statements);
+    }
+
+    setMaterial ([ statements ]) {
+        this.material = new Material(this, statements);
     }
 
     getName () {

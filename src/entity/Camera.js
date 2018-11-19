@@ -6,11 +6,15 @@ const hash = require('../helper.js').hash;
 module.exports = class Camera extends Entity {
 
     defaults () {
-        this.transform = new Transform();
+        this.transform = new Transform(this);
         this.events = [];
         this.fov = 45;
         this.far = 10;
         this.near = 1;
+    }
+
+    setTransform ([ statements ]) {
+        this.transform = new Transform(this, statements);
     }
 
     getEvents () {

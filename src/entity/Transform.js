@@ -7,8 +7,16 @@ module.exports = class Transform extends Entity {
 
     defaults () {
         this.events = [];
-        this.model = new Model;
-        this.world = new World;
+        this.model = new Model(this);
+        this.world = new World(this);
+    }
+
+    setModel ([ statements ]) {
+        this.model = new Model(this, statements);
+    }
+
+    setWorld ([ statements ]) {
+        this.world = new World(this, statements);
     }
 
     transformVerticesIntoSpace (vertices, space) {

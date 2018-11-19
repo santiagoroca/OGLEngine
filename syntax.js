@@ -67,7 +67,7 @@ module.exports = {
         ],
 
         scene: [
-            [ " SCENE OBRACE statements CBRACE ",  ` $$ = new yy.Scene($3); `]
+            [ " SCENE OBRACE statements CBRACE ",  ` $$ = new yy.Scene({}, $3); `]
         ],
 
         statements: 
@@ -79,18 +79,12 @@ module.exports = {
 
         statement:
         [
-            [ " ADD class ", " $$ = [ 'add', [ $2[0], $2[1] ] ]; " ],
-            [ " SET class ", " $$ = [ 'set', [ $2[0], $2[1] ] ]; " ],
-            [ " SET VARNAME value ", " $$ = [ 'set', [ $2.replace(/=/g, '').trim(), $3 ] ]; " ],
+            [ " ADD class ", " $$ = [ 'add', $2 ]; " ],
+            [ " SET class ", " $$ = [ 'set', $2 ]; " ],
+            [ " SET VARNAME value ", " $$ = [ 'set', [ $2.replace(/=/, '').trim(), $3 ] ]; " ],
             [ " DEFINE class_name EXTENDS class_name OBRACE statements CBRACE ", `
-                yy[$2] = class extends yy[$4] {
-                    constructor (statements = []) {
-                        super([ ...$6, ...statements ]);
-                    }
-                }
-
-                $$ = null;
-            ` ],
+                $$ = [ 'extends', [ $2, $4, $6 ] ];
+            `],
             [ " function ", " $$ = $1; " ],
         ],
 
@@ -103,21 +97,12 @@ module.exports = {
 
         class_name:
         [
-            [ " CLASS_NAME ", " $$ = ($1.charAt(0).toUpperCase() + $1.slice(1)).trim(); " ],
+            [ " CLASS_NAME ", " $$ = $1; " ],
         ],
 
         class:
         [
-            [" class_name OBRACE statements CBRACE ", `
-                try {
-                    $$ = [
-                        yy[$1].name.toLowerCase(), new yy[$1]($3) 
-                    ];
-                } catch (error) {
-                    console.log(error);
-                    throw(new Error('Class ' + $1 + ' not found.'))
-                }
-            `],
+            [" class_name OBRACE statements CBRACE ", ` $$ = [ $1, $3 ]; `],
         ],
 
         vec3:
@@ -201,7 +186,7 @@ module.exports = {
             [ " number ", " $$ = $1 " ],
             [ " string ", " $$ = $1; " ],
             [ " BOOL ", " $$ = $1 == 'true'; " ],
-            [ " SCOPE_VARIABLE ", " $$ = $1; "],
+            [ " SCOPE_VARIABLE ", " $$ = $1.replace(/\./, ''); "],
             [ " vec3 ", " $$ = $1; "],
             [ " expression ", " $$ = $1; " ],
             [ " OPAR function CPAR ", " $$ = $2; " ],
