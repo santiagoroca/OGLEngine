@@ -1,21 +1,25 @@
 const Entity = require('./Entity');
 const World = require('./World');
 const Model = require('./Model');
+const EntityConverter = require('../runtime/EntityConverter')
 
-module.exports = class Transform extends Entity {
+class Transform extends Entity {
 
     static getConfig () {
         return ({
             isUniqueInstance: true, 
-            plural: 'scenes',
-            singular: 'transform'
+            plural: 'transforms',
+            singular: 'transform',
+            defaults: context => ({
+                events: [],
+                model: new Model(context),
+                world: new World(context),
+            })
         });
     }
 
     defaults () {
-        this.events = [];
-        this.model = new Model(this);
-        this.world = new World(this);
+        
     }
 
     transformVerticesIntoSpace (vertices, space) {
@@ -54,3 +58,5 @@ module.exports = class Transform extends Entity {
     }
 
 }
+
+module.exports = EntityConverter(Transform);

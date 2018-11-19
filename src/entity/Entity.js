@@ -6,32 +6,48 @@ module.exports = class Entity {
         return ({
             isUniqueInstance: true,
             plural: 'entities',
-            singular: 'entity'
+            singular: 'entity',
+            defaults: {}
         });
     }
 
     constructor (parent, statements = []) {
-        statements = statements.filter(statement => statement != null);
-
+        const config = this.constructor.getConfig();
         this.parent = parent;
-        this.defaults();
+
+        // Prepare Statements to be executed
+        statements = statements.filter(statement => statement != null);
+        const functions = statements.filter(a => isNaN(parseInt(a)));
+        statements = statements.filter(a => !isNaN(parseInt(a)));
+        statements = statements.sort((a, b) => parseInt(a) - parseInt(b));
+
+        // Initialize defaults
+        const defaults = typeof config.defaults == 'function' ? 
+                            config.defaults(this) : config.defaults;
+                            
+        for (const key in defaults) {
+            this[key] = defaults[key];
+        }
 
         for (let [ method, argument ] of statements) {
             method = method.trim();
 
-            // If the method exists in the class, execute it and
-            // go to the next statement
-            if (this[method]) {
-                this[method](argument);
-                continue;
+            switch (method) {
+                case '0setVariable': this.set(argument); break;
+                case '1extendClass': this.extendClass(argument); break;
+                case '2addClass': this.addClass(argument); break;
+                case '3setClass': this.setClass(argument); break;
+                default: console.log('Method not found');
+            }
+        }
+
+        for (const [ name, argument ] of functions) {
+            if (!this[name]) {
+                throw(new Error(`Method ${name} not defined for entity ${config.singular}`))
             }
 
-            switch (method) {
-                case 'addClass': this.addClass(argument); break;
-                case 'setClass': this.setClass(argument); break;
-                case 'setVariable': this.set(argument); break;
-                default: break;
-            }
+            this.parseArgs(argument);
+            this[name](argument);
         }
 
         this.name = hash();
@@ -78,41 +94,68 @@ module.exports = class Entity {
         throw(new Error(`Class ${className} was not found.`));
     }
 
-    set ([ property, value ]) {
+    set ([property, [ type, value ]]) {
         const customSetter = `set${capitalize(property)}`;
 
         if (this[customSetter]) {
             this[customSetter](value);
             return;
         }
+
+        switch (type) {
+            case 'const': this[property] = value; break;
+            case 'func': this[property] = value; break;
+            case 'var': {
+
+                if (this[property] && property == value) {
+                    throw(new Error(`Property ${property} assigned to itself.`))
+                }
+
+                Object.defineProperty(this, property, {
+                    configurable: true,
+                    get: () => this.getVariable(value)
+                });
+
+            }
+        }
         
-        this[property] = value;
     }
 
-    parseArg (arg) {
-        if (typeof arg === 'string') {
-            return this.getVariable(arg);
+    parseArgs (args) {
+        for (let key in args) {
+            const [ type, value ] = args[key];
+
+            switch (type) {
+                case 'const': args[key] = value; break;
+                case 'func': args[key] = [ value[0], this.parseArgs(value[1]) ]; break;
+                case 'var':  Object.defineProperty(args, key, {
+                    configurable: true,
+                    get: () => this.getVariable(value)
+                }); break;
+            }
         }
 
-        return arg;
+        return args;
+    }
+
+    parseArg ([ type, value ]) {
+        switch (type) {
+            case 'const': return value;
+            case 'func': return value;
+            case 'var': return this.getVariable(value)
+        }
     }
 
     getVariable (varname) {
         try {
-            if (this[varname]) {
+            if (typeof this[varname] !== 'undefined') {
                 return this[varname];
             }
     
             return this.parent.getVariable(varname);
         } catch (exception) {
-            return `variables.${varname}`;
-        }
-        
-    }
 
-    add ([ property, value]) {
-        if (this[property + 's'] && typeof this[property + 's'] == 'array') {
-            this[property + 's'].push(value);
+            return `variables.${varname}`;
         }
     }
 
@@ -120,6 +163,17 @@ module.exports = class Entity {
         if (this.events) {
             this.events.push(event);
         }
+    }
+
+    extendClass ([ newClass, oldClass, statements ]) {
+        const TargetClass = ClassResolver.get(oldClass);
+
+        if (TargetClass) {
+            ClassResolver.set(newClass, TargetClass, statements);
+            return;
+        }
+
+        throw(new Error(`${newClass} can't extend ${oldClass}. Class not found.`));       
     }
 
     getEvents () {

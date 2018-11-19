@@ -1,12 +1,21 @@
 const Entity = require('./Entity');
+const EntityConverter = require('../runtime/EntityConverter')
 
-module.exports = class Matrix extends Entity {
+class Mesh extends Entity {
 
     static getConfig () {
         return ({
             isUniqueInstance: true, 
             plural: 'meshes',
-            singular: 'mesh'
+            singular: 'mesh',
+            defaults: {
+                vertices: [],
+                faces: [],
+                normals: [],
+                uvs: [],
+                source: null,
+                texture: null,
+            }
         });
     }
 
@@ -70,3 +79,5 @@ module.exports = class Matrix extends Entity {
     }
 
 }
+
+module.exports = EntityConverter(Mesh);

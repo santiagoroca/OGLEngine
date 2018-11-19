@@ -31,7 +31,6 @@ module.exports = class Scene {
     }
 
     appendLight (light) {
-
         light = Object.assign({
             type: 'directional',
             direction: [0.5, 0.5, 0.5],
@@ -43,7 +42,6 @@ module.exports = class Scene {
             case 'ambient': this.ambient_lights.push(light); break;
             case 'point': this.point_lights.push(light); break;
         }
-
     }
 
     toString () {

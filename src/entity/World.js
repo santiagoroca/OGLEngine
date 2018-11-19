@@ -1,58 +1,49 @@
 const Entity = require('./Entity');
 const math = require('../runtime/math.js');
 const TransformEvents = require('../events/TransformEvents');
+const EntityConverter = require('../runtime/EntityConverter')
 
-module.exports = class World extends Entity {
+class World extends Entity {
 
     static getConfig () {
         return ({
             isUniqueInstance: true, 
             plural: 'worlds',
-            singular: 'world'
+            singular: 'world',
+            defaults: {
+                events: [],
+                _translate: [0, 0, 0],
+                _x_angle: 0,
+                _y_angle: 0,
+                _z_angle: 0,
+                _scale: 1.0,
+            }
         });
     }
 
-    defaults () {
-        this.events = [];
-        this._translate = [0, 0, 0];
-        this._x_angle = 0;
-        this._y_angle = 0;
-        this._z_angle = 0;
-        this._scale = 1.0;
-    }
-
-    parseArg (arg) {
-        if (typeof arg == 'string') {
-            return this.getVariable(arg);
-        }
-
-        return arg;
-    }
-
     translate (args) {
-        args = { x: 0, y: 0, z: 0, space: 0, ...args,  }
+        args = { x: 0, y: 0, z: 0, ...args,  }
 
         this._translate = math.vec3.add(
             this._translate, [
-                this.parseArg(args.x),
-                this.parseArg(args.y),
-                this.parseArg(args.z)
+                args.x,
+                args.y,
+                args.z
             ]
         );
     }
 
     scale (args) {
-        args = { size: 1, space: 0, ...args, }
-
-        this._scale *= this.parseArg(args.size);
+        args = { size: 1, ...args, }
+        this._scale *= args.size;
     }
 
     rotate (args) {
-        args = { x: 0, y: 0, z: 0, space: 0, ...args, }
+        args = { x: 0, y: 0, z: 0, ...args, }
 
-        this._x_angle += this.parseArg(args.x);
-        this._y_angle += this.parseArg(args.y);
-        this._z_angle += this.parseArg(args.z);
+        this._x_angle += args.x;
+        this._y_angle += args.y;
+        this._z_angle += args.z;
     }
 
     getMatrix () {
@@ -67,11 +58,13 @@ module.exports = class World extends Entity {
     }
 
     getEvents (object_id) {
-        return this.events.map(event => ({
-            ...event, hndl: TransformEvents[event.hndl[0]](
-                arg => this.parseArg(arg), object_id, event.hndl[1]
-            )
-        }));
+        return this.events.map(event => {
+            const [ type, args ] = event.hndl;
+            
+            return {
+                 ...event, hndl: TransformEvents[type](object_id, args)
+            }
+        });
     }
 
     get () {
@@ -89,3 +82,5 @@ module.exports = class World extends Entity {
     }
 
 }
+
+module.exports = EntityConverter(World);

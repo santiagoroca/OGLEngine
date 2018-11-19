@@ -1,17 +1,26 @@
-module.exports = class Events {
+const Entity = require('./Entity');
 
-    constructor () {
-        this.dynamics = [];
-        this.events = {
-            drag: [], keypress: [],
-            keydown: [], interval: [], 
-            mousewheel: [] 
-        };
+module.exports = class Events extends Entity {
+
+    static getConfig () {
+        return ({
+            isUniqueInstance: true, 
+            plural: 'geometries',
+            singular: 'geometry',
+            defaults: {
+                dynamics: [],
+                events: {
+                    drag: [], keypress: [],
+                    keydown: [], interval: [], 
+                    mousewheel: [] 
+                }
+            }
+        })
     }
 
     addEvents (events, object_id) {
         for (const event of events) {
-            this.events [event.type].push(event);
+            this.events[event.type].push(event);
         }
 
         this.dynamics.push(object_id);

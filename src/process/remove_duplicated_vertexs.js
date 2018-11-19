@@ -8,7 +8,7 @@
 * edges that should not be merged.
 *
 */
-module.exports = (vertexs, indexes, normals) => {
+module.exports = (vertexs, indexes) => {
     const new_indexes = [];
     const seen_vertex = {};
     

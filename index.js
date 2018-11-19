@@ -1,7 +1,7 @@
 const write = require('fs').writeFileSync;
 const read = require('fs').readFileSync;
 const WRAPPER_TEMPLATE = read('./template/wrapper.js').toString();
-const ClassResolver = require('./src/entity/ClassResolver');
+const ClassResolver = require('./src/runtime/ClassResolver');
 const Parser = require('jison').Parser;
 const syntax = require('./syntax.js');
 const parser = new Parser(syntax);

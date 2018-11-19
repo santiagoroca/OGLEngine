@@ -154,17 +154,17 @@ module.exports = class PhongShader {
             ${this.config.hasNormals() ? `
                 PhongShaderProgram_${hash}.vertexNormalAttribute = webgl.getAttribLocation(PhongShaderProgram_${hash}, "aVertexNormal");
                 webgl.enableVertexAttribArray(PhongShaderProgram_${hash}.vertexNormalAttribute);
-            `: ''};
+            `: ''}
             
             ${this.config.hasTexture() ? `
                 PhongShaderProgram_${hash}.vertexUVAttribute = webgl.getAttribLocation(PhongShaderProgram_${hash}, "aVertexUV");
                 webgl.enableVertexAttribArray(PhongShaderProgram_${hash}.vertexUVAttribute);
-            `: ''};
+            `: ''}
 
             ${this.config.hasSpecularMap() ? `
                 PhongShaderProgram_${hash}.specularMapSampler = webgl.getUniformLocation(PhongShaderProgram_${hash}, "specularMapSampler");
                 webgl.uniform1i(PhongShaderProgram_${hash}.specularMapSampler, 1);
-            `: ''};
+            `: ''}
 
             PhongShaderProgram_${hash}.world = webgl.getUniformLocation(PhongShaderProgram_${hash}, 'world');
             PhongShaderProgram_${hash}.model = webgl.getUniformLocation(PhongShaderProgram_${hash}, 'model');

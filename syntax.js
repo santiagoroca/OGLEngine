@@ -79,11 +79,11 @@ module.exports = {
 
         statement:
         [
-            [ " ADD class ", " $$ = [ 'addClass', $2 ]; " ],
-            [ " SET class ", " $$ = [ 'setClass', $2 ]; " ],
-            [ " SET VARNAME value ", " $$ = [ 'setVariable', [ $2.replace(/=/, '').trim(), $3 ] ]; " ],
+            [ " ADD class ", " $$ = [ '2addClass', $2 ]; " ],
+            [ " SET class ", " $$ = [ '3setClass', $2 ]; " ],
+            [ " SET VARNAME value ", " $$ = [ '0setVariable', [ $2.replace(/=/, '').trim(), $3 ] ]; " ],
             [ " DEFINE class_name EXTENDS class_name OBRACE statements CBRACE ", `
-                $$ = [ 'extendClass', [ $2, $4, $6 ] ];
+                $$ = [ '1extendClass', [ $2, $4, $6 ] ];
             `],
             [ " function ", " $$ = $1; " ],
         ],
@@ -184,15 +184,15 @@ module.exports = {
 
         value: 
         [
-            [ " number ", " $$ = parseFloat($1); " ],
-            [ " string ", " $$ = $1; " ],
-            [ " BOOL ", " $$ = $1 == 'true'; " ],
-            [ " SCOPE_VARIABLE ", " $$ = $1.replace(/\./, ''); "],
-            [ " vec3 ", " $$ = $1; "],
-            [ " expression ", " $$ = $1; " ],
-            [ " OPAR function CPAR ", " $$ = $2; " ],
-            [ " hexadecimal ", " $$ = $1; "],
-            [ " constant ", " $$ = $1; "]
+            [ " number ", " $$ = [ 'const', parseFloat($1) ]; " ],
+            [ " string ", " $$ = [ 'const', $1 ]; " ],
+            [ " BOOL ", " $$ = [ 'const', $1 == 'true' ]; " ],
+            [ " SCOPE_VARIABLE ", " $$ = [ 'var', $1.replace(/\./, '') ]; "],
+            [ " vec3 ", " $$ = [ 'const', $1 ]; "],
+            [ " expression ", " $$ = [ 'expr', $1 ]; " ],
+            [ " OPAR function CPAR ", " $$ = [ 'func', $2 ]; " ],
+            [ " hexadecimal ", " $$ = [ 'const', $1 ]; "],
+            [ " constant ", " $$ = [ 'const', $1 ]; "]
         ],
 
         expression:

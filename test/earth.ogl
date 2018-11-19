@@ -1,5 +1,29 @@
 scene {
 
+    define Star extends geometry {
+        set remove_duplicated_vertexs=false
+        set generate_normals=false
+        set material_shininess=20.0
+        set rotation=0.05deg
+        set size=20.0
+        set distance_from_center=100.0
+
+        set transform {
+            set model {
+                on -> type=ogl.INTERVAL, every=ogl.FRAME, hndl=(rotate -> y=.rotation)
+            }
+
+            set world {
+                translate -> z=.distance_from_center
+                scale -> size=.size
+            }
+        }
+
+        set material {
+            set shininess=.material_shininess
+        }
+    }
+
     add camera {
         set fov=20.0
         set near=0.1
@@ -11,7 +35,7 @@ scene {
 
             set model {
                 on -> type=ogl.DRAG, btn=ogl.BUTTON0, hndl=(
-                    rotate -> x=(.delta_y * -1), y=.delta_x
+                    rotate -> x=.delta_y, y=.delta_x
                 )
 
                 rotate -> y=-160deg
@@ -23,7 +47,7 @@ scene {
                 )
 
                 on -> type=ogl.DRAG, btn=ogl.BUTTON2, hndl=(
-                    translate -> x=(.delta_x * 4), y=(.delta_y * 4)
+                    translate -> x=.delta_x, y=.delta_y
                 )
 
                 translate -> z=-25.0
@@ -46,73 +70,24 @@ scene {
     }
 
     # Eerth
-    add geometry {
-        set remove_duplicated_vertexs=false
-        set  generate_normals=false
+    add Star {
         set source='./models/earth/mesh.obj'
         set texture='./models/earth/texture.jpg'
         set specularmap='./models/earth/specular.jpg'
-
-        set transform {
-            set model {
-                rotate -> x=24deg
-                on -> type=ogl.INTERVAL, every=ogl.FRAME, hndl=(rotate -> y=0.05deg)
-            }
-        }
-
-        set material {
-            set shininess=20.0
-        }
-    }
-
-    # Moon
-    add geometry {
-        set remove_duplicated_vertexs=false
-        set  generate_normals=false
-        set source='./models/earth/mesh.obj'
-        set texture='./models/moon.jpg'
-
-        set transform {
-            set model {
-                scale -> size=0.1
-                on -> type=ogl.INTERVAL, every=ogl.FRAME, hndl=(rotate -> y=-0.05deg)
-            }
-
-            set world {
-                translate -> z=3.0
-                on -> type=ogl.INTERVAL, every=ogl.FRAME, hndl=(rotate -> y=-0.1deg)
-            }
-        }
-
-        set material {
-            set shininess=100.0
-        }
+        set material_shininess=20.0
+        set rotation=0.05deg
+        set size=1.0
+        set distance_from_center=1.0
     }
   
     # Sun
-    add geometry {
-        set remove_duplicated_vertexs=false
-        set  generate_normals=false
+    add Star {
         set source='./models/star.obj'
         set texture='./models/sun.jpg'
-
-        # World Translation
-        set translate_z=100.0
-
-        set transform {
-            set model {
-                on -> type=ogl.INTERVAL, every=ogl.FRAME, hndl=(rotate -> y=0.01deg)
-            }
-
-            set world {
-                translate -> z=.translate_z
-                scale -> size=20.0
-            }
-        }
-
-        set material {
-            set shininess=255.0
-        }
+        set material_shininess=20.0
+        set rotation=0.05deg
+        set size=20.0
+        set distance_from_center=100.0
     }
 
 }

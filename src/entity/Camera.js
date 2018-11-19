@@ -1,25 +1,25 @@
 const Entity = require('./Entity');
 const Transform = require('./Transform.js');
-const Events = require('../events/Events.js');
 const hash = require('../runtime/helper.js').hash;
+const EntityConverter = require('../runtime/EntityConverter')
 
-module.exports = class Camera extends Entity {
+class Camera extends Entity {
 
     static getConfig () {
         return ({
             isUniqueInstance: true, 
             plural: 'cameras',
-            singular: 'camera'
+            singular: 'camera',
+            defaults: context => ({
+                transform: new Transform(context),
+                events: [],
+                fov: 45,
+                far: 10,
+                near: 1,
+            })
         });
     }
 
-    defaults () {
-        this.transform = new Transform(this);
-        this.events = [];
-        this.fov = 45;
-        this.far = 10;
-        this.near = 1;
-    }
     getEvents () {
         const object_id = this.getName();
 
@@ -63,3 +63,5 @@ module.exports = class Camera extends Entity {
     }
 
 }
+
+module.exports = EntityConverter(Camera);

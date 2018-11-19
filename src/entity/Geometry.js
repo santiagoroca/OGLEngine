@@ -6,81 +6,81 @@ const load = require('../parser/Loader.js');
 const read = require('fs').readFileSync;
 const write = require('fs').writeFileSync;
 const hash = require('../runtime/helper').hash;
+const EntityConverter = require('../runtime/EntityConverter')
 
 // Helper Procceses
 const GenerateNormals = require('../process/generate_normals')
 const RemoveDuplicatedVertexs = require('../process/remove_duplicated_vertexs');
 
 
-module.exports = class Geometry extends Entity {
+class Geometry extends Entity {
 
     static getConfig () {
         return ({
             isUniqueInstance: true, 
             plural: 'geometries',
-            singular: 'geometry'
+            singular: 'geometry',
+            defaults: context => ({
+
+                /*
+                * Fixed arguments that should always 
+                * be present. If not, the geometry should
+                * fail, or not be added to the scene
+                */
+               vertexs: [],
+               indexes: [],
+        
+               /*
+               * Optional arguments. If not present, 
+               * the shader will react and create a program
+               * that adjusts itself to these.
+               */
+               normals: [],
+               uvs: [],
+               color: undefined,
+               texture: undefined,
+               specularmap: undefined,
+               
+               /*
+               * Remove Duplicated Vertexs
+               *
+               * If set to true, the duplicated vertex
+               * of the geometry will be removed before the normals
+               * regeneration, so that you obtain a more smooth render
+               * 
+               */
+               remove_duplicated_vertexs: true,
+        
+               /*
+               * Generate Normals
+               * 
+               * If set to true, the normals
+               * will be generated, regardless of the 
+               * previous data on the normals array.
+               *
+               */
+               generate_normals: true,
+               
+               /*
+               * Inline Data
+               *
+               * If set to true, the buffer data of the mesh
+               * will be written in the destiny file, instead of
+               * external files.
+               *
+               */
+               inline_data: false,
+        
+               /*
+               * Helper internal classes and arrays,
+               * used to build the AST.
+               */
+               transform: new Transform(context),
+               material: new Material(context),
+               events: [],
+        
+            })
         });
-    }
-
-    defaults () {
-
-        /*
-        * Fixed arguments that should always 
-        * be present. If not, the geometry should
-        * fail, or not be added to the scene
-        */
-       this.vertexs = [];
-       this.indexes = [];
-
-       /*
-       * Optional arguments. If not present, 
-       * the shader will react and create a program
-       * that adjusts itself to these.
-       */
-       this.normals = [];
-       this.uvs = [];
-       this.color = undefined;
-       this.texture = undefined;
-       this.specularmap = undefined;
-       
-       /*
-       * Remove Duplicated Vertexs
-       *
-       * If set to true, the duplicated vertex
-       * of the geometry will be removed before the normals
-       * regeneration, so that you obtain a more smooth render
-       * 
-       */
-       this.remove_duplicated_vertexs = true;
-
-       /*
-       * Generate Normals
-       * 
-       * If set to true, the normals
-       * will be generated, regardless of the 
-       * previous data on the normals array.
-       *
-       */
-       this.generate_normals = true;
-       
-       /*
-       * Inline Data
-       *
-       * If set to true, the buffer data of the mesh
-       * will be written in the destiny file, instead of
-       * external files.
-       *
-       */
-       this.inline_data = false;
-
-       /*
-       * Helper internal classes and arrays,
-       * used to build the AST.
-       */
-       this.transform = new Transform(this);
-       this.material = new Material(this);
-       this.events = [];
-
     }
 
     includeUVs () {
@@ -339,3 +339,5 @@ module.exports = class Geometry extends Entity {
     }
 
 }
+
+module.exports = EntityConverter(Geometry);

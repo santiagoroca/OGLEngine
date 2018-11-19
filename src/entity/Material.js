@@ -1,21 +1,19 @@
 const Entity = require('./Entity');
+const EntityConverter = require('../runtime/EntityConverter')
 
-module.exports = class Material extends Entity {
+class Material extends Entity {
 
     static getConfig () {
         return ({
             isUniqueInstance: true, 
             plural: 'materials',
-            singular: 'material'
+            singular: 'material',
+            defaults: {
+                shininess: 1.0
+            }
         });
     }
 
-    defaults () {
-        this.shininess = 1.0;
-    }
-
-    toString () {
-        return ``;
-    }
-
 }
+
+module.exports = EntityConverter(Material);

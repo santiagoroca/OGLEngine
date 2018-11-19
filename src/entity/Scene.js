@@ -4,7 +4,8 @@ const Geometry = require('./Geometry');
 const Light = require('./Light');
 const Shaders = require('../shader/Shaders.js');
 const Render = require('./Render.js');
-const Events = require('../events/Events');
+const Events = require('./Events');
+const EntityConverter = require('../runtime/EntityConverter')
 
 /*
 * @title Scene
@@ -15,20 +16,19 @@ const Events = require('../events/Events');
 *
 * @return Scene
 */
-module.exports = class Scene extends Entity {
+class Scene extends Entity {
 
     static getConfig () {
         return ({
             isUniqueInstance: true, 
             plural: 'scenes',
-            singular: 'scene'
+            singular: 'scene',
+            defaults: {
+                cameras: [],
+                geometries: [],
+                lights: [],
+            }
         });
-    }
-
-    defaults () {
-        this.cameras = [];
-        this.geometries = [];
-        this.lights = [];
     }
 
     addCamera ([ statements ]) {
@@ -52,7 +52,6 @@ module.exports = class Scene extends Entity {
 
         const shaders = new Shaders(this.lights);
         const events = new Events();
-        
 
         for (const geometry of this.geometries) {
             out += geometry.toString();
@@ -73,3 +72,5 @@ module.exports = class Scene extends Entity {
     }
 
 }
+
+module.exports = EntityConverter(Scene);
