@@ -1,5 +1,5 @@
 scene {
-
+    
     define Star extends geometry {
         set remove_duplicated_vertexs=false
         set generate_normals=false
