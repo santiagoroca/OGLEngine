@@ -27,6 +27,7 @@ class Scene extends Entity {
                 cameras: [],
                 geometries: [],
                 lights: [],
+                cubemap: null,
             }
         });
     }
@@ -52,6 +53,10 @@ class Scene extends Entity {
 
         const shaders = new Shaders(this.lights);
         const events = new Events();
+
+        if (this.cubemap) {
+            out += this.cubemap.toString();
+        }   
 
         for (const geometry of this.geometries) {
             out += geometry.toString();

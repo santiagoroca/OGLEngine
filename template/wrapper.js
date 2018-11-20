@@ -17,6 +17,7 @@ function viewer (container) {
     const webgl = canvas.getContext("webgl");
     webgl.viewport(0, 0, container.clientWidth, container.clientHeight);
     webgl.clearColor(0.0, 0.0, 0.0, 0.0);
+    webgl.getExtension('OES_element_index_uint');
     webgl.getExtension('OES_standard_derivatives');
     webgl.enable(webgl.DEPTH_TEST);
 

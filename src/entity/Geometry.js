@@ -48,7 +48,7 @@ class Geometry extends Entity {
                * regeneration, so that you obtain a more smooth render
                * 
                */
-               remove_duplicated_vertexs: true,
+               remove_duplicated_vertexs: false,
         
                /*
                * Generate Normals
@@ -58,7 +58,7 @@ class Geometry extends Entity {
                * previous data on the normals array.
                *
                */
-               generate_normals: true,
+               generate_normals: false,
                
                /*
                * Inline Data
@@ -195,7 +195,7 @@ class Geometry extends Entity {
     saveToFile () {
 
         createWriteStream(`./dist/models/${this.getName()}.faces`)
-            .write(Buffer.from(new Uint16Array(this.indexes).buffer));
+            .write(Buffer.from(new Uint32Array(this.indexes).buffer));
 
         createWriteStream(`./dist/models/${this.getName()}.vertexs`)
             .write(Buffer.from(new Float32Array(this.getTransformedVertexs()).buffer));

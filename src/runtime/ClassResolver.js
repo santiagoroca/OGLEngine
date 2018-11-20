@@ -9,6 +9,7 @@ const classes = {
     material: require('../entity/Material'),
     mesh: require('../entity/Mesh'),
     transform: require('../entity/Transform'),
+    cubemap: require('../entity/Cubemap'),
 }
 
 module.exports = {

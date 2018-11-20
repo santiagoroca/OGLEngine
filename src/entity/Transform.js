@@ -54,6 +54,7 @@ class Transform extends Entity {
         return JSON.stringify({
             model: this.model.get(),
             world: this.world.get(),
+            matrix: []
         });
     }
 

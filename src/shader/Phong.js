@@ -56,6 +56,7 @@ module.exports = class PhongShader {
                 uniform mat4 cameraModel;
                 uniform mat4 cameraWorld;
 
+                uniform samplerCube cubemap;
                 ${this.config.hasUniformColor() ? 'uniform vec4 geometryColor;': ''}
                 ${this.config.hasTexture() ? 'uniform sampler2D uSampler;': ''}
                 ${this.config.hasSpecularMap() ? 'uniform sampler2D specularMapSampler;': ''}
@@ -115,8 +116,13 @@ module.exports = class PhongShader {
                     }
              
                     gl_FragColor = (
-                        ${this.config.hasUniformColor() ? `geometryColor +` : '' }
-                        ${this.config.hasTexture() ? `texture2D(uSampler, vec2(vVertexUV.s, 1.0-vVertexUV.t))` : ''}
+                        ${
+                            [
+                                'textureCube(cubemap, normal)',
+                                this.config.hasUniformColor() ? `geometryColor` : '',
+                                this.config.hasTexture() ? `texture2D(uSampler, vec2(vVertexUV.s, 1.0-vVertexUV.t))` : ''
+                            ].filter(stm => stm != '').join('+')
+                        }
                     ) * (vec4(light, light, light, 1.0) + ambient_light) + specular;
 
                 }
@@ -171,6 +177,9 @@ module.exports = class PhongShader {
             PhongShaderProgram_${hash}.cameraWorld = webgl.getUniformLocation(PhongShaderProgram_${hash}, 'cameraWorld');
             PhongShaderProgram_${hash}.cameraModel = webgl.getUniformLocation(PhongShaderProgram_${hash}, 'cameraModel');
             PhongShaderProgram_${hash}.projection = webgl.getUniformLocation(PhongShaderProgram_${hash}, 'projection');
+
+            PhongShaderProgram_${hash}.cubemap = webgl.getUniformLocation(PhongShaderProgram_${hash}, 'cubemap');
+            webgl.uniform1i(PhongShaderProgram_${hash}.cubemap, 9);
             
             ${this.config.hasUniformColor() ?`
                 PhongShaderProgram_${hash}.geometryColor = webgl.getUniformLocation(PhongShaderProgram_${hash}, 'geometryColor');
@@ -219,7 +228,7 @@ module.exports = class PhongShader {
                     `: ''}
 
                     webgl.bindBuffer(webgl.ELEMENT_ARRAY_BUFFER, ${geometry}.indexes);
-                    webgl.drawElements(webgl.TRIANGLES, ${geometry}.count, webgl.UNSIGNED_SHORT, 0);
+                    webgl.drawElements(webgl.TRIANGLES, ${geometry}.count, webgl.UNSIGNED_INT, 0);
 
                 `).join('\n')
 
