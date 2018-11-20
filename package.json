@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "node build.js"
+    "build": "node build.js",
+    "compile": "npm run-script build && node ./ogl.js ./test/earth.ogl"
   },
   "bin": {
     "ogl": "./index.js"

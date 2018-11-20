@@ -16,7 +16,9 @@ module.exports = {
             ["define", "return 'DEFINE';"],
             ["pass", "return 'PASS';"],
             ["scene", "return 'SCENE';"],
+            ["export", "return 'EXPORT';"],
             ["extends", "return 'EXTENDS';"],
+            ["import", "return 'IMPORT';"],
             ["ogl\.[a-zA-Z0-9]+", "return 'CONSTANT';"],
             ["[a-zA-Z_]+=", "return 'VARNAME';"],
             ["[a-zA-Z]+ ?(?=->)", "return 'FUNC_NAME';"],
@@ -44,12 +46,8 @@ module.exports = {
             [",", "return 'COLON';"],
             ["->", "return 'ARROW';"],
             ["[\\*\\+\\-\\^\\%\\/]", "return 'OPERATOR';"],
-            ["\\.[a-zA-Z0-9_]*", "return 'SCOPE_VARIABLE';"],
+            ["\\.[a-zA-Z0-9_]+", "return 'SCOPE_VARIABLE';"],
             ["'", "return 'QUOTE';"],
-            [
-                "[#|\\.]-?[_a-zA-Z]+[_a-zA-Z0-9-]*",
-                "return 'SELECTOR';"
-            ],
 
             /* Delimiters */
             ["$", "return 'EOF';"],
@@ -63,7 +61,13 @@ module.exports = {
         run:
         [
             [ " scene EOF ", " return $1; " ],
+            [ " export EOF ", " return $1; " ],
             [ " EOF ", SKIP ],
+        ],
+
+        export: 
+        [
+            [ " EXPORT OBRACE statements CBRACE ",  ` $$ = $3; `]
         ],
 
         scene: [
@@ -79,6 +83,7 @@ module.exports = {
 
         statement:
         [
+            [ " IMPORT string ", " $$ = yy.GetAST($2)[0]; " ],
             [ " ADD class ", " $$ = [ '2addClass', $2 ]; " ],
             [ " SET class ", " $$ = [ '3setClass', $2 ]; " ],
             [ " SET VARNAME value ", " $$ = [ '0setVariable', [ $2.replace(/=/, '').trim(), $3 ] ]; " ],

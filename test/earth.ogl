@@ -1,5 +1,7 @@
 scene {
-    
+
+    import './test/orbit_camera.ogl'
+
     define Star extends geometry {
         set remove_duplicated_vertexs=false
         set generate_normals=false
@@ -23,40 +25,6 @@ scene {
 
         set material {
             set shininess=.material_shininess
-        }
-    }
-
-    add camera {
-        set fov=20.0
-        set near=0.1
-        set far=1000.0
-
-        # This will ovewrite the model transform and add this new 
-        # listener
-        set transform {
-
-            set model {
-                on -> type=ogl.DRAG, btn=ogl.BUTTON0, hndl=(
-                    rotate -> x=(.delta_y * -1), y=.delta_x
-                )
-
-                rotate -> y=-160deg
-            }
-
-            set world {
-                on -> type=ogl.MOUSEWHEEL, hndl=(
-                    translate -> z=.delta_z
-                )
-
-                on -> type=ogl.DRAG, btn=ogl.BUTTON2, hndl=(
-                    translate -> x=.delta_x, y=.delta_y
-                )
-
-                translate -> z=-25.0
-                translate -> x=5.0
-                translate -> y=-1.5
-            }
-
         }
     }
 
