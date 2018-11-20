@@ -3,6 +3,8 @@ scene {
     define Star extends geometry {
         set remove_duplicated_vertexs=false
         set generate_normals=false
+        set source='./models/earth/mesh.obj'
+        set texture='./models/earth/texture.jpg'
         set material_shininess=20.0
         set rotation=0.05deg
         set size=20.0
@@ -35,7 +37,7 @@ scene {
 
             set model {
                 on -> type=ogl.DRAG, btn=ogl.BUTTON0, hndl=(
-                    rotate -> x=.delta_y, y=.delta_x
+                    rotate -> x=(.delta_y * -1), y=.delta_x
                 )
 
                 rotate -> y=-160deg
@@ -71,23 +73,20 @@ scene {
 
     # Eerth
     add Star {
-        set source='./models/earth/mesh.obj'
-        set texture='./models/earth/texture.jpg'
         set specularmap='./models/earth/specular.jpg'
         set material_shininess=20.0
         set rotation=0.05deg
         set size=1.0
-        set distance_from_center=1.0
+        set distance_from_center=0.0
     }
   
     # Sun
     add Star {
         set source='./models/star.obj'
         set texture='./models/sun.jpg'
-        set material_shininess=20.0
+        set material_shininess=100.0
         set rotation=0.05deg
         set size=20.0
-        set distance_from_center=100.0
     }
 
 }

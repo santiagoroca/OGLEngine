@@ -42,9 +42,9 @@ module.exports = {
             ["#.*", "/* IGNORE */"],
             ["[/][*][^*]*[*]+([^/*][^*]*[*]+)*[/]", "/* IGNORE */"],
             [",", "return 'COLON';"],
-            ["\\*", "return 'PRODUCT';"],
             ["->", "return 'ARROW';"],
-            ["\\.[a-zA-Z0-9_/]*", "return 'SCOPE_VARIABLE';"],
+            ["[\\*\\+\\-\\^\\%\\/]", "return 'OPERATOR';"],
+            ["\\.[a-zA-Z0-9_]*", "return 'SCOPE_VARIABLE';"],
             ["'", "return 'QUOTE';"],
             [
                 "[#|\\.]-?[_a-zA-Z]+[_a-zA-Z0-9-]*",
@@ -185,21 +185,19 @@ module.exports = {
         value: 
         [
             [ " number ", " $$ = [ 'const', parseFloat($1) ]; " ],
+            [ " SCOPE_VARIABLE ", " $$ = [ 'var', $1.replace(/\./, '') ]; "],
+            [ " hexadecimal ", " $$ = [ 'const', $1 ]; "],
+            [ " constant ", " $$ = [ 'const', $1 ]; "],
             [ " string ", " $$ = [ 'const', $1 ]; " ],
             [ " BOOL ", " $$ = [ 'const', $1 == 'true' ]; " ],
-            [ " SCOPE_VARIABLE ", " $$ = [ 'var', $1.replace(/\./, '') ]; "],
             [ " vec3 ", " $$ = [ 'const', $1 ]; "],
             [ " expression ", " $$ = [ 'expr', $1 ]; " ],
             [ " OPAR function CPAR ", " $$ = [ 'func', $2 ]; " ],
-            [ " hexadecimal ", " $$ = [ 'const', $1 ]; "],
-            [ " constant ", " $$ = [ 'const', $1 ]; "]
         ],
 
         expression:
         [
-            [ " OPAR expression CPAR ", " $$ = $2; " ],
-            [ " SCOPE_VARIABLE PRODUCT number ", " $$ = $1.replace(/\./, '') + '*' + $3; " ],
-            [ " number PRODUCT number ", " $$ = $1 * $3; " ]
+            [ " OPAR value OPERATOR value CPAR ", " $$ = [ $3, [ $2, $4 ] ]; " ],
         ],
 
         constant:

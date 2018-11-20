@@ -105,6 +105,7 @@ module.exports = class Entity {
         switch (type) {
             case 'const': this[property] = value; break;
             case 'func': this[property] = value; break;
+            case 'expr': this[property] = this.parseOperation(value); break;
             case 'var': {
 
                 if (this[property] && property == value) {
@@ -121,6 +122,27 @@ module.exports = class Entity {
         
     }
 
+    parseOperation ([ operator, [ terma, termb ]]) {
+        terma = this.parseArg(terma);
+        termb = this.parseArg(termb);
+
+        // If one the variables is actually from the runtime, 
+        // skip operation and return string.
+        if (typeof terma === 'string' || typeof termb === 'string') {
+            return `${terma} ${operator} ${termb}`;
+        }
+
+        switch (operator) {
+            case '*' : return terma * termb;
+            case '+' : return terma + termb;
+            case '/' : return terma / termb;
+            case '%' : return terma % termb;
+            case '-' : return terma - termb;
+            case '^' : return Math.pow(terma, termb);
+            default: return terma;
+        }
+    }
+
     parseArgs (args) {
         for (let key in args) {
             const [ type, value ] = args[key];
@@ -128,6 +150,7 @@ module.exports = class Entity {
             switch (type) {
                 case 'const': args[key] = value; break;
                 case 'func': args[key] = [ value[0], this.parseArgs(value[1]) ]; break;
+                case 'expr': args[key] = this.parseOperation(value); break;
                 case 'var':  Object.defineProperty(args, key, {
                     configurable: true,
                     get: () => this.getVariable(value)
