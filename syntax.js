@@ -19,6 +19,7 @@ module.exports = {
             ["export", "return 'EXPORT';"],
             ["extends", "return 'EXTENDS';"],
             ["import", "return 'IMPORT';"],
+            ["as", "return 'AS';"],
             ["ogl\.[a-zA-Z0-9]+", "return 'CONSTANT';"],
             ["[a-zA-Z_]+=", "return 'VARNAME';"],
             ["[a-zA-Z]+ ?(?=->)", "return 'FUNC_NAME';"],
@@ -76,14 +77,28 @@ module.exports = {
 
         statements: 
         [
-            [ " statements statement ", " $$.push($2); " ],
-            [ " statement ", " $$ = [$1]; " ],
+            [ " statements statement ", `
+                if ($2[0] == 'import') {
+                    Array.prototype.push.apply($$, $2[1]);    
+                } else {
+                    $$.push($2);
+                }
+            `],
+            [ " statement ", `
+                $$ = [];
+                
+                if ($1[0] == 'import') {
+                    Array.prototype.push.apply($$, $1[1]);
+                } else {
+                    $$.push($1);
+                }
+            `],
             [ " PASS ", " $$ = []; " ],
         ],
 
         statement:
         [
-            [ " IMPORT string ", " $$ = yy.GetAST($2)[0]; " ],
+            [ " IMPORT string ", " $$ = [ 'import', yy.GetAST($2) ]; " ],
             [ " ADD class ", " $$ = [ '2addClass', $2 ]; " ],
             [ " SET class ", " $$ = [ '3setClass', $2 ]; " ],
             [ " SET VARNAME value ", " $$ = [ '0setVariable', [ $2.replace(/=/, '').trim(), $3 ] ]; " ],

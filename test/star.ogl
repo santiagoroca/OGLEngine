@@ -1,0 +1,29 @@
+export {
+
+    define Star extends geometry {
+        set remove_duplicated_vertexs=false
+        set generate_normals=false
+        set source='./models/earth/mesh.obj'
+        set texture='./models/earth/texture.jpg'
+        set material_shininess=20.0
+        set rotation=0.05deg
+        set size=20.0
+        set distance_from_center=100.0
+
+        set transform {
+            set model {
+                on -> type=ogl.INTERVAL, every=ogl.FRAME, hndl=(rotate -> y=.rotation)
+            }
+
+            set world {
+                translate -> z=.distance_from_center
+                scale -> size=.size
+            }
+        }
+
+        set material {
+            set shininess=.material_shininess
+        }
+    }
+
+}

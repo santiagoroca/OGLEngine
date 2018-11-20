@@ -12,7 +12,6 @@ const EntityConverter = require('../runtime/EntityConverter')
 const GenerateNormals = require('../process/generate_normals')
 const RemoveDuplicatedVertexs = require('../process/remove_duplicated_vertexs');
 
-
 class Geometry extends Entity {
 
     static getConfig () {
@@ -196,17 +195,17 @@ class Geometry extends Entity {
     saveToFile () {
 
         createWriteStream(`./dist/models/${this.getName()}.faces`)
-            .write(new Buffer(new Uint16Array(this.indexes).buffer));
+            .write(Buffer.from(new Uint16Array(this.indexes).buffer));
 
         createWriteStream(`./dist/models/${this.getName()}.vertexs`)
-            .write(new Buffer(new Float32Array(this.getTransformedVertexs()).buffer));
+            .write(Buffer.from(new Float32Array(this.getTransformedVertexs()).buffer));
 
         createWriteStream(`./dist/models/${this.getName()}.normals`)
-            .write(new Buffer(new Float32Array(this.getNormals()).buffer));
+            .write(Buffer.from(new Float32Array(this.getNormals()).buffer));
 
         if (this.hasTexture()) {
             createWriteStream(`./dist/models/${this.getName()}.uvs`)
-                .write(new Buffer(new Float32Array(this.uvs).buffer));
+                .write(Buffer.from(new Float32Array(this.uvs).buffer));
         }
 
     }

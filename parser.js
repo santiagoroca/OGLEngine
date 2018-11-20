@@ -96,16 +96,30 @@ case 5:
  this.$ = new yy.Scene({}, $$[$0-1]); 
 break;
 case 6:
- this.$.push($$[$0]); 
+
+                if ($$[$0][0] == 'import') {
+                    Array.prototype.push.apply(this.$, $$[$0][1]);    
+                } else {
+                    this.$.push($$[$0]);
+                }
+            
 break;
-case 7: case 25: case 31:
- this.$ = [$$[$0]]; 
+case 7:
+
+                this.$ = [];
+                
+                if ($$[$0][0] == 'import') {
+                    Array.prototype.push.apply(this.$, $$[$0][1]);
+                } else {
+                    this.$.push($$[$0]);
+                }
+            
 break;
 case 8:
  this.$ = []; 
 break;
 case 9:
- this.$ = yy.GetAST($$[$0])[0]; 
+ this.$ = [ 'import', yy.GetAST($$[$0]) ]; 
 break;
 case 10:
  this.$ = [ '2addClass', $$[$0] ]; 
@@ -155,6 +169,9 @@ case 21:
 break;
 case 24:
  this.$.push( parseFloat($$[$0]) ); 
+break;
+case 25: case 31:
+ this.$ = [$$[$0]]; 
 break;
 case 26:
 
@@ -719,62 +736,64 @@ case 7:return 23;
 break;
 case 8:return 14;
 break;
-case 9:return 54;
+case 9:return 'AS';
 break;
-case 10:return 19;
+case 10:return 54;
 break;
-case 11:return 25;
+case 11:return 19;
 break;
-case 12:return 28;
+case 12:return 25;
 break;
-case 13:return 47;
+case 13:return 28;
 break;
-case 14:return 46;
+case 14:return 47;
 break;
-case 15:return 32;
+case 15:return 46;
 break;
-case 16:return 35;
+case 16:return 32;
 break;
-case 17:return 51;
+case 17:return 35;
 break;
-case 18:return 30;
+case 18:return 51;
 break;
-case 19:return 37;
+case 19:return 30;
 break;
-case 20:return 38;
+case 20:return 37;
 break;
-case 21:return 8;
+case 21:return 38;
 break;
-case 22:return 10;
+case 22:return 8;
 break;
-case 23:return 31;
+case 23:return 10;
 break;
-case 24:return 34;
+case 24:return 31;
 break;
-case 25:return 40;
+case 25:return 34;
 break;
-case 26:return 42;
+case 26:return 40;
 break;
-case 27:/* IGNORE */
+case 27:return 42;
 break;
 case 28:/* IGNORE */
 break;
-case 29:return 33;
+case 29:/* IGNORE */
 break;
-case 30:return 26;
+case 30:return 33;
 break;
-case 31:return 53;
+case 31:return 26;
 break;
-case 32:return 49;
+case 32:return 53;
 break;
-case 33:return 'QUOTE';
+case 33:return 49;
 break;
-case 34:return 5;
+case 34:return 'QUOTE';
+break;
+case 35:return 5;
 break;
 }
 },
-rules: [/^(?:\s+)/,/^(?:add)/,/^(?:set)/,/^(?:define)/,/^(?:pass)/,/^(?:scene)/,/^(?:export)/,/^(?:extends)/,/^(?:import)/,/^(?:ogl.[a-zA-Z0-9]+)/,/^(?:[a-zA-Z_]+=)/,/^(?:[a-zA-Z]+ ?(?=->))/,/^(?:[a-zA-Z]+ ?(?=({|extends)))/,/^(?:0x[0-9A-Fa-f]{8})/,/^(?:0x[0-9A-Fa-f]{6})/,/^(?:\-?[0-9]+(?:\.[0-9]+)?)/,/^(?:'[a-zA-Z0-9\._\/]+')/,/^(?:(true|false))/,/^(?:vec3)/,/^(?:deg)/,/^(?:rad)/,/^(?:\{)/,/^(?:\})/,/^(?:\()/,/^(?:\))/,/^(?:\[)/,/^(?:\])/,/^(?:#.*)/,/^(?:[\/][*][^*]*[*]+([^\/*][^*]*[*]+)*[\/])/,/^(?:,)/,/^(?:->)/,/^(?:[\*\+\-\^\%\/])/,/^(?:\.[a-zA-Z0-9_]+)/,/^(?:')/,/^(?:$)/],
-conditions: {"INITIAL":{"rules":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34],"inclusive":true}}
+rules: [/^(?:\s+)/,/^(?:add)/,/^(?:set)/,/^(?:define)/,/^(?:pass)/,/^(?:scene)/,/^(?:export)/,/^(?:extends)/,/^(?:import)/,/^(?:as)/,/^(?:ogl.[a-zA-Z0-9]+)/,/^(?:[a-zA-Z_]+=)/,/^(?:[a-zA-Z]+ ?(?=->))/,/^(?:[a-zA-Z]+ ?(?=({|extends)))/,/^(?:0x[0-9A-Fa-f]{8})/,/^(?:0x[0-9A-Fa-f]{6})/,/^(?:\-?[0-9]+(?:\.[0-9]+)?)/,/^(?:'[a-zA-Z0-9\._\/]+')/,/^(?:(true|false))/,/^(?:vec3)/,/^(?:deg)/,/^(?:rad)/,/^(?:\{)/,/^(?:\})/,/^(?:\()/,/^(?:\))/,/^(?:\[)/,/^(?:\])/,/^(?:#.*)/,/^(?:[\/][*][^*]*[*]+([^\/*][^*]*[*]+)*[\/])/,/^(?:,)/,/^(?:->)/,/^(?:[\*\+\-\^\%\/])/,/^(?:\.[a-zA-Z0-9_]+)/,/^(?:')/,/^(?:$)/],
+conditions: {"INITIAL":{"rules":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35],"inclusive":true}}
 });
 return lexer;
 })();

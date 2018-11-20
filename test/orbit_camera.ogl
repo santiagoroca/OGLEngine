@@ -1,5 +1,5 @@
 export {
-    
+
     add camera {
         set fov=20.0
         set near=0.1
@@ -33,5 +33,5 @@ export {
 
         }
     }
-    
+
 }

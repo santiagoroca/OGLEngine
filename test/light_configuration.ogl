@@ -1,0 +1,14 @@
+export {
+
+    # Directional Light
+    add light {
+        set type=ogl.POINT
+        set position=vec3(0.0, 0.0, 20.0)
+    }
+
+    add light {
+        set type=ogl.AMBIENT
+        set color=0x333333
+    }
+
+}
