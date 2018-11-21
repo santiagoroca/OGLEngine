@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 
-const execSync = require('child_process').execSync;
 const program = require('commander');
+const ogl = require('./ogl')
  
 program
     .command('compile <filename>')
-    .action((filename, cmd) => execSync(`node ${__dirname}/ogl.js ${filename}`))
+    .action((filename, cmd) => ogl(filename))
  
 program.parse(process.argv);

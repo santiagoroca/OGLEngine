@@ -47,6 +47,10 @@ module.exports = class Events extends Entity {
         return `
 
             const cube_map_texture = webgl.createTexture();
+            webgl.activeTexture(webgl.TEXTURE9);
+            webgl.bindTexture(webgl.TEXTURE_CUBE_MAP, cube_map_texture);
+            webgl.texParameteri(webgl.TEXTURE_CUBE_MAP, webgl.TEXTURE_MAG_FILTER, webgl.LINEAR);
+            webgl.texParameteri(webgl.TEXTURE_CUBE_MAP, webgl.TEXTURE_MIN_FILTER, webgl.LINEAR);
 
             const cube_map_image_top = new Image();
             cube_map_image_top.onload = function () {
@@ -60,7 +64,7 @@ module.exports = class Events extends Entity {
             cube_map_image_bottom.onload = function () {
                 webgl.activeTexture(webgl.TEXTURE9);
                 webgl.bindTexture(webgl.TEXTURE_CUBE_MAP, cube_map_texture);
-                webgl.texImage2D(webgl.TEXTURE_CUBE_MAP_POSITIVE_Y, 0, webgl.RGBA, webgl.RGBA, webgl.UNSIGNED_BYTE, cube_map_image_bottom);
+                webgl.texImage2D(webgl.TEXTURE_CUBE_MAP_NEGATIVE_Y, 0, webgl.RGBA, webgl.RGBA, webgl.UNSIGNED_BYTE, cube_map_image_bottom);
             }
             cube_map_image_bottom.src = '${this.bottom}';
 
@@ -68,7 +72,7 @@ module.exports = class Events extends Entity {
             cube_map_image_left.onload = function () {
                 webgl.activeTexture(webgl.TEXTURE9);
                 webgl.bindTexture(webgl.TEXTURE_CUBE_MAP, cube_map_texture);
-                webgl.texImage2D(webgl.TEXTURE_CUBE_MAP_POSITIVE_Y, 0, webgl.RGBA, webgl.RGBA, webgl.UNSIGNED_BYTE, cube_map_image_left);
+                webgl.texImage2D(webgl.TEXTURE_CUBE_MAP_NEGATIVE_X, 0, webgl.RGBA, webgl.RGBA, webgl.UNSIGNED_BYTE, cube_map_image_left);
             }
             cube_map_image_left.src = '${this.left}';
 
@@ -76,7 +80,7 @@ module.exports = class Events extends Entity {
             cube_map_image_right.onload = function () {
                 webgl.activeTexture(webgl.TEXTURE9);
                 webgl.bindTexture(webgl.TEXTURE_CUBE_MAP, cube_map_texture);
-                webgl.texImage2D(webgl.TEXTURE_CUBE_MAP_POSITIVE_Y, 0, webgl.RGBA, webgl.RGBA, webgl.UNSIGNED_BYTE, cube_map_image_right);
+                webgl.texImage2D(webgl.TEXTURE_CUBE_MAP_POSITIVE_X, 0, webgl.RGBA, webgl.RGBA, webgl.UNSIGNED_BYTE, cube_map_image_right);
             }
             cube_map_image_right.src = '${this.right}';
 
@@ -84,7 +88,7 @@ module.exports = class Events extends Entity {
             cube_map_image_front.onload = function () {
                 webgl.activeTexture(webgl.TEXTURE9);
                 webgl.bindTexture(webgl.TEXTURE_CUBE_MAP, cube_map_texture);
-                webgl.texImage2D(webgl.TEXTURE_CUBE_MAP_POSITIVE_Y, 0, webgl.RGBA, webgl.RGBA, webgl.UNSIGNED_BYTE, cube_map_image_front);
+                webgl.texImage2D(webgl.TEXTURE_CUBE_MAP_NEGATIVE_Z, 0, webgl.RGBA, webgl.RGBA, webgl.UNSIGNED_BYTE, cube_map_image_front);
             }
             cube_map_image_front.src = '${this.front}';
 
@@ -92,7 +96,7 @@ module.exports = class Events extends Entity {
             cube_map_image_back.onload = function () {
                 webgl.activeTexture(webgl.TEXTURE9);
                 webgl.bindTexture(webgl.TEXTURE_CUBE_MAP, cube_map_texture);
-                webgl.texImage2D(webgl.TEXTURE_CUBE_MAP_POSITIVE_Y, 0, webgl.RGBA, webgl.RGBA, webgl.UNSIGNED_BYTE, cube_map_image_back);
+                webgl.texImage2D(webgl.TEXTURE_CUBE_MAP_POSITIVE_Z, 0, webgl.RGBA, webgl.RGBA, webgl.UNSIGNED_BYTE, cube_map_image_back);
             }
             cube_map_image_back.src = '${this.back}';
 

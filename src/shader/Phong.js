@@ -118,7 +118,7 @@ module.exports = class PhongShader {
                     gl_FragColor = (
                         ${
                             [
-                                'textureCube(cubemap, normal)',
+                                'textureCube(cubemap, reflect(-eye, normal))',
                                 this.config.hasUniformColor() ? `geometryColor` : '',
                                 this.config.hasTexture() ? `texture2D(uSampler, vec2(vVertexUV.s, 1.0-vVertexUV.t))` : ''
                             ].filter(stm => stm != '').join('+')
