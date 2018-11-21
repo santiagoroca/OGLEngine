@@ -53,7 +53,7 @@ class Scene extends Entity {
 
         const events = new Events();
         const shaders = new Shaders({
-            shouldRenderCubeMap: this.cubemap.shouldRenderCubeMap()
+            shouldRenderCubeMap: this.cubemap.shouldRenderCubeMap() && shouldRenderCubeMap.cubemap_reflection
         }, this.lights);
 
         if (this.cubemap) {

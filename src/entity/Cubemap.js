@@ -11,8 +11,8 @@ module.exports = class Events extends Entity {
             plural: 'cubemaps',
             singular: 'cubemap',
             defaults: {
-                displaySkyBox: true,
-                reflectCubeMap: true,
+                skybox_visibility: true,
+                cubemap_reflection: true,
                 top: undefined,
                 bottom: undefined,
                 left: undefined,
@@ -232,7 +232,7 @@ module.exports = class Events extends Entity {
     }
 
     generateRenderBlock () {
-        if (!this.shouldRenderCubeMap() || !this.displaySkyBox) {
+        if (!this.shouldRenderCubeMap() || !this.skybox_visibility) {
             return '';
         }
 
