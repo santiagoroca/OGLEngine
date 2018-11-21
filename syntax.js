@@ -29,7 +29,7 @@ module.exports = {
             ["0x[0-9A-Fa-f]{8}", "return 'HEXA8';"],
             ["0x[0-9A-Fa-f]{6}", "return 'HEXA6';"],
             ["\\-?[0-9]+(?:\\.[0-9]+)?", "return 'NUMBER';"],
-            ["'[a-zA-Z0-9\\._/]+'", "return 'STRING';"],
+            ["'[a-zA-Z0-9\\._/]*'", "return 'STRING';"],
             ["(true|false)", "return 'BOOL';"],
             ["vec3", "return 'VEC3';"],
             ["deg", "return 'DEG';"],
@@ -101,7 +101,7 @@ module.exports = {
             [ " IMPORT string ", " $$ = [ 'import', yy.GetAST($2) ]; " ],
             [ " ADD class ", " $$ = [ '2addClass', $2 ]; " ],
             [ " SET class ", " $$ = [ '3setClass', $2 ]; " ],
-            [ " SET VARNAME value ", " $$ = [ '0setVariable', [ $2.replace(/=/, '').trim(), $3 ] ]; " ],
+            [ " SET VARNAME value ", " $$ = [ '0setVariable', [ $2.replace(/=/, '').trim(), $3, @1.first_line ] ]; console.log(@1.first_line); " ],
             [ " DEFINE class_name EXTENDS class_name OBRACE statements CBRACE ", `
                 $$ = [ '1extendClass', [ $2, $4, $6 ] ];
             `],
@@ -128,13 +128,13 @@ module.exports = {
         vec3:
         [
             [ " VEC3 OPAR NUMBER COLON NUMBER COLON NUMBER CPAR ", ` 
-                $$ = [
+                $$ = yy.Vec3 (
                     parseFloat($3), 
                     parseFloat($5),
                     parseFloat($7)
-                ]; 
+                );
             `],
-            [ " VEC3 OPAR STRING COLON STRING COLON STRING CPAR ", " $$ = [$3, $5, $7]; " ]
+            [ " VEC3 OPAR STRING COLON STRING COLON STRING CPAR ", " $$ = yy.Vec3 ( $3, $5, $7 ); " ]
         ],
 
         unit:
@@ -158,21 +158,15 @@ module.exports = {
         hexadecimal: [
             [ " HEXA6 ", `
                 $$ = parseInt($1.replace(/0x/, ''), 16); 
-                $$ = {
-                    r: ($$ >> 16) & 255,
-                    g: ($$ >> 8) & 255,
-                    b: ($$ >> 0) & 255, 
-                    a: 255
-                };
+                $$ = new yy.Color (
+                    ($$ >> 16) & 255, ($$ >> 8) & 255, ($$ >> 0) & 255, 255
+                );
             `],
             [ " HEXA8 ", `
                 $$ = parseInt($1.replace(/0x/, ''), 16); 
-                $$ = {
-                    r: ($$ >> 24) & 255,
-                    g: ($$ >> 16) & 255,
-                    b: ($$ >> 8) & 255,
-                    a: ($$ >> 0) & 255,
-                };
+                $$ = new yy.Color (
+                    ($$ >> 24) & 255, ($$ >> 16) & 255, ($$ >> 8) & 255, ($$ >> 0) & 255,
+                );
             `],
         ],
 

@@ -1,5 +1,4 @@
 const Entity = require('./Entity');
-const EntityConverter = require('../runtime/EntityConverter')
 
 class Event extends Entity {
 
@@ -14,4 +13,4 @@ class Event extends Entity {
     
 }
 
-module.exports = EntityConverter(Event);
+module.exports = Event;

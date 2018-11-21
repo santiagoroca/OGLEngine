@@ -8,12 +8,12 @@ module.exports = class Events extends Entity {
             plural: 'geometries',
             singular: 'geometry',
             defaults: {
-                dynamics: [],
-                events: {
+                dynamics: NativeTypes.self([]),
+                events: NativeTypes.self({
                     drag: [], keypress: [],
                     keydown: [], interval: [], 
                     mousewheel: [] 
-                }
+                })
             }
         })
     }

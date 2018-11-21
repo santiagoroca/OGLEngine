@@ -11,14 +11,14 @@ module.exports = class Events extends Entity {
             plural: 'cubemaps',
             singular: 'cubemap',
             defaults: {
-                skybox_visibility: true,
-                cubemap_reflection: true,
-                top: undefined,
-                bottom: undefined,
-                left: undefined,
-                right: undefined,
-                back: undefined,
-                front: undefined,
+                skybox_visibility: NativeTypes.boolean(true),
+                cubemap_reflection: NativeTypes.boolean(true),
+                top: NativeTypes.string(undefined),
+                bottom: NativeTypes.string(undefined),
+                left: NativeTypes.string(undefined),
+                right: NativeTypes.string(undefined),
+                back: NativeTypes.string(undefined),
+                front: NativeTypes.string(undefined),
             }
         })
     }

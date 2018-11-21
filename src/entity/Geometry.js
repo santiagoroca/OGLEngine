@@ -6,7 +6,6 @@ const load = require('../parser/Loader.js');
 const read = require('fs').readFileSync;
 const write = require('fs').writeFileSync;
 const hash = require('../runtime/helper').hash;
-const EntityConverter = require('../runtime/EntityConverter')
 
 // Helper Procceses
 const GenerateNormals = require('../process/generate_normals')
@@ -26,19 +25,19 @@ class Geometry extends Entity {
                 * be present. If not, the geometry should
                 * fail, or not be added to the scene
                 */
-               vertexs: [],
-               indexes: [],
+               vertexs: NativeTypes.self([]),
+               indexes: NativeTypes.self([]),
         
                /*
                * Optional arguments. If not present, 
                * the shader will react and create a program
                * that adjusts itself to these.
                */
-               normals: [],
-               uvs: [],
-               color: undefined,
-               texture: undefined,
-               specularmap: undefined,
+               normals: NativeTypes.self([]),
+               uvs: NativeTypes.self([]),
+               color: NativeTypes.color(),
+               texture: NativeTypes.string(undefined),
+               specularmap: NativeTypes.string(undefined),
                
                /*
                * Remove Duplicated Vertexs
@@ -48,7 +47,7 @@ class Geometry extends Entity {
                * regeneration, so that you obtain a more smooth render
                * 
                */
-               remove_duplicated_vertexs: false,
+               remove_duplicated_vertexs: NativeTypes.boolean(),
         
                /*
                * Generate Normals
@@ -58,7 +57,7 @@ class Geometry extends Entity {
                * previous data on the normals array.
                *
                */
-               generate_normals: false,
+               generate_normals: NativeTypes.boolean(),
                
                /*
                * Inline Data
@@ -68,15 +67,15 @@ class Geometry extends Entity {
                * external files.
                *
                */
-               inline_data: false,
+               inline_data: NativeTypes.boolean(),
         
                /*
                * Helper internal classes and arrays,
                * used to build the AST.
                */
-               transform: new Transform(context),
-               material: new Material(context),
-               events: [],
+               transform: NativeTypes.self(new Transform(context)),
+               material: NativeTypes.self(new Material(context)),
+               events: NativeTypes.self([]),
         
             })
         });
@@ -339,4 +338,4 @@ class Geometry extends Entity {
 
 }
 
-module.exports = EntityConverter(Geometry);
+module.exports = Geometry;

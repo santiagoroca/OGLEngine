@@ -1,7 +1,6 @@
 const Entity = require('./Entity');
 const math = require('../runtime/math.js');
 const TransformEvents = require('../events/TransformEvents');
-const EntityConverter = require('../runtime/EntityConverter')
 
 class Model extends Entity {
 
@@ -11,12 +10,12 @@ class Model extends Entity {
             plural: 'models',
             singular: 'model',
             defaults: {
-                events: [],
-                _translate: [0, 0, 0],
-                _x_angle: 0,
-                _y_angle: 0,
-                _z_angle: 0,
-                _scale: 1.0
+                events: NativeTypes.self([]),
+                _translate: NativeTypes.vec3(),
+                _x_angle: NativeTypes.number(),
+                _y_angle: NativeTypes.number(),
+                _z_angle: NativeTypes.number(),
+                _scale: NativeTypes.number(1.0)
             }
         });
     }
@@ -83,4 +82,4 @@ class Model extends Entity {
 
 }
 
-module.exports = EntityConverter(Model);
+module.exports = Model;

@@ -1,7 +1,6 @@
 const Entity = require('./Entity');
 const World = require('./World');
 const Model = require('./Model');
-const EntityConverter = require('../runtime/EntityConverter')
 
 class Transform extends Entity {
 
@@ -11,9 +10,9 @@ class Transform extends Entity {
             plural: 'transforms',
             singular: 'transform',
             defaults: context => ({
-                events: [],
-                model: new Model(context),
-                world: new World(context),
+                events: NativeTypes.self([]),
+                model: NativeTypes.self(new Model(context)),
+                world: NativeTypes.self(new World(context)),
             })
         });
     }
@@ -60,4 +59,4 @@ class Transform extends Entity {
 
 }
 
-module.exports = EntityConverter(Transform);
+module.exports = Transform;

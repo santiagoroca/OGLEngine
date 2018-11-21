@@ -2,10 +2,10 @@ const Entity = require('./Entity');
 const Camera = require('./Camera');
 const Geometry = require('./Geometry');
 const Light = require('./Light');
+const Cubemap = require('./Cubemap.js');
 const Shaders = require('../shader/Shaders.js');
 const Render = require('./Render.js');
 const Events = require('./Events');
-const EntityConverter = require('../runtime/EntityConverter')
 
 /*
 * @title Scene
@@ -24,10 +24,10 @@ class Scene extends Entity {
             plural: 'scenes',
             singular: 'scene',
             defaults: {
-                cameras: [],
-                geometries: [],
-                lights: [],
-                cubemap: null,
+                cameras: NativeTypes.self([]),
+                geometries: NativeTypes.self([]),
+                lights: NativeTypes.self([]),
+                cubemap: NativeTypes.self(new Cubemap()),
             }
         });
     }
@@ -53,7 +53,7 @@ class Scene extends Entity {
 
         const events = new Events();
         const shaders = new Shaders({
-            shouldRenderCubeMap: this.cubemap.shouldRenderCubeMap() && shouldRenderCubeMap.cubemap_reflection
+            shouldRenderCubeMap: this.cubemap.shouldRenderCubeMap() && this.cubemap.cubemap_reflection
         }, this.lights);
 
         if (this.cubemap) {
@@ -73,7 +73,7 @@ class Scene extends Entity {
         
         out += shaders.toString();
         out += Render([
-            this.cubemap.generateRenderBlock(), 
+            this.cubemap.generateRenderBlock(),
             shaders.generateRenderBlock()
         ]);
         out += events.toString();
@@ -83,4 +83,4 @@ class Scene extends Entity {
 
 }
 
-module.exports = EntityConverter(Scene);
+module.exports = Scene;

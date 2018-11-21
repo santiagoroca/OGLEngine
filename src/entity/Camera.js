@@ -1,7 +1,6 @@
 const Entity = require('./Entity');
 const Transform = require('./Transform.js');
 const hash = require('../runtime/helper.js').hash;
-const EntityConverter = require('../runtime/EntityConverter')
 
 class Camera extends Entity {
 
@@ -11,11 +10,11 @@ class Camera extends Entity {
             plural: 'cameras',
             singular: 'camera',
             defaults: context => ({
-                transform: new Transform(context),
-                events: [],
-                fov: 45,
-                far: 10,
-                near: 1,
+                transform: NativeTypes.self(new Transform(context)),
+                events: NativeTypes.self([]),
+                fov: NativeTypes.number(45),
+                far: NativeTypes.number(10),
+                near: NativeTypes.number(1),
             })
         });
     }
@@ -64,4 +63,4 @@ class Camera extends Entity {
 
 }
 
-module.exports = EntityConverter(Camera);
+module.exports = Camera;

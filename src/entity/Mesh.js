@@ -1,5 +1,4 @@
 const Entity = require('./Entity');
-const EntityConverter = require('../runtime/EntityConverter')
 
 class Mesh extends Entity {
 
@@ -9,12 +8,12 @@ class Mesh extends Entity {
             plural: 'meshes',
             singular: 'mesh',
             defaults: {
-                vertices: [],
-                faces: [],
-                normals: [],
-                uvs: [],
-                source: null,
-                texture: null,
+                vertices: NativeTypes.self([]),
+                faces: NativeTypes.self([]),
+                normals: NativeTypes.self([]),
+                uvs: NativeTypes.self([]),
+                source: NativeTypes.string(),
+                texture: NativeTypes.string(),
             }
         });
     }
@@ -80,4 +79,4 @@ class Mesh extends Entity {
 
 }
 
-module.exports = EntityConverter(Mesh);
+module.exports = Mesh;

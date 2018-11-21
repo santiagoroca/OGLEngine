@@ -26,7 +26,7 @@ module.exports = class Entity {
                             config.defaults(this) : config.defaults;
                             
         for (const key in defaults) {
-            this[key] = defaults[key];
+            Object.defineProperty(this, key, defaults[key])
         }
 
         for (let [ method, argument ] of statements) {
@@ -94,30 +94,37 @@ module.exports = class Entity {
         throw(new Error(`Class ${className} was not found.`));
     }
 
-    set ([property, [ type, value ]]) {
-        const customSetter = `set${capitalize(property)}`;
+    set ([property, [ type, value ], line]) {
 
-        if (this[customSetter]) {
-            this[customSetter](value);
-            return;
-        }
+        try {
 
-        switch (type) {
-            case 'const': this[property] = value; break;
-            case 'func': this[property] = value; break;
-            case 'expr': this[property] = this.parseOperation(value); break;
-            case 'var': {
+            const customSetter = `set${capitalize(property)}`;
 
-                if (this[property] && property == value) {
-                    throw(new Error(`Property ${property} assigned to itself.`))
-                }
-
-                Object.defineProperty(this, property, {
-                    configurable: true,
-                    get: () => this.getVariable(value)
-                });
-
+            if (this[customSetter]) {
+                this[customSetter](value);
+                return;
             }
+
+            switch (type) {
+                case 'const': this[property] = value; break;
+                case 'func': this[property] = value; break;
+                case 'expr': this[property] = this.parseOperation(value); break;
+                case 'var': {
+
+                    if (this[property] && property == value) {
+                        throw(new Error(`Property ${property} assigned to itself.`))
+                    }
+
+                    Object.defineProperty(this, property, {
+                        configurable: true,
+                        get: () => this.getVariable(value)
+                    });
+
+                }
+            }
+
+        } catch (Exception) {
+            throw(`${property}: ${Exception} on line ${line}`)
         }
         
     }

@@ -1,7 +1,6 @@
 const Entity = require('./Entity');
 const math = require('../runtime/math.js');
 const TransformEvents = require('../events/TransformEvents');
-const EntityConverter = require('../runtime/EntityConverter')
 
 class World extends Entity {
 
@@ -11,12 +10,12 @@ class World extends Entity {
             plural: 'worlds',
             singular: 'world',
             defaults: {
-                events: [],
-                _translate: [0, 0, 0],
-                _x_angle: 0,
-                _y_angle: 0,
-                _z_angle: 0,
-                _scale: 1.0,
+                events: NativeTypes.self([]),
+                _translate: NativeTypes.vec3(),
+                _x_angle: NativeTypes.number(),
+                _y_angle: NativeTypes.number(),
+                _z_angle: NativeTypes.number(),
+                _scale: NativeTypes.number(1.0)
             }
         });
     }
@@ -24,13 +23,9 @@ class World extends Entity {
     translate (args) {
         args = { x: 0, y: 0, z: 0, ...args,  }
 
-        this._translate = math.vec3.add(
-            this._translate, [
-                args.x,
-                args.y,
-                args.z
-            ]
-        );
+        this._translate.x += args.x;
+        this._translate.y += args.y;
+        this._translate.z += args.z;
     }
 
     scale (args) {
@@ -83,4 +78,4 @@ class World extends Entity {
 
 }
 
-module.exports = EntityConverter(World);
+module.exports = World;

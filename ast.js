@@ -1,5 +1,7 @@
 const { parser } = require(__dirname + '/parser');
 const read = require('fs').readFileSync;
+const { Vec3 } = require('./src/runtime/NativeTypes')
+const { Color } = require('./src/runtime/NativeTypes')
 
 const GetAST = filename => parser.parse(
     read(filename).toString()
@@ -9,7 +11,7 @@ const GetAST = filename => parser.parse(
 parser.yy = {
     Scene: require(__dirname + '/src/entity/Scene.js'),
     Constants: require(__dirname + '/src/runtime/constants.js'),
-    GetAST
+    Vec3, Color, GetAST
 }
 
 module.exports = GetAST;

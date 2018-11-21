@@ -1,5 +1,4 @@
 const Entity = require('./Entity');
-const EntityConverter = require('../runtime/EntityConverter')
 
 class Light extends Entity {
 
@@ -11,19 +10,19 @@ class Light extends Entity {
             defaults: {
 
                 // Defaults
-                type: 'point',
+                type: NativeTypes.string('point'),
 
                 // All lights
-                color: { r: 0, g: 0, b: 0, a: 1.0 },
+                color: NativeTypes.color(),
                 
                 // Directional Light
-                direction: [1.0, 1.0, 1.0],
+                direction: NativeTypes.vec3(new Vec3(1.0, 1.0, 1.0)),
 
                 // Point Light
-                position: [1.0, 1.0, 1.0],
+                position: NativeTypes.vec3(new Vec3(1.0, 1.0, 1.0)),
 
                 // Specular
-                attenuation: 1.0,
+                attenuation: NativeTypes.number(1.0),
 
             }
         });
@@ -31,4 +30,4 @@ class Light extends Entity {
 
 }
 
-module.exports = EntityConverter(Light);
+module.exports = Light;

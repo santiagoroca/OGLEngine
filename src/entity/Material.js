@@ -1,5 +1,4 @@
 const Entity = require('./Entity');
-const EntityConverter = require('../runtime/EntityConverter')
 
 class Material extends Entity {
 
@@ -9,11 +8,11 @@ class Material extends Entity {
             plural: 'materials',
             singular: 'material',
             defaults: {
-                shininess: 1.0
+                shininess: NativeTypes.number(1.0)
             }
         });
     }
 
 }
 
-module.exports = EntityConverter(Material);
+module.exports = Material;
