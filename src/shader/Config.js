@@ -1,7 +1,12 @@
 module.exports = class Config {
 
-    constructor () {
+    constructor (globalConfig) {
+        this.globalConfig = globalConfig;
         this.key = 0;
+    }
+
+    shouldRenderCubeMap () {
+        return this.globalConfig.shouldRenderCubeMap;
     }
 
     setUniformColor (value) {

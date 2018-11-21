@@ -13,7 +13,10 @@ module.exports = class PhongShader {
 
         // Does the fragment shader needs a varying with the
         // position of the current vertex?
-        const fragment_varying_vertex_position = directional_l.length || point_l.length;
+        const fragment_varying_vertex_position = 
+            directional_l.length || 
+            point_l.length || 
+            this.config.shouldRenderCubeMap();
 
         return `
 
@@ -56,7 +59,7 @@ module.exports = class PhongShader {
                 uniform mat4 cameraModel;
                 uniform mat4 cameraWorld;
 
-                uniform samplerCube cubemap;
+                ${this.config.shouldRenderCubeMap() ? 'uniform samplerCube cubemap;': ''}
                 ${this.config.hasUniformColor() ? 'uniform vec4 geometryColor;': ''}
                 ${this.config.hasTexture() ? 'uniform sampler2D uSampler;': ''}
                 ${this.config.hasSpecularMap() ? 'uniform sampler2D specularMapSampler;': ''}
@@ -90,8 +93,9 @@ module.exports = class PhongShader {
                         vec3 camera_space_${name} = vec3(mat3(cameraWorld) * mat3(cameraModel) * vec3(dir_${name}));
                         float diffuse_${name} = max(0.0, dot(normal, camera_space_${name}));
                         
-                        if(diffuse_${name} > 0.0)
-                            specular += pow(max(0.0, dot(eye, reflect(-camera_space_${name}, normal))), ${this.config.getShininess()}.0);
+                        specular += pow(max(0.0, dot(
+                            eye, reflect(-camera_space_${name}, normal)
+                        )), ${this.config.getShininess()}.0) * vec4(0.1);
 
                         light += diffuse_${name};
 
@@ -105,7 +109,7 @@ module.exports = class PhongShader {
                         
                         specular += pow(max(0.0, dot(
                             eye, reflect(-surfaceToLight_${name}, normal)
-                        )), ${this.config.getShininess()}.0) * vec4(1.0);
+                        )), ${this.config.getShininess()}.0) * vec4(0.1);
 
                         light += diffuse_${name};
 
@@ -118,7 +122,7 @@ module.exports = class PhongShader {
                     gl_FragColor = (
                         ${
                             [
-                                'textureCube(cubemap, reflect(-eye, normal))',
+                                this.config.shouldRenderCubeMap() ? 'textureCube(cubemap, reflect(-eye, normal))' : '',
                                 this.config.hasUniformColor() ? `geometryColor` : '',
                                 this.config.hasTexture() ? `texture2D(uSampler, vec2(vVertexUV.s, 1.0-vVertexUV.t))` : ''
                             ].filter(stm => stm != '').join('+')
@@ -172,14 +176,16 @@ module.exports = class PhongShader {
                 webgl.uniform1i(PhongShaderProgram_${hash}.specularMapSampler, 1);
             `: ''}
 
+            ${this.config.shouldRenderCubeMap() ? `
+                PhongShaderProgram_${hash}.cubemap = webgl.getUniformLocation(PhongShaderProgram_${hash}, 'cubemap');
+                webgl.uniform1i(PhongShaderProgram_${hash}.cubemap, 9);
+            `: ''}
+
             PhongShaderProgram_${hash}.world = webgl.getUniformLocation(PhongShaderProgram_${hash}, 'world');
             PhongShaderProgram_${hash}.model = webgl.getUniformLocation(PhongShaderProgram_${hash}, 'model');
             PhongShaderProgram_${hash}.cameraWorld = webgl.getUniformLocation(PhongShaderProgram_${hash}, 'cameraWorld');
             PhongShaderProgram_${hash}.cameraModel = webgl.getUniformLocation(PhongShaderProgram_${hash}, 'cameraModel');
             PhongShaderProgram_${hash}.projection = webgl.getUniformLocation(PhongShaderProgram_${hash}, 'projection');
-
-            PhongShaderProgram_${hash}.cubemap = webgl.getUniformLocation(PhongShaderProgram_${hash}, 'cubemap');
-            webgl.uniform1i(PhongShaderProgram_${hash}.cubemap, 9);
             
             ${this.config.hasUniformColor() ?`
                 PhongShaderProgram_${hash}.geometryColor = webgl.getUniformLocation(PhongShaderProgram_${hash}, 'geometryColor');

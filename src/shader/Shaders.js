@@ -3,7 +3,8 @@ const Config = require('./Config')
 
 module.exports = class Scene {
 
-    constructor (lights) {
+    constructor (globalConfig, lights) {
+        this.globalConfig = globalConfig;
         this.directional_lights = [];
         this.ambient_lights = [];
         this.point_lights = [];
@@ -15,7 +16,7 @@ module.exports = class Scene {
     }
 
     addGeometry (geometry) {
-        let config = new Config();
+        let config = new Config(this.globalConfig);
 
         config.setUniformColor(geometry.hasUniformColor() ? 1 : 0);
         config.setTexture(geometry.hasTexture() ? 1 : 0);
@@ -78,6 +79,12 @@ module.exports = class Scene {
             directional_lights, ambient_lights, this.point_lights
         )).join('\n');
         
+    }
+
+    generateRenderBlock () {
+        return Object.keys(this.shaders).map(
+            shader => this.shaders[shader].generateRenderBlock()
+        ).join('\n')
     }
 
 }

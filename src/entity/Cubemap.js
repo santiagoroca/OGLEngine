@@ -11,6 +11,8 @@ module.exports = class Events extends Entity {
             plural: 'cubemaps',
             singular: 'cubemap',
             defaults: {
+                displaySkyBox: true,
+                reflectCubeMap: true,
                 top: undefined,
                 bottom: undefined,
                 left: undefined,
@@ -19,6 +21,11 @@ module.exports = class Events extends Entity {
                 front: undefined,
             }
         })
+    }
+
+    shouldRenderCubeMap () {
+        const faces = [this.top, this.bottom, this.left, this.right, this.back, this.front];
+        return faces.filter(face => face == undefined).length == 0
     }
 
     writeFaceToFile (texture) {
@@ -30,10 +37,10 @@ module.exports = class Events extends Entity {
     }
 
     toString () {
-        const faces = [this.top, this.bottom, this.left, this.right, this.back, this.front];
+        let out = '';
 
-        if (faces.filter(face => face == undefined).length) {
-            console.log('Ignoring Cubemap due to missing face.');
+        if (!this.shouldRenderCubeMap()) {
+            console.log('Cube map ignored due to missing faces.');
             return '';
         }
 
@@ -100,6 +107,145 @@ module.exports = class Events extends Entity {
             }
             cube_map_image_back.src = '${this.back}';
 
+            const PhongVertex_cubemap = \`
+                attribute lowp vec3 aVertexPosition;
+                uniform mat4 projection;
+                uniform mat4 cameraModel;
+                uniform mat4 cameraWorld;
+                varying vec3 vVertexPosition;
+
+                const mat4 transform = mat4(
+                    vec4(1000.0, 0.0, 0.0, 0.0),
+                    vec4(0.0, 1000.0, 0.0, 0.0),
+                    vec4(0.0, 0.0, 1000.0, 0.0),
+                    vec4(-500.0, -500.0, -500.0, 1.0)
+                );
+                
+                void main(void) {
+                    gl_Position = projection * cameraWorld * cameraModel * transform * vec4(aVertexPosition, 1.0);
+                    vVertexPosition = aVertexPosition;
+                }
+
+            \`;
+
+            const PhongFragment_cubemap = \`
+                precision highp float;
+                uniform samplerCube cubemap;
+                varying vec3 vVertexPosition;
+
+                void main() {
+                    gl_FragColor = textureCube(cubemap, vVertexPosition);
+                }
+            \`;
+
+            // Fragment 
+            const PhongFragmentShader_cubemap = webgl.createShader(webgl.FRAGMENT_SHADER);
+            webgl.shaderSource(PhongFragmentShader_cubemap, PhongFragment_cubemap);
+            webgl.compileShader(PhongFragmentShader_cubemap);
+
+            if (!webgl.getShaderParameter(PhongFragmentShader_cubemap, webgl.COMPILE_STATUS)) {
+                alert(webgl.getShaderInfoLog(PhongFragmentShader_cubemap));
+            }
+
+            // Vertex
+            const PhongVertexShader_cubemap = webgl.createShader(webgl.VERTEX_SHADER);
+            webgl.shaderSource(PhongVertexShader_cubemap, PhongVertex_cubemap);
+            webgl.compileShader(PhongVertexShader_cubemap);
+
+            if (!webgl.getShaderParameter(PhongVertexShader_cubemap, webgl.COMPILE_STATUS)) {
+                alert(webgl.getShaderInfoLog(PhongVertexShader_cubemap));
+            }
+
+            // Program
+            const PhongShaderProgram_cubemap = webgl.createProgram();
+            webgl.attachShader(PhongShaderProgram_cubemap, PhongVertexShader_cubemap);
+            webgl.attachShader(PhongShaderProgram_cubemap, PhongFragmentShader_cubemap);
+            webgl.linkProgram(PhongShaderProgram_cubemap);
+            webgl.useProgram(PhongShaderProgram_cubemap);
+
+            // Attributes and uniforms
+            PhongShaderProgram_cubemap.vertexPositionAttribute = webgl.getAttribLocation(PhongShaderProgram_cubemap, "aVertexPosition");
+            webgl.enableVertexAttribArray(PhongShaderProgram_cubemap.vertexPositionAttribute);
+
+            PhongShaderProgram_cubemap.cubemap = webgl.getUniformLocation(PhongShaderProgram_cubemap, 'cubemap');
+            webgl.uniform1i(PhongShaderProgram_cubemap.cubemap, 9);
+
+            PhongShaderProgram_cubemap.cameraWorld = webgl.getUniformLocation(PhongShaderProgram_cubemap, 'cameraWorld');
+            PhongShaderProgram_cubemap.cameraModel = webgl.getUniformLocation(PhongShaderProgram_cubemap, 'cameraModel');
+            PhongShaderProgram_cubemap.projection = webgl.getUniformLocation(PhongShaderProgram_cubemap, 'projection');
+
+            const v_buff_cubemap = webgl.createBuffer();
+            webgl.bindBuffer(webgl.ARRAY_BUFFER, v_buff_cubemap);
+            webgl.bufferData(webgl.ARRAY_BUFFER, new Float32Array([
+
+                // Frontface
+                -1, -1, 1,
+                1, -1, 1,
+                -1, 1, 1,
+                1, 1, 1,
+                1, -1, 1,
+                -1, 1, 1,
+
+                // Backface
+                -1, -1, -1,
+                1, -1, -1,
+                -1, 1, -1,
+                1, 1, -1,
+                1, -1, -1,
+                -1, 1, -1,
+
+                // Top
+                -1, 1, 1,
+                1, 1, 1,
+                -1, 1, -1,
+                1, 1, 1,
+                1, 1, -1,
+                -1, 1, -1,
+
+                // Bottom
+                -1, -1, 1,
+                1, -1, 1,
+                -1, -1, -1,
+                1, -1, 1,
+                1, -1, -1,
+                -1, -1, -1,
+
+                // Left
+                -1, -1, 1,
+                -1, -1, -1,
+                -1, 1, -1,
+                -1, -1, 1,
+                -1, 1, 1,
+                -1, 1, -1,
+
+                // Right
+                1, -1, 1,
+                1, -1, -1,
+                1, 1, -1,
+                1, -1, 1,
+                1, 1, 1,
+                1, 1, -1,
+
+            ]).buffer, webgl.STATIC_DRAW);
+
+        `;
+    }
+
+    generateRenderBlock () {
+        if (!this.shouldRenderCubeMap() || !this.displaySkyBox) {
+            return '';
+        }
+
+        return `
+            webgl.useProgram(PhongShaderProgram_cubemap);
+            webgl.uniformMatrix4fv(PhongShaderProgram_cubemap.cameraWorld, false, activeCamera.transform.world.matrix);
+            webgl.uniformMatrix4fv(PhongShaderProgram_cubemap.cameraModel, false, activeCamera.transform.model.matrix);
+            webgl.uniformMatrix4fv(PhongShaderProgram_cubemap.projection, false, activeCamera.projectionMatrix);
+
+            webgl.bindBuffer(webgl.ARRAY_BUFFER, v_buff_cubemap);
+            webgl.vertexAttribPointer(PhongShaderProgram_cubemap.vertexPositionAttribute, 3, webgl.FLOAT, false, 0, 0);
+
+            webgl.drawArrays(webgl.TRIANGLES, 0, 36);
         `;
     }
 

@@ -51,8 +51,10 @@ class Scene extends Entity {
     toString () {
         let out = '';
 
-        const shaders = new Shaders(this.lights);
         const events = new Events();
+        const shaders = new Shaders({
+            shouldRenderCubeMap: this.cubemap.shouldRenderCubeMap()
+        }, this.lights);
 
         if (this.cubemap) {
             out += this.cubemap.toString();
@@ -70,7 +72,10 @@ class Scene extends Entity {
         }
         
         out += shaders.toString();
-        out += Render(shaders.shaders);
+        out += Render([
+            this.cubemap.generateRenderBlock(), 
+            shaders.generateRenderBlock()
+        ]);
         out += events.toString();
         
         return out;
