@@ -1,7 +1,7 @@
 const { parser } = require(__dirname + '/parser');
 const read = require('fs').readFileSync;
-const { Vec3 } = require('./src/runtime/NativeTypes')
-const { Color } = require('./src/runtime/NativeTypes')
+const Vec3 = require('./src/runtime/NativeTypes/Vec3')
+const Color = require('./src/runtime/NativeTypes/Color')
 
 const GetAST = filename => parser.parse(
     read(filename).toString()

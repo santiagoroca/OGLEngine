@@ -94,35 +94,25 @@ module.exports = class Entity {
         throw(new Error(`Class ${className} was not found.`));
     }
 
-    set ([property, [ type, value ], line]) {
+    set ([property, arg, line]) {
 
         try {
 
             const customSetter = `set${capitalize(property)}`;
 
             if (this[customSetter]) {
-                this[customSetter](value);
+                this[customSetter](arg[1]);
                 return;
             }
 
-            switch (type) {
-                case 'const': this[property] = value; break;
-                case 'func': this[property] = value; break;
-                case 'expr': this[property] = this.parseOperation(value); break;
-                case 'var': {
+            const value = this.parseArg(arg);
 
-                    if (this[property] && property == value) {
-                        throw(new Error(`Property ${property} assigned to itself.`))
-                    }
-
-                    Object.defineProperty(this, property, {
-                        configurable: true,
-                        get: () => this.getVariable(value)
-                    });
-
-                }
+            if (!this.hasOwnProperty(property)) {
+                Object.defineProperty(this, property, NativeTypes.infer(value));
             }
 
+            this[property] = value;
+            
         } catch (Exception) {
             throw(`${property}: ${Exception} on line ${line}`)
         }
@@ -173,6 +163,7 @@ module.exports = class Entity {
             case 'const': return value;
             case 'func': return value;
             case 'var': return this.getVariable(value)
+            case 'expr': return this.parseOperation(value)
         }
     }
 
