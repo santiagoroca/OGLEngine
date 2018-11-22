@@ -101,7 +101,10 @@ module.exports = {
             [ " IMPORT string ", " $$ = [ 'import', yy.GetAST($2) ]; " ],
             [ " ADD class ", " $$ = [ '2addClass', $2 ]; " ],
             [ " SET class ", " $$ = [ '3setClass', $2 ]; " ],
-            [ " SET VARNAME value ", " $$ = [ '0setVariable', [ $2.replace(/=/, '').trim(), $3, @1.first_line ] ]; console.log(@1.first_line); " ],
+            [ " SET VARNAME value ", ` $$ = [
+                '0setVariable', 
+                [ $2.replace(/=/, '').trim(), $3, @1.first_line ] 
+            ];`],
             [ " DEFINE class_name EXTENDS class_name OBRACE statements CBRACE ", `
                 $$ = [ '1extendClass', [ $2, $4, $6 ] ];
             `],

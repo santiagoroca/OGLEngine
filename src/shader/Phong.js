@@ -67,11 +67,11 @@ module.exports = class PhongShader {
                 const vec4 ambient_light = vec4(${ambient_l});
 
                 ${directional_l.map(
-                    ({ name, direction }) => `const vec3 dir_${name} = normalize(vec3(${direction}));`
+                    ({ name, direction }) => `const vec3 dir_${name} = normalize(vec3(${direction.toString()}));`
                 ).join('\n')}
 
                 ${point_l.map(
-                    ({ name, position }) => `const vec3 point_${name} = vec3(${position});`
+                    ({ name, position }) => `const vec3 point_${name} = vec3(${position.toString()});`
                 ).join('\n')}
 
                 ${this.config.hasNormals() ? 'varying vec3 vNormal;': ''}
@@ -95,7 +95,7 @@ module.exports = class PhongShader {
                         
                         specular += pow(max(0.0, dot(
                             eye, reflect(-camera_space_${name}, normal)
-                        )), ${this.config.getShininess()}.0) * vec4(0.1);
+                        )), ${this.config.getShininess().toFixed(1)}) * vec4(0.1);
 
                         light += diffuse_${name};
 
@@ -109,7 +109,7 @@ module.exports = class PhongShader {
                         
                         specular += pow(max(0.0, dot(
                             eye, reflect(-surfaceToLight_${name}, normal)
-                        )), ${this.config.getShininess()}.0) * vec4(0.1);
+                        )), ${this.config.getShininess().toFixed(1)}) * vec4(0.1);
 
                         light += diffuse_${name};
 

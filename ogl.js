@@ -3,8 +3,6 @@ const NativeTypes = require(__dirname + '/src/runtime/NativeTypes')
 
 global['ClassResolver'] = ClassResolver;
 global['NativeTypes'] = NativeTypes;
-global['Vec3'] = NativeTypes.Vec3;
-global['Color'] = NativeTypes.Color;
 
 const write = require('fs').writeFileSync;
 const read = require('fs').readFileSync;

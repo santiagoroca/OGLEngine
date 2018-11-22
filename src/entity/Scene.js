@@ -24,10 +24,10 @@ class Scene extends Entity {
             plural: 'scenes',
             singular: 'scene',
             defaults: {
-                cameras: NativeTypes.self([]),
-                geometries: NativeTypes.self([]),
-                lights: NativeTypes.self([]),
-                cubemap: NativeTypes.self(new Cubemap()),
+                cameras: NativeTypes.infer([]),
+                geometries: NativeTypes.infer([]),
+                lights: NativeTypes.infer([]),
+                cubemap: NativeTypes.infer(new Cubemap()),
             }
         });
     }

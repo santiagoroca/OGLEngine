@@ -1,7 +1,4 @@
 module.exports = {
-    "UP": [0, 1, 0],
-    "RIGHT": [1, 0, 0],
-    "BACK": [0, 0, 1],
     "DRAG": 'drag',
     "KEYPRESS": 'keypress',
     "KEYDOWN": "keydown",

@@ -25,16 +25,16 @@ class Geometry extends Entity {
                 * be present. If not, the geometry should
                 * fail, or not be added to the scene
                 */
-               vertexs: NativeTypes.self([]),
-               indexes: NativeTypes.self([]),
+               vertexs: NativeTypes.infer([]),
+               indexes: NativeTypes.infer([]),
         
                /*
                * Optional arguments. If not present, 
                * the shader will react and create a program
                * that adjusts itself to these.
                */
-               normals: NativeTypes.self([]),
-               uvs: NativeTypes.self([]),
+               normals: NativeTypes.infer([]),
+               uvs: NativeTypes.infer([]),
                color: NativeTypes.color(),
                texture: NativeTypes.string(undefined),
                specularmap: NativeTypes.string(undefined),
@@ -67,15 +67,15 @@ class Geometry extends Entity {
                * external files.
                *
                */
-               inline_data: NativeTypes.boolean(),
+               inline_data: NativeTypes.boolean(false),
         
                /*
                * Helper internal classes and arrays,
                * used to build the AST.
                */
-               transform: NativeTypes.self(new Transform(context)),
-               material: NativeTypes.self(new Material(context)),
-               events: NativeTypes.self([]),
+               transform: NativeTypes.infer(new Transform(context)),
+               material: NativeTypes.infer(new Material(context)),
+               events: NativeTypes.infer([]),
         
             })
         });
@@ -193,6 +193,7 @@ class Geometry extends Entity {
 
     saveToFile () {
 
+
         createWriteStream(`./dist/models/${this.getName()}.faces`)
             .write(Buffer.from(new Uint32Array(this.indexes).buffer));
 
@@ -307,28 +308,20 @@ class Geometry extends Entity {
                 transform: ${this.transform},
                 count: ${this.indexes.length},
 
-                ${this.includeUVs() ?
-                `
+                ${this.includeUVs() ? `
                     uvs: uvs_buff_${this.name},
                 ` : ''}
 
-                ${this.hasTexture() ?
-                `
+                ${this.hasTexture() ? `
                     texture: texture_${this.name},
                 ` : ''}
 
-                ${this.hasSpecularMap() ?
-                `
+                ${this.hasSpecularMap() ? `
                     specularmap: specular_map_${this.name},
                 ` : ''}
 
                 ${this.hasUniformColor() ? `
-                    color: [
-                        ${this.color.r/255}, 
-                        ${this.color.g/255}, 
-                        ${this.color.b/255}, 
-                        ${this.color.a/255}
-                    ],
+                    color: [${this.color.asArray(255)}],
                 ` : ''}
                 
             });

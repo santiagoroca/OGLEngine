@@ -32,12 +32,6 @@ module.exports = class Scene {
     }
 
     appendLight (light) {
-        light = Object.assign({
-            type: 'directional',
-            direction: [0.5, 0.5, 0.5],
-            color: { r: 0.5, g: 0.5, b: 0.5, a: 1.0 }
-        }, light);
-
         switch (light.type) {
             case 'directional': this.directional_lights.push(light); break;
             case 'ambient': this.ambient_lights.push(light); break;

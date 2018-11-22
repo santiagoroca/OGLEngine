@@ -128,7 +128,10 @@ case 11:
  this.$ = [ '3setClass', $$[$0] ]; 
 break;
 case 12:
- this.$ = [ '0setVariable', [ $$[$0-1].replace(/=/, '').trim(), $$[$0], _$[$0-2].first_line ] ]; console.log(_$[$0-2].first_line); 
+ this.$ = [
+                '0setVariable', 
+                [ $$[$0-1].replace(/=/, '').trim(), $$[$0], _$[$0-2].first_line ] 
+            ];
 break;
 case 13:
 

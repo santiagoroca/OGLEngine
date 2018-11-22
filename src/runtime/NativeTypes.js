@@ -1,10 +1,53 @@
-class Color { constuctor (r = 0, g = 0, b = 0, a = 1) { this.r = r; this.g = g; this.b = b; this.a = a; } }
-class Vec3 { constuctor (x = 0, y = 0, z = 0) { this.x = x; this.y = y; this.z = z; } }
+class Color { 
+    constructor (r = 255, g = 255, b = 255, a = 255) { 
+        this.r = r; this.g = g; this.b = b; this.a = a; 
+    }
+
+    toString () {
+        return `
+            ${(this.r).toFixed(1)}, 
+            ${(this.g).toFixed(1)}, 
+            ${(this.b).toFixed(1)}, 
+            ${(this.a).toFixed(1)}
+        `;
+    }
+
+    asArray (normalize = 1) {
+        return [
+            this.r/normalize,
+            this.g/normalize,
+            this.b/normalize,
+            this.a/normalize
+        ]
+    }
+}
+
+class Vec3 {
+    constructor (x = 0, y = 0, z = 0) {
+        this.x = x; this.y = y; this.z = z; 
+    }
+
+    toString () {
+        return `
+            ${(this.x).toFixed(1)},
+            ${(this.y).toFixed(1)},
+            ${(this.z).toFixed(1)}
+        `
+    }
+
+    asArray () {
+        return [
+            this.x,
+            this.y,
+            this.z
+        ]
+    }
+}
 
 function GenerateProperty (type, default_value, check) {
     return function (def) {
-        def = def || default_value();
-
+        def = typeof def == 'undefined' ? default_value() : def;
+        
         return {
             configurable: true,
             get: () => def,
@@ -43,7 +86,7 @@ module.exports = {
         return value.constructor.name !== 'Vec3'
     }),
 
-    self: (value) => ({
+    infer: (value) => ({
         configurable: true,
         get: () => value,
         set: (v) => value = v

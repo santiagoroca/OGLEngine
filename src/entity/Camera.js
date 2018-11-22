@@ -10,8 +10,8 @@ class Camera extends Entity {
             plural: 'cameras',
             singular: 'camera',
             defaults: context => ({
-                transform: NativeTypes.self(new Transform(context)),
-                events: NativeTypes.self([]),
+                transform: NativeTypes.infer(new Transform(context)),
+                events: NativeTypes.infer([]),
                 fov: NativeTypes.number(45),
                 far: NativeTypes.number(10),
                 near: NativeTypes.number(1),

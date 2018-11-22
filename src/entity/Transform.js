@@ -10,9 +10,9 @@ class Transform extends Entity {
             plural: 'transforms',
             singular: 'transform',
             defaults: context => ({
-                events: NativeTypes.self([]),
-                model: NativeTypes.self(new Model(context)),
-                world: NativeTypes.self(new World(context)),
+                events: NativeTypes.infer([]),
+                model: NativeTypes.infer(new Model(context)),
+                world: NativeTypes.infer(new World(context)),
             })
         });
     }

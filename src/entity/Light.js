@@ -16,10 +16,10 @@ class Light extends Entity {
                 color: NativeTypes.color(),
                 
                 // Directional Light
-                direction: NativeTypes.vec3(new Vec3(1.0, 1.0, 1.0)),
+                direction: NativeTypes.vec3(new NativeTypes.Vec3(1.0, 1.0, 1.0)),
 
                 // Point Light
-                position: NativeTypes.vec3(new Vec3(1.0, 1.0, 1.0)),
+                position: NativeTypes.vec3(new NativeTypes.Vec3(1.0, 1.0, 1.0)),
 
                 // Specular
                 attenuation: NativeTypes.number(1.0),

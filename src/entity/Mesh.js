@@ -8,10 +8,10 @@ class Mesh extends Entity {
             plural: 'meshes',
             singular: 'mesh',
             defaults: {
-                vertices: NativeTypes.self([]),
-                faces: NativeTypes.self([]),
-                normals: NativeTypes.self([]),
-                uvs: NativeTypes.self([]),
+                vertices: NativeTypes.infer([]),
+                faces: NativeTypes.infer([]),
+                normals: NativeTypes.infer([]),
+                uvs: NativeTypes.infer([]),
                 source: NativeTypes.string(),
                 texture: NativeTypes.string(),
             }

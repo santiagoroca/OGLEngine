@@ -10,7 +10,7 @@ class World extends Entity {
             plural: 'worlds',
             singular: 'world',
             defaults: {
-                events: NativeTypes.self([]),
+                events: NativeTypes.infer([]),
                 _translate: NativeTypes.vec3(),
                 _x_angle: NativeTypes.number(),
                 _y_angle: NativeTypes.number(),
@@ -44,7 +44,7 @@ class World extends Entity {
     getMatrix () {
         let transform = math.mat4.identity();
 
-        transform = math.mat4.translate(transform, this._translate);
+        transform = math.mat4.translate(transform, this._translate.asArray());
         transform = math.mat4.rotate(transform, this._y_angle, [transform[1], transform[5], transform[9]]);
         transform = math.mat4.rotate(transform, this._x_angle, [transform[0], transform[4], transform[8]]);
         transform = math.mat4.rotate(transform, this._z_angle, [transform[2], transform[6], transform[10]]);
@@ -64,7 +64,7 @@ class World extends Entity {
 
     get () {
         return {
-            translate: this._translate,
+            translate: this._translate.asArray(),
             x_angle: this._x_angle,
             y_angle: this._y_angle,
             z_angle: this._z_angle,
