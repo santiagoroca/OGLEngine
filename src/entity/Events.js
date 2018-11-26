@@ -81,7 +81,6 @@ module.exports = class Events extends Entity {
                     }
                 `).join('\n')}
                 
-                requestAnimationFrame(() => render());
                 requestAnimationFrame(() => EventLoop());
             };
 
@@ -125,7 +124,7 @@ module.exports = class Events extends Entity {
 
             setInterval(() => {
 
-                ${this.dynamics.map(object => `
+                ${this.dynamics.filter(({ transforms }) => transforms.length).map(object => `
 
                     if (${object.transforms.map(transform => `${transform.getName()}.isDirty`).join('||')}) {
 
@@ -176,6 +175,7 @@ module.exports = class Events extends Entity {
                                 );
 
                                 ${transform.getName()}.isDirty = false;
+                                isSceneDirty = true;
 
                         `).join('\n')}
                     

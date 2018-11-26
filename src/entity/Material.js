@@ -1,4 +1,5 @@
 const Entity = require('./Entity');
+const Color = require('../runtime/NativeTypes/Color')
 
 class Material extends Entity {
 
@@ -8,9 +9,17 @@ class Material extends Entity {
             plural: 'materials',
             singular: 'material',
             defaults: {
-                shininess: NativeTypes.number(1.0)
+                opacity: NativeTypes.number(255.0),
+                shininess: NativeTypes.number(1.0),
+                color: NativeTypes.color(),
             }
         });
+    }
+
+    getColor () {
+        return new Color(
+            this.color.r, this.color.g, this.color.b, this.opacity
+        );
     }
 
 }

@@ -35,7 +35,6 @@ class Geometry extends Entity {
                */
                normals: NativeTypes.infer([]),
                uvs: NativeTypes.infer([]),
-               color: NativeTypes.color(),
                texture: NativeTypes.string(undefined),
                specularmap: NativeTypes.string(undefined),
                
@@ -104,7 +103,7 @@ class Geometry extends Entity {
     }
 
     hasUniformColor () {
-        return !!this.color;
+        return !!this.material.color;
     }
 
     // Configure Texture as externla object 
@@ -326,7 +325,7 @@ class Geometry extends Entity {
                 ` : ''}
 
                 ${this.hasUniformColor() ? `
-                    color: [${this.color.asArray(255)}],
+                    color: [${this.material.getColor().asArray(255)}],
                 ` : ''}
 
             });
