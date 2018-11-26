@@ -10,7 +10,7 @@ class Camera extends Entity {
             plural: 'cameras',
             singular: 'camera',
             defaults: context => ({
-                transform: NativeTypes.infer(new Transform(context)),
+                transforms: NativeTypes.infer([]),
                 events: NativeTypes.infer([]),
                 fov: NativeTypes.number(45),
                 far: NativeTypes.number(10),
@@ -26,7 +26,9 @@ class Camera extends Entity {
             ...this.events.map(event => ({
                 ...event, hndl: event.hndl(object_id)
             })),
-            ...this.transform.getEvents(`${object_id}.transform`)
+            ...this.transforms.reduce(
+                (array, transform) => [ ...array, ...transform.getEvents()]
+            , [])
         ];
     }
 
@@ -41,17 +43,21 @@ class Camera extends Entity {
 
         return `
 
+            ${this.transforms.map(
+                transform => transform.toString()
+            ).join('\n')}
+
             const aspect = canvas.width / canvas.height;
             const b = ${a} * aspect;
             const h = b + b;
             const ${this.getName()} = {
+                matrix: [ 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 ],
                 projectionMatrix: [
                     1 * 2 / h, 0,            0,                    0,
                     0,         1 * 2 / ${i}, 0,                    0,
                     0,         0,            -11 / ${j},           -1,
                     0,         0,            -(10 * 1 * 2) / ${j}, 0
                 ],
-                transform: ${this.transform.toString()}
             };
 
             cameras.push(${this.getName()});

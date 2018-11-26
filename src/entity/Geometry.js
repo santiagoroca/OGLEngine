@@ -73,8 +73,8 @@ class Geometry extends Entity {
                * Helper internal classes and arrays,
                * used to build the AST.
                */
-               transform: NativeTypes.infer(new Transform(context)),
                material: NativeTypes.infer(new Material(context)),
+               transforms: NativeTypes.infer([]),
                events: NativeTypes.infer([]),
         
             })
@@ -128,7 +128,6 @@ class Geometry extends Entity {
     }
     
     getTransformedVertexs () {
-        this.transform.transformVertices(this.vertexs);
         return this.vertexs;
     }
 
@@ -187,7 +186,9 @@ class Geometry extends Entity {
             ...this.events.map(event => ({
                 ...event, hndl: event.hndl(object_id)
             })),
-            ...this.transform.getEvents(`${object_id}.transform`)
+            ...this.transforms.reduce(
+                (array, transform) => [ ...array, ...transform.getEvents()]
+            , [])
         ];
     }
 
@@ -301,11 +302,15 @@ class Geometry extends Entity {
                 specular_image_${this.name}.src = '${this.specularmap}';
             ` : ''}
 
+            ${this.transforms.map(
+                transform => transform.toString()
+            ).join('\n')}
+
             const geometry_${this.name} = Object.assign({
                 vertexs: v_buff_${this.name},
                 indexes: f_buff_${this.name},
                 normals: n_buff_${this.name},
-                transform: ${this.transform},
+                matrix: [ 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 ],
                 count: ${this.indexes.length},
 
                 ${this.includeUVs() ? `
@@ -323,7 +328,7 @@ class Geometry extends Entity {
                 ${this.hasUniformColor() ? `
                     color: [${this.color.asArray(255)}],
                 ` : ''}
-                
+
             });
 
         `;

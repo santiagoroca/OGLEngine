@@ -18,12 +18,12 @@ module.exports = class Events extends Entity {
         })
     }
 
-    addEvents (events, object_id) {
+    addEvents (events, object) {
         for (const event of events) {
             this.events[event.type].push(event);
         }
 
-        this.dynamics.push(object_id);
+        this.dynamics.push(object);
     }
 
     toString () {
@@ -125,100 +125,60 @@ module.exports = class Events extends Entity {
 
             setInterval(() => {
 
-                ${this.dynamics.map(object_id => `
+                ${this.dynamics.map(object => `
 
-                    if (${object_id}.transform.model.isDirty || ${object_id}.transform.world.isDirty) {
+                    if (${object.transforms.map(transform => `${transform.getName()}.isDirty`).join('||')}) {
 
-                        ${object_id}.transform.model.matrix = [
-                            1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1
-                        ];
-    
-                        ${object_id}.transform.model.matrix = mat4.rotate(
-                            ${object_id}.transform.model.matrix, ${object_id}.transform.model.y_angle, [
-                            ${object_id}.transform.model.matrix[1], 
-                            ${object_id}.transform.model.matrix[5], 
-                            ${object_id}.transform.model.matrix[9]
-                        ]);
-                        ${object_id}.transform.model.matrix = mat4.rotate(
-                            ${object_id}.transform.model.matrix, ${object_id}.transform.model.x_angle, [
-                            ${object_id}.transform.model.matrix[0], 
-                            ${object_id}.transform.model.matrix[4], 
-                            ${object_id}.transform.model.matrix[8]
-                        ]);
-                        ${object_id}.transform.model.matrix = mat4.rotate(
-                            ${object_id}.transform.model.matrix, ${object_id}.transform.model.z_angle, [
-                            ${object_id}.transform.model.matrix[2], 
-                            ${object_id}.transform.model.matrix[6],
-                            ${object_id}.transform.model.matrix[10]
-                        ]);
-
-                        let right = vec3.multiplyScalar(vec3.normalize([
-                            ${object_id}.transform.model.matrix[0], ${object_id}.transform.model.matrix[4], ${object_id}.transform.model.matrix[8]
-                        ]), ${object_id}.transform.model.translate[0]);
-                    
-                        let up = vec3.multiplyScalar(vec3.normalize([
-                            ${object_id}.transform.model.matrix[1], ${object_id}.transform.model.matrix[5], ${object_id}.transform.model.matrix[9]
-                        ]), ${object_id}.transform.model.translate[1]);
-                    
-                        let back = vec3.multiplyScalar(vec3.normalize([
-                            ${object_id}.transform.model.matrix[2], ${object_id}.transform.model.matrix[6], ${object_id}.transform.model.matrix[10]
-                        ]), ${object_id}.transform.model.translate[2]);
-
-                        ${object_id}.transform.model.matrix[12] += right[0] + up[0] + back[0];
-                        ${object_id}.transform.model.matrix[13] += right[1] + up[1] + back[1];
-                        ${object_id}.transform.model.matrix[14] += right[2] + up[2] + back[2];
-
-                        ${object_id}.transform.model.matrix = mat4.scale(
-                            ${object_id}.transform.model.matrix,
-                            [${object_id}.transform.model.scale, ${object_id}.transform.model.scale, ${object_id}.transform.model.scale]
-                        );
-
-                        ${object_id}.transform.world.matrix = [
+                        ${object.getName()}.matrix = [
                             1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1
                         ];
 
-                        ${object_id}.transform.world.matrix = mat4.rotate(
-                            ${object_id}.transform.world.matrix, ${object_id}.transform.world.y_angle, [
-                            ${object_id}.transform.world.matrix[1], 
-                            ${object_id}.transform.world.matrix[5], 
-                            ${object_id}.transform.world.matrix[9]
-                        ]);
-                        ${object_id}.transform.world.matrix = mat4.rotate(
-                            ${object_id}.transform.world.matrix, ${object_id}.transform.world.x_angle, [
-                            ${object_id}.transform.world.matrix[0], 
-                            ${object_id}.transform.world.matrix[4], 
-                            ${object_id}.transform.world.matrix[8]
-                        ]);
-                        ${object_id}.transform.world.matrix = mat4.rotate(
-                            ${object_id}.transform.world.matrix, ${object_id}.transform.world.z_angle, [
-                            ${object_id}.transform.world.matrix[2], 
-                            ${object_id}.transform.world.matrix[6],
-                            ${object_id}.transform.world.matrix[10]
-                        ]);
+                        ${object.transforms.map(transform => `
 
-                        right = vec3.multiplyScalar(vec3.normalize([
-                            ${object_id}.transform.world.matrix[0], ${object_id}.transform.world.matrix[4], ${object_id}.transform.world.matrix[8]
-                        ]), ${object_id}.transform.world.translate[0]);
+                                ${object.getName()}.matrix = mat4.rotate(
+                                    ${object.getName()}.matrix, ${transform.getName()}.y_angle, [
+                                    ${object.getName()}.matrix[1], 
+                                    ${object.getName()}.matrix[5], 
+                                    ${object.getName()}.matrix[9]
+                                ]);
+                                ${object.getName()}.matrix = mat4.rotate(
+                                    ${object.getName()}.matrix, ${transform.getName()}.x_angle, [
+                                    ${object.getName()}.matrix[0], 
+                                    ${object.getName()}.matrix[4], 
+                                    ${object.getName()}.matrix[8]
+                                ]);
+                                ${object.getName()}.matrix = mat4.rotate(
+                                    ${object.getName()}.matrix, ${transform.getName()}.z_angle, [
+                                    ${object.getName()}.matrix[2], 
+                                    ${object.getName()}.matrix[6],
+                                    ${object.getName()}.matrix[10]
+                                ]);
+
+                                right = vec3.multiplyScalar(vec3.normalize([
+                                    ${object.getName()}.matrix[0], ${object.getName()}.matrix[4], ${object.getName()}.matrix[8]
+                                ]), ${transform.getName()}.translate[0]);
+                            
+                                up = vec3.multiplyScalar(vec3.normalize([
+                                    ${object.getName()}.matrix[1], ${object.getName()}.matrix[5], ${object.getName()}.matrix[9]
+                                ]), ${transform.getName()}.translate[1]);
+                            
+                                back = vec3.multiplyScalar(vec3.normalize([
+                                    ${object.getName()}.matrix[2], ${object.getName()}.matrix[6], ${object.getName()}.matrix[10]
+                                ]), ${transform.getName()}.translate[2]);
+
+                                ${object.getName()}.matrix[12] += right[0] + up[0] + back[0];
+                                ${object.getName()}.matrix[13] += right[1] + up[1] + back[1];
+                                ${object.getName()}.matrix[14] += right[2] + up[2] + back[2];
+
+                                ${object.getName()}.matrix = mat4.scale(
+                                    ${object.getName()}.matrix,
+                                    [${transform.getName()}.scale, ${transform.getName()}.scale, ${transform.getName()}.scale]
+                                );
+
+                                ${transform.getName()}.isDirty = false;
+
+                        `).join('\n')}
                     
-                        up = vec3.multiplyScalar(vec3.normalize([
-                            ${object_id}.transform.world.matrix[1], ${object_id}.transform.world.matrix[5], ${object_id}.transform.world.matrix[9]
-                        ]), ${object_id}.transform.world.translate[1]);
-                    
-                        back = vec3.multiplyScalar(vec3.normalize([
-                            ${object_id}.transform.world.matrix[2], ${object_id}.transform.world.matrix[6], ${object_id}.transform.world.matrix[10]
-                        ]), ${object_id}.transform.world.translate[2]);
-
-                        ${object_id}.transform.world.matrix[12] += right[0] + up[0] + back[0];
-                        ${object_id}.transform.world.matrix[13] += right[1] + up[1] + back[1];
-                        ${object_id}.transform.world.matrix[14] += right[2] + up[2] + back[2];
-
-                        ${object_id}.transform.world.matrix = mat4.scale(
-                            ${object_id}.transform.world.matrix,
-                            [${object_id}.transform.world.scale, ${object_id}.transform.world.scale, ${object_id}.transform.world.scale]
-                        );
-
-                        ${object_id}.transform.model.isDirty = false;
-                        ${object_id}.transform.world.isDirty = false;
                     }
 
                 `).join('\n')}

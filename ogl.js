@@ -2,7 +2,6 @@ const ClassResolver = require(__dirname + '/src/runtime/ClassResolver');
 const NativeTypes = require(__dirname + '/src/runtime/NativeTypes')
 const Log = require(__dirname + '/src/runtime/Log')
 
-
 global['MORE_INFO_LEVEL'] = 5;
 global['INFO_LEVEL'] = 4;
 global['WARNING_LEVEL'] = 3;
@@ -19,9 +18,10 @@ const fse = require('fs-extra');
 const ast = require(__dirname + '/ast')
 
 // Clear Dist folder
-fse.emptyDirSync('./dist/');
 fse.ensureDirSync('./dist/textures')
 fse.ensureDirSync('./dist/models')
+fse.emptyDirSync('./dist/textures');
+fse.emptyDirSync('./dist/models');
 
 module.exports = (filename, loglevel = 2) => {
     global['LOG_LEVEL'] = loglevel;

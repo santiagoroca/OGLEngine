@@ -111,8 +111,7 @@ module.exports = class Events extends Entity {
             const PhongVertex_cubemap = \`
                 attribute lowp vec3 aVertexPosition;
                 uniform mat4 projection;
-                uniform mat4 cameraModel;
-                uniform mat4 cameraWorld;
+                uniform mat4 cameraMatrix;
                 varying vec3 vVertexPosition;
 
                 const mat4 transform = mat4(
@@ -123,7 +122,7 @@ module.exports = class Events extends Entity {
                 );
                 
                 void main(void) {
-                    gl_Position = projection * cameraWorld * cameraModel * transform * vec4(aVertexPosition, 1.0);
+                    gl_Position = projection * cameraMatrix * transform * vec4(aVertexPosition, 1.0);
                     vVertexPosition = aVertexPosition;
                 }
 
@@ -239,8 +238,7 @@ module.exports = class Events extends Entity {
 
         return `
             webgl.useProgram(PhongShaderProgram_cubemap);
-            webgl.uniformMatrix4fv(PhongShaderProgram_cubemap.cameraWorld, false, activeCamera.transform.world.matrix);
-            webgl.uniformMatrix4fv(PhongShaderProgram_cubemap.cameraModel, false, activeCamera.transform.model.matrix);
+            webgl.uniformMatrix4fv(PhongShaderProgram_cubemap.cameraMatrix, false, activeCamera.matrix);
             webgl.uniformMatrix4fv(PhongShaderProgram_cubemap.projection, false, activeCamera.projectionMatrix);
 
             webgl.bindBuffer(webgl.ARRAY_BUFFER, v_buff_cubemap);

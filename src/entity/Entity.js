@@ -78,7 +78,7 @@ module.exports = class Entity {
             return;
         }
 
-        throw(new Error('Class not found', `Class ${className} was not found.`));
+        throw(new Error(`Class ${className} was not found.`));
     }
 
     addClass ([ className, statements ]) {

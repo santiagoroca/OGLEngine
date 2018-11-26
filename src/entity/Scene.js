@@ -53,7 +53,8 @@ class Scene extends Entity {
 
         const events = new Events();
         const shaders = new Shaders({
-            shouldRenderCubeMap: this.cubemap.shouldRenderCubeMap() && this.cubemap.cubemap_reflection
+            shouldRenderCubeMap: this.cubemap.shouldRenderCubeMap() && 
+                                 this.cubemap.cubemap_reflection
         }, this.lights);
 
         if (this.cubemap) {
@@ -63,12 +64,12 @@ class Scene extends Entity {
         for (const geometry of this.geometries) {
             out += geometry.toString();
             shaders.addGeometry(geometry);
-            events.addEvents(geometry.getEvents(), geometry.getName());
+            events.addEvents(geometry.getEvents(), geometry);
         }
 
         for (const camera of this.cameras) {
             out += camera.toString();
-            events.addEvents(camera.getEvents(), camera.getName());
+            events.addEvents(camera.getEvents(), camera);
         }
         
         out += shaders.toString();

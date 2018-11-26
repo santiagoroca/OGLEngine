@@ -27,11 +27,8 @@ module.exports = class PhongShader {
                 ${this.config.hasNormals() ? 'attribute lowp vec3 aVertexNormal;': ''}
                 ${this.config.hasTexture() ? 'attribute lowp vec2 aVertexUV;': ''}
 
-                uniform mat4 model;
-                uniform mat4 world;
-
-                uniform mat4 cameraModel;
-                uniform mat4 cameraWorld;
+                uniform mat4 matrix;
+                uniform mat4 cameraMatrix;
 
                 uniform mat4 projection;
                 ${this.config.hasTexture() ? 'uniform sampler2D uSampler;': ''}
@@ -41,10 +38,10 @@ module.exports = class PhongShader {
                 ${fragment_varying_vertex_position ? 'varying vec3 vVertexPosition;': ''}
                 
                 void main(void) {
-                    vec4 worldModelSpaceVertex = cameraWorld * cameraModel * world * model * vec4(aVertexPosition, 1.0);
+                    vec4 worldModelSpaceVertex = cameraMatrix * matrix * vec4(aVertexPosition, 1.0);
                     gl_Position = projection * worldModelSpaceVertex;
                     ${fragment_varying_vertex_position ? 'vVertexPosition = worldModelSpaceVertex.xyz;': ''}
-                    ${this.config.hasNormals() ? 'vNormal = mat3(cameraWorld) * mat3(cameraModel) * mat3(world) * mat3(model) * aVertexNormal;': ''}
+                    ${this.config.hasNormals() ? 'vNormal = mat3(cameraMatrix) * mat3(matrix) * aVertexNormal;': ''}
                     ${this.config.hasTexture() ? 'vVertexUV = aVertexUV;': ''}
                 }
 
@@ -53,11 +50,8 @@ module.exports = class PhongShader {
             const PhongFragment_${hash} = \`
                 precision highp float;
 
-                uniform mat4 model;
-                uniform mat4 world;
-
-                uniform mat4 cameraModel;
-                uniform mat4 cameraWorld;
+                uniform mat4 matrix;
+                uniform mat4 cameraMatrix;
 
                 ${this.config.shouldRenderCubeMap() ? 'uniform samplerCube cubemap;': ''}
                 ${this.config.hasUniformColor() ? 'uniform vec4 geometryColor;': ''}
@@ -84,13 +78,13 @@ module.exports = class PhongShader {
 
                     ${fragment_varying_vertex_position ? `
                         vec3 normal = normalize(vNormal);
-                        vec3 cameraPosition = (cameraWorld * cameraModel)[3].xyz;
+                        vec3 cameraPosition = (cameraMatrix)[3].xyz;
                         vec3 eye = normalize(-vVertexPosition);
                     ` : ''}
                     
                     ${directional_l.map(({ name, shininess }) => `
 
-                        vec3 camera_space_${name} = vec3(mat3(cameraWorld) * mat3(cameraModel) * vec3(dir_${name}));
+                        vec3 camera_space_${name} = vec3(mat3(cameraMatrix) * vec3(dir_${name}));
                         float diffuse_${name} = max(0.0, dot(normal, camera_space_${name}));
                         
                         specular += pow(max(0.0, dot(
@@ -103,7 +97,7 @@ module.exports = class PhongShader {
 
                     ${point_l.map(({ name, shininess }, index) => `
 
-                        vec3 camera_space_${name} = vec3(cameraWorld * cameraModel * vec4(point_${name}, 1.0));
+                        vec3 camera_space_${name} = vec3(cameraMatrix * vec4(point_${name}, 1.0));
                         vec3 surfaceToLight_${name} = normalize(camera_space_${name} - vVertexPosition);
                         float diffuse_${name} = max(0.0, dot(normal, surfaceToLight_${name}));
                         
@@ -181,10 +175,8 @@ module.exports = class PhongShader {
                 webgl.uniform1i(PhongShaderProgram_${hash}.cubemap, 9);
             `: ''}
 
-            PhongShaderProgram_${hash}.world = webgl.getUniformLocation(PhongShaderProgram_${hash}, 'world');
-            PhongShaderProgram_${hash}.model = webgl.getUniformLocation(PhongShaderProgram_${hash}, 'model');
-            PhongShaderProgram_${hash}.cameraWorld = webgl.getUniformLocation(PhongShaderProgram_${hash}, 'cameraWorld');
-            PhongShaderProgram_${hash}.cameraModel = webgl.getUniformLocation(PhongShaderProgram_${hash}, 'cameraModel');
+            PhongShaderProgram_${hash}.matrix = webgl.getUniformLocation(PhongShaderProgram_${hash}, 'matrix');
+            PhongShaderProgram_${hash}.cameraMatrix = webgl.getUniformLocation(PhongShaderProgram_${hash}, 'cameraMatrix');
             PhongShaderProgram_${hash}.projection = webgl.getUniformLocation(PhongShaderProgram_${hash}, 'projection');
             
             ${this.config.hasUniformColor() ?`
@@ -199,15 +191,13 @@ module.exports = class PhongShader {
 
         return `
             webgl.useProgram(PhongShaderProgram_${hash});
-            webgl.uniformMatrix4fv(PhongShaderProgram_${hash}.cameraWorld, false, activeCamera.transform.world.matrix);
-            webgl.uniformMatrix4fv(PhongShaderProgram_${hash}.cameraModel, false, activeCamera.transform.model.matrix);
+            webgl.uniformMatrix4fv(PhongShaderProgram_${hash}.cameraMatrix, false, activeCamera.matrix);
             webgl.uniformMatrix4fv(PhongShaderProgram_${hash}.projection, false, activeCamera.projectionMatrix);
 
             ${
                 this.geometries.map(geometry => `
 
-                    webgl.uniformMatrix4fv(PhongShaderProgram_${hash}.world, false, ${geometry}.transform.world.matrix);
-                    webgl.uniformMatrix4fv(PhongShaderProgram_${hash}.model, false, ${geometry}.transform.model.matrix);
+                    webgl.uniformMatrix4fv(PhongShaderProgram_${hash}.matrix, false, ${geometry}.matrix);
 
                     webgl.bindBuffer(webgl.ARRAY_BUFFER, ${geometry}.vertexs);
                     webgl.vertexAttribPointer(PhongShaderProgram_${hash}.vertexPositionAttribute, 3, webgl.FLOAT, false, 0, 0);
