@@ -21,8 +21,6 @@ module.exports = class Scene {
         config.setUniformColor(geometry.hasUniformColor() ? 1 : 0);
         config.setTexture(geometry.hasTexture() ? 1 : 0);
         config.setNormals(geometry.hasNormals() ? 1 : 0);
-        config.setShininess(Math.min(parseInt(geometry.material.shininess), 255));
-        config.setReflectivity(Math.min(parseFloat(geometry.material.reflectivity), 255));
         config.setSpecularMap(geometry.hasSpecularMap() ? 1 : 0);
 
         if (!this.shaders[config.key]) {

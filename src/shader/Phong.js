@@ -53,8 +53,12 @@ module.exports = class PhongShader {
                 uniform mat4 matrix;
                 uniform mat4 cameraMatrix;
 
+                // Material Config
+                ${this.config.hasUniformColor() ? 'uniform vec4 color;': ''}
+                uniform float shinnines;
+                uniform float reflectivity;
+
                 ${this.config.shouldRenderCubeMap() ? 'uniform samplerCube cubemap;': ''}
-                ${this.config.hasUniformColor() ? 'uniform vec4 geometryColor;': ''}
                 ${this.config.hasTexture() ? 'uniform sampler2D uSampler;': ''}
                 ${this.config.hasSpecularMap() ? 'uniform sampler2D specularMapSampler;': ''}
 
@@ -89,7 +93,7 @@ module.exports = class PhongShader {
                         
                         specular += pow(max(0.0, dot(
                             eye, reflect(-camera_space_${light.name}, normal)
-                        )), ${this.config.getShininess().toFixed(1)}) * vec3(1.0);
+                        )), shinnines) * vec3(1.0);
 
                     `).join('\n')}
 
@@ -101,7 +105,7 @@ module.exports = class PhongShader {
                         
                         specular += pow(max(0.0, dot(
                             eye, reflect(-surfaceToLight_${light.name}, normal)
-                        )), ${this.config.getShininess().toFixed(1)}) * vec3(1.0);
+                        )), shinnines) * vec3(1.0);
 
                     `).join('\n')}
 
@@ -113,13 +117,13 @@ module.exports = class PhongShader {
                         ${
                             [
                                 this.config.shouldRenderCubeMap() ? 
-                                    `vec4(textureCube(cubemap, reflect(-eye, normal)).rgb, 0.0) * ${(this.config.getReflectivity() / 255).toFixed(2)}`
+                                    `vec4(textureCube(cubemap, reflect(-eye, normal)).rgb, 0.0) * reflectivity`
                                 : '',
-                                this.config.hasUniformColor() ? `geometryColor` : '',
+                                this.config.hasUniformColor() ? `color` : '',
                                 this.config.hasTexture() ? `texture2D(uSampler, vec2(vVertexUV.s, 1.0-vVertexUV.t))` : ''
                             ].filter(stm => stm != '').join(' + ')
                         }
-                    ) * (vec4(light, 1.0) + ambient_light) + vec4(specular, 1.0);
+                    ) * (vec4(light, 1.0) + ambient_light) + vec4(specular, 0.0);
 
                 }
             \`;
@@ -177,8 +181,10 @@ module.exports = class PhongShader {
             PhongShaderProgram_${hash}.cameraMatrix = webgl.getUniformLocation(PhongShaderProgram_${hash}, 'cameraMatrix');
             PhongShaderProgram_${hash}.projection = webgl.getUniformLocation(PhongShaderProgram_${hash}, 'projection');
             
+            PhongShaderProgram_${hash}.shinnines = webgl.getUniformLocation(PhongShaderProgram_${hash}, 'shinnines');
+            PhongShaderProgram_${hash}.reflectivity = webgl.getUniformLocation(PhongShaderProgram_${hash}, 'reflectivity');
             ${this.config.hasUniformColor() ?`
-                PhongShaderProgram_${hash}.geometryColor = webgl.getUniformLocation(PhongShaderProgram_${hash}, 'geometryColor');
+                PhongShaderProgram_${hash}.color = webgl.getUniformLocation(PhongShaderProgram_${hash}, 'color');
             `: ''}
             
         `;
@@ -200,8 +206,10 @@ module.exports = class PhongShader {
                     webgl.bindBuffer(webgl.ARRAY_BUFFER, ${geometry}.vertexs);
                     webgl.vertexAttribPointer(PhongShaderProgram_${hash}.vertexPositionAttribute, 3, webgl.FLOAT, false, 0, 0);
                     
+                    webgl.uniform1f(PhongShaderProgram_${hash}.shinnines, ${geometry}.material.shinnines);
+                    webgl.uniform1f(PhongShaderProgram_${hash}.reflectivity, ${geometry}.material.reflectivity);
                     ${this.config.hasUniformColor () ? `
-                        webgl.uniform4fv(PhongShaderProgram_${hash}.geometryColor, ${geometry}.color);
+                        webgl.uniform4fv(PhongShaderProgram_${hash}.color, ${geometry}.material.color);
                     `: ''}
                     
                     ${this.config.hasNormals () ? `

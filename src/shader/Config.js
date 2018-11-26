@@ -33,28 +33,12 @@ module.exports = class Config {
         return (this.key & 4) == 4;
     }
 
-    setShininess (value) {
-        this.key |= (value << 3) >>> 0;
-    }
-
-    getShininess () {
-        return (this.key >> 3) & 255;
-    }
-
     setSpecularMap (value) {
         this.key |= (value << 11);
     }
 
     hasSpecularMap () {
         return (this.key & 2048) == 2048;
-    }
-
-    setReflectivity (value) {
-        this.key |= (value << 12);
-    }
-
-    getReflectivity () {
-        return (this.key >> 12) & 255;
     }
 
 }

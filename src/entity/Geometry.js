@@ -310,6 +310,7 @@ class Geometry extends Entity {
                 indexes: f_buff_${this.name},
                 normals: n_buff_${this.name},
                 matrix: [ 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 ],
+                material: ${this.material.toString()},
                 count: ${this.indexes.length},
 
                 ${this.includeUVs() ? `
@@ -322,10 +323,6 @@ class Geometry extends Entity {
 
                 ${this.hasSpecularMap() ? `
                     specularmap: specular_map_${this.name},
-                ` : ''}
-
-                ${this.hasUniformColor() ? `
-                    color: [${this.material.getColor().asArray(255)}],
                 ` : ''}
 
             });

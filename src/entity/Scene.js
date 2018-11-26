@@ -32,24 +32,54 @@ class Scene extends Entity {
         });
     }
 
-    addCamera ([ statements ]) {
-        this.cameras.push(new Camera(this, statements));
-    }
-
-    addLight ([ statements ]) {
-        this.lights(new Light(this, statements));
-    }
-
-    addGeometry ([ statements ]) {
-        this.geometries.push(new Geometry(this, statements));
-    }
-
     getGeometries () {
         return this.geometries;
     }
 
     toString () {
-        let out = '';
+        let out = `
+            function viewer (container) {
+
+                /*
+                * Canvas Configuration
+                */
+                const canvas = document.createElement('canvas');
+                canvas.style.width = "100%";
+                canvas.style.height = "100%";
+                canvas.width = container.clientWidth;
+                canvas.height = container.clientHeight;
+                container.appendChild(canvas);
+                canvas.oncontextmenu = () => false;
+
+                /*
+                * WebGL Context Configuration
+                */
+                const webgl = canvas.getContext("webgl");
+                webgl.viewport(0, 0, container.clientWidth, container.clientHeight);
+                webgl.clearColor(0.0, 0.0, 0.0, 0.0);
+                webgl.getExtension('OES_element_index_uint');
+                webgl.getExtension('OES_standard_derivatives');
+                webgl.enable(webgl.DEPTH_TEST);
+                webgl.depthFunc(webgl.LEQUAL);
+                webgl.enable(webgl.BLEND);
+                webgl.blendEquation(webgl.FUNC_ADD);
+                webgl.blendFuncSeparate(webgl.SRC_ALPHA, webgl.ONE_MINUS_SRC_ALPHA, webgl.ONE, webgl.ONE_MINUS_SRC_ALPHA);
+                //webgl.enable (webgl.CULL_FACE);
+
+                /*
+                * There are multiple cameras but only one active
+                */
+                const cameras = [];
+                let activeCamera = null;
+
+                /*
+                *
+                */
+                function enableCamera (camera) {
+                    activeCamera = camera; 
+                }
+
+        `;
 
         const events = new Events();
         const shaders = new Shaders({
@@ -62,6 +92,7 @@ class Scene extends Entity {
         }   
 
         for (const geometry of this.geometries) {
+            console.log(geometry.material.opacity);
             out += geometry.toString();
             shaders.addGeometry(geometry);
             events.addEvents(geometry.getEvents(), geometry);
@@ -79,7 +110,7 @@ class Scene extends Entity {
         ]);
         out += events.toString();
         
-        return out;
+        return out + '}';
     }
 
 }

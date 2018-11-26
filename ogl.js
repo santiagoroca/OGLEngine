@@ -13,7 +13,6 @@ global['NativeTypes'] = NativeTypes;
 
 const write = require('fs').writeFileSync;
 const read = require('fs').readFileSync;
-const WRAPPER_TEMPLATE = read(__dirname + '/template/wrapper.js').toString();
 const fse = require('fs-extra');
 const ast = require(__dirname + '/ast')
 
@@ -31,7 +30,7 @@ module.exports = (filename, loglevel = 2) => {
     write('./dist/build.js', `
         ${read(__dirname + '/template/mat.js')}
         ${read(__dirname + '/template/transform.js')}
-        ${WRAPPER_TEMPLATE.replace(/'%scene%'/, scene)}
+        ${scene}
     `);
 }
 
