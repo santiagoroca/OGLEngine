@@ -31,7 +31,7 @@ module.exports = (renderBlocks) => {
             
             requestAnimationFrame(render);
         }
+
         requestAnimationFrame(render);
-        
     `;
 }

@@ -9,6 +9,7 @@ class Material extends Entity {
             plural: 'materials',
             singular: 'material',
             defaults: {
+                reflectivity: NativeTypes.number(255.0), 
                 opacity: NativeTypes.number(255.0),
                 shininess: NativeTypes.number(1.0),
                 color: NativeTypes.color(),

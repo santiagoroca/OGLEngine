@@ -73,8 +73,8 @@ module.exports = class PhongShader {
                 ${fragment_varying_vertex_position ? 'varying vec3 vVertexPosition;': ''}
 
                 void main() {
-                    float light = 0.0;
-                    vec4 specular = vec4(0.0);
+                    vec3 light = vec3(0.0);
+                    vec3 specular = vec3(0.0);
 
                     ${fragment_varying_vertex_position ? `
                         vec3 normal = normalize(vNormal);
@@ -82,30 +82,26 @@ module.exports = class PhongShader {
                         vec3 eye = normalize(-vVertexPosition);
                     ` : ''}
                     
-                    ${directional_l.map(({ name, shininess }) => `
+                    ${directional_l.map(light => `
 
-                        vec3 camera_space_${name} = vec3(mat3(cameraMatrix) * vec3(dir_${name}));
-                        float diffuse_${name} = max(0.0, dot(normal, camera_space_${name}));
+                        vec3 camera_space_${light.name} = mat3(cameraMatrix) * dir_${light.name};
+                        light += max(0.0, dot(normal, camera_space_${light.name})) * vec3(${light.color.toStringNoAlpha(255)});
                         
                         specular += pow(max(0.0, dot(
-                            eye, reflect(-camera_space_${name}, normal)
-                        )), ${this.config.getShininess().toFixed(1)}) * vec4(0.1);
-
-                        light += diffuse_${name};
+                            eye, reflect(-camera_space_${light.name}, normal)
+                        )), ${this.config.getShininess().toFixed(1)}) * vec3(1.0);
 
                     `).join('\n')}
 
-                    ${point_l.map(({ name, shininess }, index) => `
+                    ${point_l.map(light => `
 
-                        vec3 camera_space_${name} = vec3(cameraMatrix * vec4(point_${name}, 1.0));
-                        vec3 surfaceToLight_${name} = normalize(camera_space_${name} - vVertexPosition);
-                        float diffuse_${name} = max(0.0, dot(normal, surfaceToLight_${name}));
+                        vec3 camera_space_${light.name} = vec3(cameraMatrix * vec4(point_${light.name}, 1.0));
+                        vec3 surfaceToLight_${light.name} = normalize(camera_space_${light.name} - vVertexPosition);
+                        light += max(0.0, dot(normal, surfaceToLight_${light.name})) * vec3(${light.color.toStringNoAlpha(255)});
                         
                         specular += pow(max(0.0, dot(
-                            eye, reflect(-surfaceToLight_${name}, normal)
-                        )), ${this.config.getShininess().toFixed(1)}) * vec4(0.1);
-
-                        light += diffuse_${name};
+                            eye, reflect(-surfaceToLight_${light.name}, normal)
+                        )), ${this.config.getShininess().toFixed(1)}) * vec3(1.0);
 
                     `).join('\n')}
 
@@ -116,12 +112,14 @@ module.exports = class PhongShader {
                     gl_FragColor = (
                         ${
                             [
-                                this.config.shouldRenderCubeMap() ? 'vec4(textureCube(cubemap, reflect(-eye, normal)).rgb, 0.0)' : '',
+                                this.config.shouldRenderCubeMap() ? 
+                                    `vec4(textureCube(cubemap, reflect(-eye, normal)).rgb, 0.0) * ${(this.config.getReflectivity() / 255).toFixed(2)}`
+                                : '',
                                 this.config.hasUniformColor() ? `geometryColor` : '',
                                 this.config.hasTexture() ? `texture2D(uSampler, vec2(vVertexUV.s, 1.0-vVertexUV.t))` : ''
-                            ].filter(stm => stm != '').join('+')
+                            ].filter(stm => stm != '').join(' + ')
                         }
-                    ) * (vec4(light, light, light, 1.0) + ambient_light) + specular;
+                    ) * (vec4(light, 1.0) + ambient_light) + vec4(specular, 1.0);
 
                 }
             \`;

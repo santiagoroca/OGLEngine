@@ -49,4 +49,12 @@ module.exports = class Config {
         return (this.key & 2048) == 2048;
     }
 
+    setReflectivity (value) {
+        this.key |= (value << 12);
+    }
+
+    getReflectivity () {
+        return (this.key >> 12) & 255;
+    }
+
 }

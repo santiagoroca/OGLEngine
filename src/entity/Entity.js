@@ -27,7 +27,6 @@ module.exports = class Entity {
         const defaults = typeof config.defaults == 'function' ? 
                             config.defaults(this) : config.defaults;
 
-        
         for (const key in defaults) {
             Object.defineProperty(this, key, defaults[key])
         }

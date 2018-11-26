@@ -4,12 +4,20 @@ module.exports = class Color {
         this.r = r; this.g = g; this.b = b; this.a = a; 
     }
 
-    toString () {
+    toString (normalize = 1) {
         return `
-            ${(this.r).toFixed(1)}, 
-            ${(this.g).toFixed(1)}, 
-            ${(this.b).toFixed(1)}, 
-            ${(this.a).toFixed(1)}
+            ${(this.r/normalize).toFixed(1)},
+            ${(this.g/normalize).toFixed(1)},
+            ${(this.b/normalize).toFixed(1)},
+            ${(this.a/normalize).toFixed(1)}
+        `;
+    }
+
+    toStringNoAlpha (normalize = 1) {
+        return `
+            ${(this.r/normalize).toFixed(1)},
+            ${(this.g/normalize).toFixed(1)},
+            ${(this.b/normalize).toFixed(1)}
         `;
     }
 

@@ -22,6 +22,7 @@ module.exports = class Scene {
         config.setTexture(geometry.hasTexture() ? 1 : 0);
         config.setNormals(geometry.hasNormals() ? 1 : 0);
         config.setShininess(Math.min(parseInt(geometry.material.shininess), 255));
+        config.setReflectivity(Math.min(parseFloat(geometry.material.reflectivity), 255));
         config.setSpecularMap(geometry.hasSpecularMap() ? 1 : 0);
 
         if (!this.shaders[config.key]) {
@@ -55,18 +56,18 @@ module.exports = class Scene {
         }
 
         const directional_lights = this.directional_lights.map(light => {
-            const direction = light.direction;
+            const direction = light.direction.asArray();
             const length = Math.sqrt(
                 direction[0] * direction[0] + 
                 direction[1] * direction[1] + 
                 direction[2] * direction[2]
             );
 
-            return { ...light, direction: [
-                direction[0] / length,
-                direction[1] / length,
-                direction[2] / length
-            ]};
+            light.direction[0] /= length;
+            light.direction[1] /= length;
+            light.direction[2] /= length;
+
+            return light;
         });
 
         return Object.keys(this.shaders).map(shader => this.shaders[shader].generateInitializationBlock(
