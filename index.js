@@ -5,6 +5,7 @@ const ogl = require('./ogl')
  
 program
     .command('compile <filename>')
-    .action((filename, cmd) => ogl(filename))
+    .option('-l, --loglevel <n>', 'An integer argument', parseInt)
+    .action((filename, options) => ogl(filename, options.loglevel))
  
 program.parse(process.argv);

@@ -7,6 +7,7 @@ module.exports = class Events extends Entity {
 
     static getConfig () {
         return ({
+            hierarchy_order: 2,
             isUniqueInstance: true, 
             plural: 'cubemaps',
             singular: 'cubemap',

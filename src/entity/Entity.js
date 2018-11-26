@@ -14,6 +14,7 @@ module.exports = class Entity {
     constructor (parent, statements = []) {
         const config = this.constructor.getConfig();
         this.parent = parent;
+        Log.log(`Creating new ${config.singular}.`, INFO_LEVEL, this.getDepth());
 
         // Prepare Statements to be executed
         statements = statements.filter(statement => statement != null);
@@ -22,12 +23,15 @@ module.exports = class Entity {
         statements = statements.sort((a, b) => parseInt(a) - parseInt(b));
 
         // Initialize defaults
+        Log.disable();
         const defaults = typeof config.defaults == 'function' ? 
                             config.defaults(this) : config.defaults;
-                            
+
+        
         for (const key in defaults) {
             Object.defineProperty(this, key, defaults[key])
         }
+        Log.enable();
 
         for (let [ method, argument ] of statements) {
             method = method.trim();
@@ -50,6 +54,7 @@ module.exports = class Entity {
             this[name](argument);
         }
 
+        
         this.name = hash();
     }
 
@@ -69,6 +74,7 @@ module.exports = class Entity {
             }
 
             this[TargetClass.getConfig().singular] = new TargetClass(this, statements);
+            Log.log(`Setting ${TargetClass.getConfig().singular}.`, MORE_INFO_LEVEL, this.getDepth() + 1);
             return;
         }
 
@@ -112,7 +118,7 @@ module.exports = class Entity {
             }
 
             this[property] = value;
-            
+            Log.log(`Setting ${property} to ${value}.`, MORE_INFO_LEVEL, this.getDepth() + 1);
         } catch (Exception) {
             throw(`${property}: ${Exception} on line ${line}`)
         }
@@ -199,6 +205,14 @@ module.exports = class Entity {
 
     getEvents () {
         return this.events || [];
+    }
+
+    getDepth () {
+        try {
+            return 1 + this.parent.getDepth();
+        } catch (e) {
+            return 1;
+        }
     }
 
 }

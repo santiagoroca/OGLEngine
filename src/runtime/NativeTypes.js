@@ -9,7 +9,6 @@ function GenerateProperty (type, default_value, check) {
             configurable: true,
             get: () => def,
             set: (value) => {
-                console.log(value);
                 if(check(value)) {
                     throw(new Error(`Non ${type} assignation to ${type} variable.`))
                 }

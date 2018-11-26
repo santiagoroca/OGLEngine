@@ -1,6 +1,14 @@
 const ClassResolver = require(__dirname + '/src/runtime/ClassResolver');
 const NativeTypes = require(__dirname + '/src/runtime/NativeTypes')
+const Log = require(__dirname + '/src/runtime/Log')
 
+
+global['MORE_INFO_LEVEL'] = 5;
+global['INFO_LEVEL'] = 4;
+global['WARNING_LEVEL'] = 3;
+global['ERROR_LEVEL'] = 2;
+
+global['Log'] = Log;
 global['ClassResolver'] = ClassResolver;
 global['NativeTypes'] = NativeTypes;
 
@@ -15,7 +23,8 @@ fse.emptyDirSync('./dist/');
 fse.ensureDirSync('./dist/textures')
 fse.ensureDirSync('./dist/models')
 
-module.exports = (filename) => {
+module.exports = (filename, loglevel = 2) => {
+    global['LOG_LEVEL'] = loglevel;
     const scene = ast(filename).toString();
 
     // Output program
