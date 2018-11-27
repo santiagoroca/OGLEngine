@@ -41,7 +41,7 @@ module.exports = class PhongShader {
                     vec4 worldModelSpaceVertex = cameraMatrix * matrix * vec4(aVertexPosition, 1.0);
                     gl_Position = projection * worldModelSpaceVertex;
                     ${fragment_varying_vertex_position ? 'vVertexPosition = worldModelSpaceVertex.xyz;': ''}
-                    ${this.config.hasNormals() ? 'vNormal = mat3(cameraMatrix) * mat3(matrix) * aVertexNormal;': ''}
+                    ${this.config.hasNormals() ? 'vNormal = aVertexNormal;': ''}
                     ${this.config.hasTexture() ? 'vVertexUV = aVertexUV;': ''}
                 }
 
@@ -81,17 +81,17 @@ module.exports = class PhongShader {
                     vec3 specular = vec3(0.0);
 
                     ${fragment_varying_vertex_position ? `
-                        vec3 normal = normalize(vNormal);
+                        vec3 normal = normalize(mat3(cameraMatrix * matrix) * vNormal);
                         vec3 cameraPosition = (cameraMatrix)[3].xyz;
                         vec3 eye = normalize(-vVertexPosition);
                     ` : ''}
                     
                     ${directional_l.map(light => `
 
-                        vec3 camera_space_${light.name} = mat3(cameraMatrix) * dir_${light.name};
+                        vec3 camera_space_${light.name} = normalize(mat3(cameraMatrix) * dir_${light.name});
                         light += max(0.0, dot(normal, camera_space_${light.name})) * vec3(${light.color.toStringNoAlpha(255)});
                         
-                        specular += pow(max(0.0, dot(
+                        specular += ((255.0 - shinnines) / 255.0) * pow(max(0.0, dot(
                             eye, reflect(-camera_space_${light.name}, normal)
                         )), shinnines) * vec3(1.0);
 
@@ -123,7 +123,7 @@ module.exports = class PhongShader {
                                 this.config.hasTexture() ? `texture2D(uSampler, vec2(vVertexUV.s, 1.0-vVertexUV.t))` : ''
                             ].filter(stm => stm != '').join(' + ')
                         }
-                    ) * (vec4(light, 1.0) + ambient_light) + vec4(specular, 0.0);
+                    ) * vec4(light, 1.0) + vec4(specular, 1.0);
 
                 }
             \`;

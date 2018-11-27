@@ -61,9 +61,9 @@ class Scene extends Entity {
                 webgl.getExtension('OES_standard_derivatives');
                 webgl.enable(webgl.DEPTH_TEST);
                 webgl.depthFunc(webgl.LEQUAL);
-                webgl.enable(webgl.BLEND);
+                /*webgl.enable(webgl.BLEND);
                 webgl.blendEquation(webgl.FUNC_ADD);
-                webgl.blendFuncSeparate(webgl.SRC_ALPHA, webgl.ONE_MINUS_SRC_ALPHA, webgl.ONE, webgl.ONE_MINUS_SRC_ALPHA);
+                webgl.blendFuncSeparate(webgl.SRC_ALPHA, webgl.ONE_MINUS_SRC_ALPHA, webgl.ONE, webgl.ONE_MINUS_SRC_ALPHA);*/
                 //webgl.enable (webgl.CULL_FACE);
 
                 /*

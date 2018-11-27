@@ -26,7 +26,7 @@ class Material extends Entity {
     toString () {
         return JSON.stringify({
             reflectivity: this.reflectivity / 255,
-            shinnines: this.shininess,
+            shinnines: 255 - this.shininess,
             color: this.getColor().asArray(255)
         })
     }
