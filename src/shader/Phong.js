@@ -1,3 +1,4 @@
+
 const generate_unique_hash = require('../runtime/helper.js').hash;
 
 module.exports = class PhongShader {
@@ -29,13 +30,27 @@ module.exports = class PhongShader {
 
                 uniform mat4 matrix;
                 uniform mat4 cameraMatrix;
-
                 uniform mat4 projection;
                 ${this.config.hasTexture() ? 'uniform sampler2D uSampler;': ''}
                 
                 ${this.config.hasNormals() ? 'varying vec3 vNormal;': ''}
                 ${this.config.hasTexture() ? 'varying vec2 vVertexUV;': ''}
                 ${fragment_varying_vertex_position ? 'varying vec3 vVertexPosition;': ''}
+
+                ${directional_l.map(
+                    ({ name }) => `
+                        varying vec4 vVertexPositionShadow_${name};
+                        uniform mat4 lightmapMatrix_${name};
+                        uniform mat4 lightmapProjection_${name};
+                    `
+                ).join('\n')}
+
+                const mat4 biasMatrix = mat4 (
+                    vec4(0.5, 0.0, 0.0, 0.0),
+                    vec4(0.0, 0.5, 0.0, 0.0),
+                    vec4(0.0, 0.0, 0.5, 0.0),
+                    vec4(0.5, 0.5, 0.5, 1.0)
+                );
                 
                 void main(void) {
                     vec4 worldModelSpaceVertex = cameraMatrix * matrix * vec4(aVertexPosition, 1.0);
@@ -43,6 +58,10 @@ module.exports = class PhongShader {
                     ${fragment_varying_vertex_position ? 'vVertexPosition = worldModelSpaceVertex.xyz;': ''}
                     ${this.config.hasNormals() ? 'vNormal = aVertexNormal;': ''}
                     ${this.config.hasTexture() ? 'vVertexUV = aVertexUV;': ''}
+
+                    ${directional_l.map(
+                        ({ name }) => `vVertexPositionShadow_${name} = biasMatrix * lightmapProjection_${name} * lightmapMatrix_${name} * vec4(aVertexPosition, 1.0);`
+                    ).join('\n')}
                 }
 
             \`;
@@ -75,8 +94,18 @@ module.exports = class PhongShader {
                 ${this.config.hasNormals() ? 'varying vec3 vNormal;': ''}
                 ${this.config.hasTexture() ? 'varying vec2 vVertexUV;': ''}
                 ${fragment_varying_vertex_position ? 'varying vec3 vVertexPosition;': ''}
+                
+                ${directional_l.map(
+                    ({ name }) => `
+                        varying vec4 vVertexPositionShadow_${name};
+                        uniform sampler2D shadowMap_${name};
+                    `
+                ).join('\n')}
+
+                const float bias = 0.005;
 
                 void main() {
+                    
                     vec3 light = vec3(0.0);
                     vec3 specular = vec3(0.0);
 
@@ -87,13 +116,21 @@ module.exports = class PhongShader {
                     ` : ''}
                     
                     ${directional_l.map(light => `
-
-                        vec3 camera_space_${light.name} = normalize(mat3(cameraMatrix) * dir_${light.name});
-                        light += max(0.0, dot(normal, camera_space_${light.name})) * vec3(${light.color.toStringNoAlpha(255)});
                         
-                        specular += ((255.0 - shinnines) / 255.0) * pow(max(0.0, dot(
-                            eye, reflect(-camera_space_${light.name}, normal)
-                        )), shinnines) * vec3(1.0);
+                        vec3 camera_space_${light.name} = normalize(mat3(cameraMatrix) * dir_${light.name});
+                        vec3 light_${light.name} = max(0.0, dot(normal, camera_space_${light.name})) * vec3(${light.color.toStringNoAlpha(255)});
+
+                        float depth_${light.name} = texture2D(shadowMap_${light.name}, vec2(vVertexPositionShadow_${light.name}.x, vVertexPositionShadow_${light.name}.y)).r;
+                        if (depth_${light.name} < vVertexPositionShadow_${light.name}.z - bias) {
+                            light_${light.name} *= 0.85;
+                            specular *= 0.0;
+                        } else {
+                            specular += ((255.0 - shinnines) / 255.0) * pow(max(0.0, dot(
+                                eye, reflect(-camera_space_${light.name}, normal)
+                            )), shinnines) * vec3(1.0);
+                        }
+
+                        light += light_${light.name};
 
                     `).join('\n')}
 
@@ -112,7 +149,7 @@ module.exports = class PhongShader {
                     ${this.config.hasSpecularMap() ?
                         `specular *= texture2D(specularMapSampler, vec2(vVertexUV.s, 1.0-vVertexUV.t));` : ''
                     }
-             
+
                     gl_FragColor = (
                         ${
                             [
@@ -123,7 +160,7 @@ module.exports = class PhongShader {
                                 this.config.hasTexture() ? `texture2D(uSampler, vec2(vVertexUV.s, 1.0-vVertexUV.t))` : ''
                             ].filter(stm => stm != '').join(' + ')
                         }
-                    ) * vec4(light, 1.0) + vec4(specular, 1.0);
+                    ) * (vec4(light, 1.0) + ambient_light) + vec4(specular, 1.0);
 
                 }
             \`;
@@ -177,6 +214,29 @@ module.exports = class PhongShader {
                 webgl.uniform1i(PhongShaderProgram_${hash}.cubemap, 9);
             `: ''}
 
+            ${directional_l.map((light, index) => `
+
+                webgl.uniform1i(
+                    webgl.getUniformLocation(PhongShaderProgram_${hash}, 'shadowMap_${light.name}'),
+                    20 + ${index}
+                );
+                
+                webgl.uniformMatrix4fv(
+                    webgl.getUniformLocation(PhongShaderProgram_${hash}, 'lightmapMatrix_${light.name}'), 
+                    false, mat4.lookAt([
+                        ${light.direction.x * 10},
+                        ${light.direction.y * 10},
+                        ${light.direction.z * 10},
+                    ], [0, 0, 0], [0, 1, 0], mat4.create())
+                );
+
+                webgl.uniformMatrix4fv(
+                    webgl.getUniformLocation(PhongShaderProgram_${hash}, 'lightmapProjection_${light.name}'),
+                    false, mat4.ortho(-15, 15, -15, 15, 1, 100, [])
+                );
+
+            `).join('\n')}
+
             PhongShaderProgram_${hash}.matrix = webgl.getUniformLocation(PhongShaderProgram_${hash}, 'matrix');
             PhongShaderProgram_${hash}.cameraMatrix = webgl.getUniformLocation(PhongShaderProgram_${hash}, 'cameraMatrix');
             PhongShaderProgram_${hash}.projection = webgl.getUniformLocation(PhongShaderProgram_${hash}, 'projection');
@@ -186,7 +246,7 @@ module.exports = class PhongShader {
             ${this.config.hasUniformColor() ?`
                 PhongShaderProgram_${hash}.color = webgl.getUniformLocation(PhongShaderProgram_${hash}, 'color');
             `: ''}
-            
+
         `;
     }
 

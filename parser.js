@@ -154,7 +154,7 @@ case 17:
 break;
 case 18:
  
-                this.$ = yy.Vec3 (
+                this.$ = new yy.Vec3 (
                     parseFloat($$[$0-5]), 
                     parseFloat($$[$0-3]),
                     parseFloat($$[$0-1])
@@ -162,7 +162,7 @@ case 18:
             
 break;
 case 19:
- this.$ = yy.Vec3 ( $$[$0-5], $$[$0-3], $$[$0-1] ); 
+ this.$ = new yy.Vec3 ( $$[$0-5], $$[$0-3], $$[$0-1] ); 
 break;
 case 20:
  this.$ = parseFloat(0.0174533); 

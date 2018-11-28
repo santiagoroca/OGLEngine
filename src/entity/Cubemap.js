@@ -170,8 +170,7 @@ module.exports = class Events extends Entity {
             PhongShaderProgram_cubemap.cubemap = webgl.getUniformLocation(PhongShaderProgram_cubemap, 'cubemap');
             webgl.uniform1i(PhongShaderProgram_cubemap.cubemap, 9);
 
-            PhongShaderProgram_cubemap.cameraWorld = webgl.getUniformLocation(PhongShaderProgram_cubemap, 'cameraWorld');
-            PhongShaderProgram_cubemap.cameraModel = webgl.getUniformLocation(PhongShaderProgram_cubemap, 'cameraModel');
+            PhongShaderProgram_cubemap.cameraMatrix = webgl.getUniformLocation(PhongShaderProgram_cubemap, 'cameraMatrix');
             PhongShaderProgram_cubemap.projection = webgl.getUniformLocation(PhongShaderProgram_cubemap, 'projection');
 
             const v_buff_cubemap = webgl.createBuffer();

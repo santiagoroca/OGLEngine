@@ -131,13 +131,13 @@ module.exports = {
         vec3:
         [
             [ " VEC3 OPAR NUMBER COLON NUMBER COLON NUMBER CPAR ", ` 
-                $$ = yy.Vec3 (
+                $$ = new yy.Vec3 (
                     parseFloat($3), 
                     parseFloat($5),
                     parseFloat($7)
                 );
             `],
-            [ " VEC3 OPAR STRING COLON STRING COLON STRING CPAR ", " $$ = yy.Vec3 ( $3, $5, $7 ); " ]
+            [ " VEC3 OPAR STRING COLON STRING COLON STRING CPAR ", " $$ = new yy.Vec3 ( $3, $5, $7 ); " ]
         ],
 
         unit:

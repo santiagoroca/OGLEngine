@@ -1,9 +1,7 @@
 const Entity = require('./Entity');
-const Camera = require('./Camera');
-const Geometry = require('./Geometry');
-const Light = require('./Light');
 const Cubemap = require('./Cubemap.js');
 const Shaders = require('../shader/Shaders.js');
+const Lightmap = require('../shadow/Lightmap')
 const Render = require('./Render.js');
 const Events = require('./Events');
 
@@ -59,6 +57,7 @@ class Scene extends Entity {
                 webgl.clearColor(0.0, 0.0, 0.0, 0.0);
                 webgl.getExtension('OES_element_index_uint');
                 webgl.getExtension('OES_standard_derivatives');
+                webgl.getExtension('WEBGL_depth_texture');
                 webgl.enable(webgl.DEPTH_TEST);
                 webgl.depthFunc(webgl.LEQUAL);
                 /*webgl.enable(webgl.BLEND);
@@ -82,6 +81,7 @@ class Scene extends Entity {
         `;
 
         const events = new Events();
+        const lightmap = new Lightmap(this.lights);
         const shaders = new Shaders({
             shouldRenderCubeMap: this.cubemap.shouldRenderCubeMap() && 
                                  this.cubemap.cubemap_reflection
@@ -94,6 +94,8 @@ class Scene extends Entity {
         for (const geometry of this.geometries) {
             console.log(geometry.material.opacity);
             out += geometry.toString();
+
+            lightmap.addGeometry(geometry);
             shaders.addGeometry(geometry);
             events.addEvents(geometry.getEvents(), geometry);
         }
@@ -102,7 +104,8 @@ class Scene extends Entity {
             out += camera.toString();
             events.addEvents(camera.getEvents(), camera);
         }
-        
+
+        out += lightmap.toString();
         out += shaders.toString();
         out += Render([
             this.cubemap.generateRenderBlock(),
