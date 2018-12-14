@@ -6,10 +6,25 @@ module.exports = {
         args = Object.assign({ x: 0, y: 0, z: 0 }, args);
         
         return `
-            ${object_id}.translate[0] += ${args.x};
-            ${object_id}.translate[1] += ${args.y};
-            ${object_id}.translate[2] += ${args.z};
-            ${object_id}.isDirty = true;
+            {
+                const right = vec3.multiplyScalar(vec3.normalize([
+                    ${object_id}.matrix[0], ${object_id}.matrix[4], ${object_id}.matrix[8]
+                ]), ${args.x});
+            
+                const up = vec3.multiplyScalar(vec3.normalize([
+                    ${object_id}.matrix[1], ${object_id}.matrix[5], ${object_id}.matrix[9]
+                ]), ${args.y});
+            
+                const back = vec3.multiplyScalar(vec3.normalize([
+                    ${object_id}.matrix[2], ${object_id}.matrix[6], ${object_id}.matrix[10]
+                ]), ${args.z});
+
+                ${object_id}.translate = vec3.add(${object_id}.translate, right);
+                ${object_id}.translate = vec3.add(${object_id}.translate, up);
+                ${object_id}.translate = vec3.add(${object_id}.translate, back);
+                ${object_id}.isDirty = true;
+            }
+            
         `;
     },
 

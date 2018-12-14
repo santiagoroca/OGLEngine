@@ -134,48 +134,39 @@ module.exports = class Events extends Entity {
 
                         ${object.transforms.map(transform => `
 
-                                ${object.getName()}.matrix = mat4.rotate(
-                                    ${object.getName()}.matrix, ${transform.getName()}.y_angle, [
-                                    ${object.getName()}.matrix[1], 
-                                    ${object.getName()}.matrix[5], 
-                                    ${object.getName()}.matrix[9]
-                                ]);
-                                ${object.getName()}.matrix = mat4.rotate(
-                                    ${object.getName()}.matrix, ${transform.getName()}.x_angle, [
-                                    ${object.getName()}.matrix[0], 
-                                    ${object.getName()}.matrix[4], 
-                                    ${object.getName()}.matrix[8]
-                                ]);
-                                ${object.getName()}.matrix = mat4.rotate(
-                                    ${object.getName()}.matrix, ${transform.getName()}.z_angle, [
-                                    ${object.getName()}.matrix[2], 
-                                    ${object.getName()}.matrix[6],
-                                    ${object.getName()}.matrix[10]
-                                ]);
+                                {
+                                    let matrix = mat4.identity([]);
 
-                                right = vec3.multiplyScalar(vec3.normalize([
-                                    ${object.getName()}.matrix[0], ${object.getName()}.matrix[4], ${object.getName()}.matrix[8]
-                                ]), ${transform.getName()}.translate[0]);
-                            
-                                up = vec3.multiplyScalar(vec3.normalize([
-                                    ${object.getName()}.matrix[1], ${object.getName()}.matrix[5], ${object.getName()}.matrix[9]
-                                ]), ${transform.getName()}.translate[1]);
-                            
-                                back = vec3.multiplyScalar(vec3.normalize([
-                                    ${object.getName()}.matrix[2], ${object.getName()}.matrix[6], ${object.getName()}.matrix[10]
-                                ]), ${transform.getName()}.translate[2]);
+                                    matrix = mat4.rotate(
+                                        matrix, ${transform.getName()}.y_angle, [
+                                        matrix[1], 
+                                        matrix[5], 
+                                        matrix[9]
+                                    ]);
+    
+                                    matrix = mat4.rotate(
+                                        matrix, ${transform.getName()}.x_angle, [
+                                        matrix[0], 
+                                        matrix[4], 
+                                        matrix[8]
+                                    ]);
+                                    
+                                    matrix = mat4.rotate(
+                                        matrix, ${transform.getName()}.z_angle, [
+                                        matrix[2], 
+                                        matrix[6],
+                                        matrix[10]
+                                    ]);
+    
+                                    matrix[12] += ${transform.getName()}.translate[0];
+                                    matrix[13] += ${transform.getName()}.translate[1];
+                                    matrix[14] += ${transform.getName()}.translate[2];
 
-                                ${object.getName()}.matrix[12] += right[0] + up[0] + back[0];
-                                ${object.getName()}.matrix[13] += right[1] + up[1] + back[1];
-                                ${object.getName()}.matrix[14] += right[2] + up[2] + back[2];
-
-                                ${object.getName()}.matrix = mat4.scale(
-                                    ${object.getName()}.matrix,
-                                    [${transform.getName()}.scale, ${transform.getName()}.scale, ${transform.getName()}.scale]
-                                );
-
-                                ${transform.getName()}.isDirty = false;
-                                isSceneDirty = true;
+                                    ${object.getName()}.matrix = mat4.multiply(${object.getName()}.matrix, matrix);
+                                    ${transform.getName()}.matrix = ${object.getName()}.matrix.slice();
+                                    ${transform.getName()}.isDirty = false;
+                                    isSceneDirty = true;
+                                }
 
                         `).join('\n')}
                     
