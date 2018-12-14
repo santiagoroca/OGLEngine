@@ -1,9 +1,10 @@
 const Entity = require('./Entity');
 const Cubemap = require('./Cubemap.js');
 const Shaders = require('../shader/Shaders.js');
-const Lightmap = require('../shadow/Lightmap')
-const Render = require('./Render.js');
-const Events = require('./Events');
+const Lightmap = require('../structure/Lightmap')
+const Cameras = require('../structure/Cameras')
+const Render = require('../structure/Render.js');
+const Events = require('../structure/Events');
 
 /*
 * @title Scene
@@ -65,23 +66,11 @@ class Scene extends Entity {
                 webgl.blendFuncSeparate(webgl.SRC_ALPHA, webgl.ONE_MINUS_SRC_ALPHA, webgl.ONE, webgl.ONE_MINUS_SRC_ALPHA);*/
                 //webgl.enable (webgl.CULL_FACE);
 
-                /*
-                * There are multiple cameras but only one active
-                */
-                const cameras = [];
-                let activeCamera = null;
-
-                /*
-                *
-                */
-                function enableCamera (camera) {
-                    activeCamera = camera; 
-                }
-
         `;
 
         const events = new Events();
         const lightmap = new Lightmap(this.lights);
+        const cameras = new Cameras(this.cameras);
         const shaders = new Shaders({
             shouldRenderCubeMap: this.cubemap.shouldRenderCubeMap() && 
                                  this.cubemap.cubemap_reflection
@@ -92,7 +81,6 @@ class Scene extends Entity {
         }   
 
         for (const geometry of this.geometries) {
-            console.log(geometry.material.opacity);
             out += geometry.toString();
 
             lightmap.addGeometry(geometry);
@@ -101,17 +89,15 @@ class Scene extends Entity {
         }
 
         for (const camera of this.cameras) {
-            out += camera.toString();
             events.addEvents(camera.getEvents(), camera);
         }
 
+        out += cameras.toString();
         out += lightmap.toString();
         out += shaders.toString();
-        out += Render([
-            this.cubemap.generateRenderBlock(),
-            shaders.generateRenderBlock()
-        ]);
+        out += Render([ this.cubemap.generateRenderBlock(), shaders.generateRenderBlock() ]);
         out += events.toString();
+        
         
         return out + '}';
     }

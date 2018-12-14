@@ -47,9 +47,9 @@ class Camera extends Entity {
                 transform => transform.toString()
             ).join('\n')}
 
-            const aspect = canvas.width / canvas.height;
-            const b = ${a} * aspect;
-            const h = b + b;
+            aspect = canvas.width / canvas.height;
+            b = ${a} * aspect;
+            h = b + b;
             const ${this.getName()} = {
                 matrix: [ 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 ],
                 projectionMatrix: [
@@ -60,7 +60,6 @@ class Camera extends Entity {
                 ],
             };
 
-            cameras.push(${this.getName()});
             enableCamera(${this.getName()});
             
         `;

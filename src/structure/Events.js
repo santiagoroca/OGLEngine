@@ -1,4 +1,4 @@
-const Entity = require('./Entity');
+const Entity = require('../entity/Entity');
 
 module.exports = class Events extends Entity {
 

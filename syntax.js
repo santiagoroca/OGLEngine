@@ -23,7 +23,6 @@ module.exports = {
             ["ogl\.[a-zA-Z0-9]+", "return 'CONSTANT';"],
             ["[a-zA-Z_]+=", "return 'VARNAME';"],
             ["[a-zA-Z]+ ?(?=->)", "return 'FUNC_NAME';"],
-            ["[a-zA-Z]+ ?(?=(\{|extends))", "return 'CLASS_NAME';"],
 
             /* natives */
             ["0x[0-9A-Fa-f]{8}", "return 'HEXA8';"],
@@ -34,6 +33,8 @@ module.exports = {
             ["vec3", "return 'VEC3';"],
             ["deg", "return 'DEG';"],
             ["rad", "return 'RAD';"],
+            ["\\.[a-zA-Z0-9_]+", "return 'SCOPE_VARIABLE';"],
+            ["[a-zA-Z0-9]+", "return 'KEYWORD';"],
 
             /* Tokens */
             ["\\{", "return 'OBRACE';"],
@@ -47,7 +48,6 @@ module.exports = {
             [",", "return 'COLON';"],
             ["->", "return 'ARROW';"],
             ["[\\*\\+\\-\\^\\%\\/]", "return 'OPERATOR';"],
-            ["\\.[a-zA-Z0-9_]+", "return 'SCOPE_VARIABLE';"],
             ["'", "return 'QUOTE';"],
 
             /* Delimiters */
@@ -120,12 +120,13 @@ module.exports = {
 
         class_name:
         [
-            [ " CLASS_NAME ", " $$ = $1.trim(); " ],
+            [ " KEYWORD ", " $$ = $1; " ],
         ],
 
         class:
         [
-            [" class_name OBRACE statements CBRACE ", ` $$ = [ $1, $3 ]; `],
+            [" KEYWORD OBRACE statements CBRACE ", ` $$ = [ $1, $3 ]; `],
+            [" KEYWORD ", ` $$ = [ $1, [] ]; `],
         ],
 
         vec3:
